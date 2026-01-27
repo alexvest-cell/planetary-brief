@@ -12,7 +12,7 @@ const getAiClient = () => {
 export const generateEcoAnalysis = async (userPrompt: string): Promise<string> => {
   const ai = getAiClient();
   if (!ai) {
-    return "The GreenShift Analysis Engine is currently offline (Missing API Key).";
+    return "Planetary Brief Analysis Engine is currently offline (Missing API Key).";
   }
 
   try {
@@ -20,7 +20,7 @@ export const generateEcoAnalysis = async (userPrompt: string): Promise<string> =
       model: 'gemini-3-pro-preview',
       contents: userPrompt,
       config: {
-        systemInstruction: `You are GreenShift AI, an intelligent environmental assistant powered by Google's Gemini 3 Pro model.
+        systemInstruction: `You are the Planetary Brief AI, an intelligent environmental assistant powered by Google's Gemini 3 Pro model.
         
         Your Goal: To answer *any* user question regarding the environment, climate change, sustainability, nature, or green technology with high accuracy and nuance.
 
@@ -30,7 +30,7 @@ export const generateEcoAnalysis = async (userPrompt: string): Promise<string> =
         3.  **Format**: Keep responses concise (under 200 words) unless asked for a deep dive. Use markdown (bullet points, bold text) for readability.
         4.  **Verification**: Rely on consensus science (IPCC, NOAA, etc.). If a topic is debated, present the prevailing scientific view.
         
-        If the user asks who you are, identify as the GreenShift AI Assistant.`,
+        If the user asks who you are, identify as the Planetary Brief AI Assistant.`,
       }
     });
 

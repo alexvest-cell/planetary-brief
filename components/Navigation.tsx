@@ -135,8 +135,8 @@ const Navigation: React.FC<NavigationProps> = ({
                 onClick={() => { onCategorySelect('All'); }}
               >
                 <span className="font-serif text-2xl font-bold tracking-tighter uppercase transition-opacity hover:opacity-90">
-                  <span className="text-news-accent">Green</span>
-                  <span className="text-white">Shift</span>
+                  <span className="text-news-accent">Planetary</span>
+                  <span className="text-white">Brief</span>
                 </span>
               </div>
             </div>

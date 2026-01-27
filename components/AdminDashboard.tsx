@@ -306,13 +306,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         ctx.font = "bold 50px 'Playfair Display', serif";
 
         ctx.fillStyle = "#10b981"; // news-accent green
-        ctx.fillText("GREEN", 60, 90);
+        ctx.fillText("PLANETARY", 60, 90);
 
-        const metrics = ctx.measureText("GREEN");
+        const metrics = ctx.measureText("PLANETARY");
         const greenWidth = metrics.width;
 
         ctx.fillStyle = "#ffffff"; // White
-        ctx.fillText("SHIFT", 60 + greenWidth, 90);
+        ctx.fillText("BRIEF", 60 + greenWidth, 90);
         ctx.restore();
 
         // 4. Content Block (Calculated from Bottom)
@@ -409,7 +409,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         // Trigger Download
         const dataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        link.download = `greenshift-social-${Date.now()}.png`;
+        link.download = `planetary-brief-social-${Date.now()}.png`;
         link.href = dataUrl;
         link.click();
     };

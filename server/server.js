@@ -82,7 +82,7 @@ async function seedDatabase() {
 const streamUpload = (buffer) => {
   return new Promise((resolve, reject) => {
     let stream = cloudinary.uploader.upload_stream(
-      { folder: "greenshift_uploads" },
+      { folder: "planetary_brief_uploads" },
       (error, result) => {
         if (result) {
           resolve(result);
@@ -267,7 +267,7 @@ app.post('/api/generate', async (req, res) => {
       const targetLength = minMinutes && maxMinutes ? `${minMinutes}-${maxMinutes}` : '5-7';
       const wordCount = Math.floor(((parseInt(minMinutes) || 5) + (parseInt(maxMinutes) || 7)) / 2 * 200);
 
-      systemPrompt = `You are an expert environmental journalist writing for GreenShift, a premium environmental intelligence platform.
+      systemPrompt = `You are an expert environmental journalist writing for Planetary Brief, a premium environmental intelligence platform.
       
       Based on the user's prompt, generate a comprehensive, factual environmental news article.
 
@@ -434,7 +434,7 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
     </head>
     <body style="background-color: #18181b; margin: 0; padding: 0;">
       <div class="container">
-        <div class="header"><h1><span class="accent">Green</span>Shift</h1></div>
+        <div class="header"><h1><span class="accent">Planetary</span>Brief</h1></div>
         <div class="content">
           ${isWelcome ? '<p style="text-align:center">Welcome to the inner circle.</p>' : '<p style="text-align:center">Your weekly briefing.</p>'}
           ${articleRows.map(row => `
@@ -464,9 +464,9 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
   });
 
   const info = await transporter.sendMail({
-    from: '"GreenShift Intelligence" <briefing@greenshift.ai>',
+    from: '"Planetary Brief Intelligence" <briefing@planetarybrief.com>',
     to: email,
-    subject: isWelcome ? "Welcome to GreenShift" : "Your Weekly Intelligence Brief",
+    subject: isWelcome ? "Welcome to Planetary Brief" : "Your Weekly Intelligence Brief",
     html: emailHtml,
   });
 

@@ -1,6 +1,6 @@
-# GreenShift Deployment Guide
+# Planetary Brief Deployment Guide
 
-This guide explains how to deploy your GreenShift application to the web for free using **Render** (for the app) and **MongoDB Atlas** (for the database).
+This guide explains how to deploy your Planetary Brief application to the web for free using **Render** (for the app) and **MongoDB Atlas** (for the database).
 
 ## Prerequisites (Completed ✅)
 - [x] **MongoDB Atlas** set up (Database)
@@ -22,11 +22,11 @@ git push origin main
 1. Go to [Render.com](https://render.com) and log in.
 2. Click **"New +"** -> **"Web Service"**.
 3. Select **"Build and deploy from a Git repository"**.
-4. Connect your GitHub account and select your `greenshift` repository.
+4. Connect your GitHub account and select your `planetary-brief` repository.
 
 ## Step 3: Configure Service Details
 Fill in the following settings:
-- **Name:** `greenshift-app` (or similar)
+- **Name:** `planetary-brief-app` (or similar)
 - **Region:** Closest to you (e.g., Frankfurt, Oregon)
 - **Branch:** `main`
 - **Root Directory:** `.` (Leave blank)

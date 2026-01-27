@@ -83,34 +83,35 @@ const ArticleDataVisual = ({ article }: { article: Article }) => {
 
 // Combined Footer Component
 const ArticleFooter = ({ onShowMethodology }: { onShowMethodology: () => void }) => (
-  <div className="bg-white/5 border border-white/10 rounded-xl p-6 md:p-8 my-8 flex flex-col md:flex-row gap-8 items-start md:items-center">
-    {/* Author / Source Block */}
-    <div className="flex items-center gap-4 flex-shrink-0">
-      <div className="w-12 h-12 rounded-full bg-news-accent/10 flex items-center justify-center font-serif font-bold text-news-accent text-lg ring-1 ring-news-accent/20">
-        GS
+  <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8 my-10 flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
+    {/* Brand Block */}
+    <div className="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
+      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-500/10 flex items-center justify-center font-serif font-bold text-emerald-500 text-base md:text-lg ring-1 ring-emerald-500/20 flex-shrink-0">
+        PB
       </div>
       <div className="flex flex-col">
-        <span className="font-bold text-white text-sm uppercase tracking-wide">GreenShift Originals</span>
+        <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
         <button
           onClick={onShowMethodology}
-          className="text-[10px] uppercase tracking-wider text-news-accent hover:text-white transition-colors flex items-center gap-1 mt-1 group"
+          className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
         >
           Verified Intelligence <Info size={12} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
     </div>
 
-    {/* Vertical Divider (Desktop) */}
-    <div className="hidden md:block w-px h-12 bg-white/10"></div>
+    {/* Divider */}
+    <div className="hidden md:block w-px h-10 bg-white/10"></div>
 
-    {/* Disclaimer Text */}
-    <div className="text-xs text-gray-500 leading-relaxed flex-grow">
-      <div className="flex items-center gap-2 mb-1 text-gray-400 font-bold uppercase tracking-wider text-[10px]">
-        <ShieldCheck size={12} /> Editorial Integrity
+    {/* Integrity Text */}
+    <div className="flex flex-col gap-1.5 flex-grow">
+      <div className="flex items-center gap-2 text-gray-400 font-bold uppercase tracking-wider text-[9px] md:text-[10px]">
+        <ShieldCheck size={12} className="text-emerald-500" />
+        <span>Editorial Integrity</span>
       </div>
-      <p>
+      <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
         Synthesized from verified data sources including IPCC, NOAA, and legislative filings.
-        Our mission is to translate complex scientific data into actionable intelligence.
+        <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
       </p>
     </div>
   </div>

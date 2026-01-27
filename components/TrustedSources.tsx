@@ -80,7 +80,7 @@ const TrustedSources: React.FC<TrustedSourcesProps> = ({ onBack }) => {
         <div className="max-w-4xl mx-auto mb-16">
           <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">Trusted Sources</h1>
           <p className="text-xl text-gray-400 font-light leading-relaxed">
-            GreenShift prioritizes accuracy above all else. Our algorithm and editorial team exclusively aggregate data from these verified, high-integrity institutions and publications.
+            Planetary Brief prioritizes accuracy above all else. Our algorithm and editorial team exclusively aggregate data from these verified, high-integrity institutions and publications.
           </p>
         </div>
 

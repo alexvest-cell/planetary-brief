@@ -22,7 +22,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
 
     // SEO Optimization
     React.useEffect(() => {
-        document.title = `${category} | GreenShift Intelligence`;
+        document.title = `${category} | Planetary Brief Intelligence`;
 
         let metaDesc = document.querySelector('meta[name="description"]');
         if (!metaDesc) {
