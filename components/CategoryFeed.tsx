@@ -201,7 +201,11 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                         <div className={`p-4 flex flex-col flex-grow ${index === 0 ? 'absolute bottom-0 left-0 w-full z-10' : ''}`}>
                                             <div className="flex items-center gap-2 mb-2">
                                                 <span className={`font-bold uppercase tracking-widest text-news-accent ${index === 0 ? 'text-xs' : 'text-[9px]'}`}>
-                                                    {Array.isArray(article.category) ? article.category.join(', ') : article.category}
+                                                    {(() => {
+                                                        const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+                                                        const categories = Array.isArray(article.category) ? article.category : [article.category];
+                                                        return categories.map(displayCategory).join(', ');
+                                                    })()}
                                                 </span>
                                             </div>
 

@@ -11,6 +11,10 @@ import mongoose from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
 import streamifier from 'streamifier';
 import seedArticles from './seed_data.js';
+import dns from 'dns';
+
+// Fix DNS resolution issues on Windows
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 // Models
 import Article from './models/Article.js';
@@ -38,14 +42,21 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Database Connection
 if (MONGODB_URI) {
-  mongoose.connect(MONGODB_URI)
+  mongoose.connect(MONGODB_URI, {
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 30000,
+    family: 4, // Force IPv4
+  })
     .then(async () => {
-      console.log('Connected to MongoDB');
+      console.log('✓ Connected to MongoDB');
       await seedDatabase();
     })
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch(err => {
+      console.error('MongoDB connection error:', err.message);
+      console.log('⚠️  Server will use local file storage as fallback');
+    });
 } else {
-  console.warn('⚠️ MONGODB_URI is not set. Database features will fail. Please add it to .env.local');
+  console.warn('⚠️ MONGODB_URI is not set. Using local file storage.');
 }
 
 // Cloudinary Config
@@ -82,7 +93,12 @@ async function seedDatabase() {
 const streamUpload = (buffer) => {
   return new Promise((resolve, reject) => {
     let stream = cloudinary.uploader.upload_stream(
-      { folder: "planetary_brief_uploads" },
+      {
+        folder: "planetary_brief_uploads",
+        quality: "auto:best",
+        fetch_format: "auto",
+        invalidate: true
+      },
       (error, result) => {
         if (result) {
           resolve(result);
@@ -98,14 +114,106 @@ const streamUpload = (buffer) => {
 // Multer (Memory Storage)
 const upload = multer({ storage: multer.memoryStorage() });
 
+// --- LOCAL FILE STORAGE FALLBACK ---
+// When MongoDB is not connected, store articles in a local JSON file
+const LOCAL_STORAGE_PATH = path.join(__dirname, 'local_articles.json');
+
+function readLocalArticles() {
+  try {
+    if (fs.existsSync(LOCAL_STORAGE_PATH)) {
+      const data = fs.readFileSync(LOCAL_STORAGE_PATH, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    console.error('Error reading local storage:', err);
+  }
+  return [];
+}
+
+function writeLocalArticles(articles) {
+  try {
+    fs.writeFileSync(LOCAL_STORAGE_PATH, JSON.stringify(articles, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.error('Error writing local storage:', err);
+    return false;
+  }
+}
+
+// --- AUTHENTICATION ---
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123'; // Set in .env.local
+const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || 'your-secret-key-change-this'; // Set in .env.local
+
+// Simple token generation (in production, use JWT)
+function generateToken() {
+  return Buffer.from(`${Date.now()}-${Math.random()}`).toString('base64');
+}
+
+// Store valid tokens (in-memory, resets on server restart)
+const validTokens = new Set();
+
+// Middleware to verify admin token
+function requireAuth(req, res, next) {
+  const token = req.headers['authorization']?.replace('Bearer ', '');
+
+  if (!token || !validTokens.has(token)) {
+    return res.status(401).json({ error: 'Unauthorized - Invalid or missing token' });
+  }
+
+  next();
+}
+
+// Login endpoint
+app.post('/api/auth/login', (req, res) => {
+  const { password } = req.body;
+
+  if (password === ADMIN_PASSWORD) {
+    const token = generateToken();
+    validTokens.add(token);
+
+    // Token expires in 24 hours
+    setTimeout(() => validTokens.delete(token), 24 * 60 * 60 * 1000);
+
+    res.json({ token, message: 'Login successful' });
+  } else {
+    res.status(401).json({ error: 'Invalid password' });
+  }
+});
+
+// Logout endpoint
+app.post('/api/auth/logout', (req, res) => {
+  const token = req.headers['authorization']?.replace('Bearer ', '');
+  if (token) {
+    validTokens.delete(token);
+  }
+  res.json({ message: 'Logged out successfully' });
+});
+
+// Verify token endpoint (check if still logged in)
+app.get('/api/auth/verify', (req, res) => {
+  const token = req.headers['authorization']?.replace('Bearer ', '');
+
+  if (token && validTokens.has(token)) {
+    res.json({ valid: true });
+  } else {
+    res.status(401).json({ valid: false });
+  }
+});
+
 // --- ROUTES ---
 
-// GET Articles
+// GET Articles (public - no auth required)
 app.get('/api/articles', async (req, res) => {
   try {
-    // If no DB, try to return seed data or empty (fallback for local without creds)
+    // If no DB, return local file storage or seed data
     if (mongoose.connection.readyState !== 1) {
-      console.log('Returning static seed data (No DB connection)');
+      console.log('No DB connection - checking local storage');
+      const localArticles = readLocalArticles();
+      if (localArticles.length > 0) {
+        console.log(`Returning ${localArticles.length} articles from local storage`);
+        return res.json(localArticles);
+      }
+      console.log('Returning seed data (no local storage yet)');
       return res.json(seedArticles);
     }
     const articles = await Article.find().sort({ createdAt: -1 });
@@ -116,48 +224,201 @@ app.get('/api/articles', async (req, res) => {
   }
 });
 
-// POST Article
-app.post('/api/articles', async (req, res) => {
+// GET Articles Backup/Export (protected - requires auth)
+app.get('/api/articles/export', requireAuth, async (req, res) => {
+  try {
+    let articles;
+
+    // If no DB, get from local storage or seed data
+    if (mongoose.connection.readyState !== 1) {
+      const localArticles = readLocalArticles();
+      articles = localArticles.length > 0 ? localArticles : seedArticles;
+    } else {
+      articles = await Article.find().sort({ createdAt: -1 });
+    }
+
+    // Set headers for file download
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="greenshift-backup-${timestamp}.json"`);
+
+    res.json({
+      exportDate: new Date().toISOString(),
+      totalArticles: articles.length,
+      articles: articles
+    });
+  } catch (error) {
+    console.error('Export error:', error);
+    res.status(500).json({ error: 'Failed to export articles' });
+  }
+});
+
+// GET Image URLs Backup/Export (protected - requires auth)
+app.get('/api/articles/export-images', requireAuth, async (req, res) => {
+  try {
+    let articles;
+
+    // If no DB, get from local storage or seed data
+    if (mongoose.connection.readyState !== 1) {
+      const localArticles = readLocalArticles();
+      articles = localArticles.length > 0 ? localArticles : seedArticles;
+    } else {
+      articles = await Article.find().sort({ createdAt: -1 });
+    }
+
+    // Collect all unique image URLs
+    const imageData = [];
+    const uniqueUrls = new Set();
+
+    articles.forEach(article => {
+      const images = [];
+
+      // Main image
+      if (article.imageUrl && !uniqueUrls.has(article.imageUrl)) {
+        images.push({ type: 'main', url: article.imageUrl });
+        uniqueUrls.add(article.imageUrl);
+      }
+
+      // Original image
+      if (article.originalImageUrl && !uniqueUrls.has(article.originalImageUrl)) {
+        images.push({ type: 'original', url: article.originalImageUrl });
+        uniqueUrls.add(article.originalImageUrl);
+      }
+
+      // Secondary image
+      if (article.secondaryImageUrl && !uniqueUrls.has(article.secondaryImageUrl)) {
+        images.push({ type: 'secondary', url: article.secondaryImageUrl });
+        uniqueUrls.add(article.secondaryImageUrl);
+      }
+
+      // Diagram
+      if (article.diagramUrl && !uniqueUrls.has(article.diagramUrl)) {
+        images.push({ type: 'diagram', url: article.diagramUrl });
+        uniqueUrls.add(article.diagramUrl);
+      }
+
+      if (images.length > 0) {
+        imageData.push({
+          articleId: article.id,
+          articleTitle: article.title,
+          images: images
+        });
+      }
+    });
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="greenshift-images-backup-${timestamp}.json"`);
+
+    res.json({
+      exportDate: new Date().toISOString(),
+      totalArticles: articles.length,
+      totalUniqueImages: uniqueUrls.size,
+      imageData: imageData
+    });
+  } catch (error) {
+    console.error('Image export error:', error);
+    res.status(500).json({ error: 'Failed to export image URLs' });
+  }
+});
+
+// POST Article (protected - requires auth)
+app.post('/api/articles', requireAuth, async (req, res) => {
   try {
     const newArticle = req.body;
 
-    // Ensure ID
+    // Ensure ID and timestamps
     if (!newArticle.id) {
       newArticle.id = 'gen-' + Date.now();
     }
+    if (!newArticle.createdAt) {
+      newArticle.createdAt = new Date().toISOString();
+    }
+    newArticle.updatedAt = new Date().toISOString();
 
     // Normalize content to array if string
     if (typeof newArticle.content === 'string') {
       newArticle.content = [newArticle.content];
     }
 
+    // If no DB, use local storage
+    if (mongoose.connection.readyState !== 1) {
+      console.log('No DB - saving to local storage');
+      const articles = readLocalArticles();
+      articles.push(newArticle);
+      if (writeLocalArticles(articles)) {
+        return res.status(201).json(newArticle);
+      } else {
+        return res.status(500).json({ error: 'Failed to write to local storage' });
+      }
+    }
+
     const created = await Article.create(newArticle);
     res.status(201).json(created);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to create article. DB Connected?' });
+    res.status(500).json({ error: 'Failed to create article. Error: ' + error.message });
   }
 });
 
-// PUT Article
-app.put('/api/articles/:id', async (req, res) => {
+// PUT Article (protected - requires auth)
+app.put('/api/articles/:id', requireAuth, async (req, res) => {
   try {
-    const updated = await Article.findOneAndUpdate({ id: req.params.id }, req.body, { new: true });
+    const articleId = req.params.id;
+    const updates = req.body;
+    updates.updatedAt = new Date().toISOString();
+
+    // If no DB, use local storage
+    if (mongoose.connection.readyState !== 1) {
+      console.log('No DB - updating in local storage');
+      const articles = readLocalArticles();
+      const index = articles.findIndex(a => a.id === articleId);
+      if (index === -1) {
+        return res.status(404).json({ error: 'Article not found in local storage' });
+      }
+      articles[index] = { ...articles[index], ...updates };
+      if (writeLocalArticles(articles)) {
+        return res.json(articles[index]);
+      } else {
+        return res.status(500).json({ error: 'Failed to write to local storage' });
+      }
+    }
+
+    const updated = await Article.findOneAndUpdate({ id: articleId }, updates, { new: true });
     if (!updated) return res.status(404).json({ error: 'Article not found' });
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update article' });
+    console.error(error);
+    res.status(500).json({ error: 'Failed to update article. Error: ' + error.message });
   }
 });
 
-// DELETE Article
-app.delete('/api/articles/:id', async (req, res) => {
+// DELETE Article (protected - requires auth)
+app.delete('/api/articles/:id', requireAuth, async (req, res) => {
   try {
-    const deleted = await Article.findOneAndDelete({ id: req.params.id });
+    const articleId = req.params.id;
+
+    // If no DB, use local storage
+    if (mongoose.connection.readyState !== 1) {
+      console.log('No DB - deleting from local storage');
+      const articles = readLocalArticles();
+      const filtered = articles.filter(a => a.id !== articleId);
+      if (filtered.length === articles.length) {
+        return res.status(404).json({ error: 'Article not found' });
+      }
+      if (writeLocalArticles(filtered)) {
+        return res.json({ success: true });
+      } else {
+        return res.status(500).json({ error: 'Failed to write to local storage' });
+      }
+    }
+
+    const deleted = await Article.findOneAndDelete({ id: articleId });
     if (!deleted) return res.status(404).json({ error: 'Article not found' });
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete article' });
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete article. Error: ' + error.message });
   }
 });
 
@@ -248,6 +509,18 @@ app.post('/api/generate', async (req, res) => {
       systemPrompt = `You are an expert editor. ${context}Write a single, punchy, click-worthy but factual headline for an environmental news article based on this topic. Do not use quotes.`;
     } else if (type === 'body') {
       systemPrompt = `You are an expert environmental journalist. ${context}Write a concise, engaging article body (4-5 paragraphs) based on this prompt. Use markdown formatting. Focus on facts and impact.`;
+    } else if (type === 'image_prompt') {
+      systemPrompt = `You are an expert photo editor for a top-tier news agency (like Reuters or National Geographic). 
+      Based on the article title and content provided, write a highly detailed image generation prompt suitable for Midjourney v6 or DALL-E 3.
+      
+      STYLE GUIDE:
+      - ULTRA-REALISTIC PHOTOGRAPHY, 8k resolution, raw photo style, shot on Sony A7R IV or similar
+      - Journalistic, documentary style, "on the ground" perspective (eye level)
+      - True to life colors and lighting (natural light, realistic depth of field)
+      - AVOID: abstract art, illustrations, diagrams, maps, "overviews", collage, or conceptual 3D renders.
+      - The image must look exactly like a real photograph taken by a professional photojournalist.
+      
+      Output ONLY the raw prompt text (no "Here is a prompt:", just the prompt itself).`;
     } else if (type === 'social') {
       systemPrompt = `You are a social media expert for a premium environmental news platform.
       Based on the article content provided, generate optimized social media posts.

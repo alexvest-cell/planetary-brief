@@ -5,6 +5,7 @@ export interface Article {
   topic: string;
   source: string;
   imageUrl: string;
+  imageAttribution?: string;
   originalImageUrl?: string;
   secondaryImageUrl?: string;
   diagramUrl?: string;

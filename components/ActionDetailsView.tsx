@@ -185,19 +185,22 @@ const organizationList = [
 ];
 
 const ActionDetailsView: React.FC<ActionDetailsViewProps> = ({ onBack, onSearch, articles, onArticleClick }) => {
-  const actArticles = (articles || []).filter(a => Array.isArray(a.category) ? a.category.includes('Act') : a.category === 'Act').slice(0, 6);
+  const actArticles = (articles || []).filter(a => {
+    const categories = Array.isArray(a.category) ? a.category : [a.category];
+    return categories.includes('Act') || categories.includes('Action') || categories.includes('Guides');
+  }).slice(0, 6);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="bg-zinc-950 min-h-screen animate-fade-in text-white pt-32 pb-24">
+    <div className="bg-zinc-950 min-h-screen animate-fade-in text-white pb-24">
       {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-5"
         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(16, 185, 129, 0.15) 1px, transparent 0)', backgroundSize: '40px 40px' }}>
       </div>
 
-      <div className="container mx-auto px-6 md:px-12 relative z-10">
+      <div className="container mx-auto px-6 md:px-12 pt-36 md:pt-28 relative z-10">
 
         {/* Navigation */}
         {/* Act Articles Section */}

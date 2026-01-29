@@ -1,7 +1,7 @@
 import React from 'react';
 import { Section, Article } from '../types';
-import { newsArticles, upcomingEvents } from '../data/content';
-import { ChevronRight, Filter, Calendar } from 'lucide-react';
+
+import { ChevronRight, Filter, Sparkles } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 
@@ -32,26 +32,22 @@ const Portfolio: React.FC<PortfolioProps> = ({
         })
         .filter(article => {
             // Exclude 'Act' category from Discover feed unless specifically searching
-            const isAct = Array.isArray(article.category) ? article.category.includes('Act') : article.category === 'Act';
-            if (isAct && !searchQuery) return false;
-
             return !searchQuery ||
                 article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-        }).slice(0, 11); // Show top 11 items for the grid to fill rows nicely
+        }).slice(0, 100); // Increased limit to show more articles
 
     return (
         <section id={Section.NEWS} className="pt-0 pb-12 md:pt-4 md:pb-20 bg-black">
             <div className="container mx-auto px-4 md:px-8">
 
-                <div className="flex items-center justify-between mb-8 md:mb-10 border-b border-white/10 pb-6">
-                    <h2 className="text-2xl md:text-3xl font-serif font-bold text-white">
-                        Discover
-                    </h2>
-                    {searchQuery && (
+                {searchQuery ? (
+                    <div className="flex items-center justify-between mb-8 md:mb-10 border-b border-white/10 pb-6">
                         <span className="text-xs text-gray-400">Results for "{searchQuery}"</span>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <div className="mb-8 border-b border-white/10"></div>
+                )}
 
                 {displayedArticles.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -135,7 +131,11 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             <div className={`p-4 flex flex-col flex-grow ${index === 0 ? 'absolute bottom-0 left-0 w-full z-10' : ''}`}>
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <span className={`font-bold uppercase tracking-widest text-news-accent ${index === 0 ? 'text-xs' : 'text-[9px]'}`}>
-                                                        {Array.isArray(article.category) ? article.category.join(', ') : article.category}
+                                                        {(() => {
+                                                            const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+                                                            const categories = Array.isArray(article.category) ? article.category : [article.category];
+                                                            return categories.map(displayCategory).join(', ');
+                                                        })()}
                                                     </span>
                                                 </div>
 
@@ -184,54 +184,109 @@ const Portfolio: React.FC<PortfolioProps> = ({
                     </div>
                 )}
 
-                {/* Upcoming Political Events Section - Only show if not searching */}
-                {!searchQuery && (
-                    <div className="mt-20 pt-10 border-t border-white/10">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2 bg-news-accent/10 rounded-full text-news-accent">
-                                <Calendar size={20} />
+                {/* Latest Guides Section */}
+                {!searchQuery && (() => {
+                    const guideArticles = (articles || []).filter(a => {
+                        const categories = Array.isArray(a.category) ? a.category : [a.category];
+                        return categories.includes('Guides') || categories.includes('Action') || categories.includes('Act');
+                    }).slice(0, 4);
+
+                    if (guideArticles.length === 0) return null;
+
+                    return (
+                        <div className="mt-8">
+                            <div className="mb-8">
+                                <h2 className="text-xl md:text-2xl font-serif font-bold text-white">Latest Guides</h2>
                             </div>
-                            <div>
-                                <h2 className="text-xl md:text-2xl font-serif font-bold text-white">Upcoming Global Decisions</h2>
-                                <p className="text-gray-400 text-xs md:text-sm mt-1">Critical political events shaping the environmental agenda.</p>
+
+                            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {guideArticles.map((article, index) => (
+                                    <div
+                                        key={article.id}
+                                        onClick={() => onArticleClick(article)}
+                                        className="group cursor-pointer bg-zinc-900/30 border border-white/5 hover:bg-zinc-900 hover:border-news-accent/30 transition-all duration-300 rounded-lg overflow-hidden flex flex-col h-full"
+                                    >
+                                        <div className="aspect-[3/2] overflow-hidden relative">
+                                            <img
+                                                src={article.imageUrl}
+                                                alt={article.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                                            />
+                                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
+                                                Guides
+                                            </div>
+                                        </div>
+                                        <div className="p-4 flex flex-col flex-grow">
+                                            <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
+                                                {article.title}
+                                            </h3>
+                                            <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
+                                                {article.excerpt}
+                                            </p>
+                                            <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
+                                                <span>{article.date}</span>
+                                                <span>•</span>
+                                                <span>{article.originalReadTime}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
+                    );
+                })()}
 
-                        {/* Updated Grid: grid-cols-2 on mobile (default) to fit 2 in a row */}
-                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                            {upcomingEvents.map((event) => (
+                {/* Featured Articles Section - Only show if not searching */}
+                {!searchQuery && (
+                    <div className="mt-8">
+                        <div className="mb-8">
+                            <h2 className="text-xl md:text-2xl font-serif font-bold text-white">Featured Stories</h2>
+                        </div>
+
+                        {/* Featured Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {articles.filter(a => a.isFeaturedDiscover).slice(0, 4).map((article) => (
                                 <div
-                                    key={event.id}
-                                    onClick={() => onArticleClick(event)}
-                                    className="group cursor-pointer bg-zinc-900/30 border border-white/5 hover:bg-zinc-900 hover:border-news-accent/30 transition-all duration-300 rounded-lg overflow-hidden flex flex-col"
+                                    key={`feat-${article.id}`}
+                                    onClick={() => onArticleClick(article)}
+                                    className="group cursor-pointer bg-zinc-900/30 border border-white/5 hover:bg-zinc-900 hover:border-news-accent/30 transition-all duration-300 rounded-lg overflow-hidden flex flex-col h-full"
                                 >
                                     <div className="aspect-[3/2] overflow-hidden relative">
                                         <img
-                                            src={event.imageUrl}
-                                            alt={event.title}
+                                            src={article.imageUrl}
+                                            alt={article.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                                         />
                                         <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
-                                            {event.date}
+                                            {(() => {
+                                                const cat = Array.isArray(article.category) ? article.category[0] : article.category;
+                                                return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+                                            })()}
                                         </div>
                                     </div>
-                                    <div className="p-3 md:p-5 flex flex-col flex-grow">
-                                        <div className="text-[9px] font-bold uppercase tracking-widest text-news-accent mb-2 truncate">{event.topic}</div>
-                                        <h3 className="text-xs md:text-base font-serif font-bold text-white leading-tight mb-2 md:mb-3 group-hover:text-news-accent transition-colors line-clamp-3 md:line-clamp-none">
-                                            {event.title}
+                                    <div className="p-4 flex flex-col flex-grow">
+                                        <div className="text-[9px] font-bold uppercase tracking-widest text-news-accent mb-2 truncate">{article.topic}</div>
+                                        <h3 className="text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-news-accent transition-colors line-clamp-3">
+                                            {article.title}
                                         </h3>
-                                        <p className="text-[10px] md:text-xs text-gray-400 line-clamp-2 md:line-clamp-3 mb-3 md:mb-4 leading-relaxed">
-                                            {event.excerpt}
+                                        <p className="text-xs text-gray-400 line-clamp-2 md:line-clamp-3 mb-4 leading-relaxed">
+                                            {article.excerpt}
                                         </p>
                                         <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-[9px] text-gray-500 uppercase font-bold">
-                                            <span className="truncate mr-1">{event.source}</span>
-                                            <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform text-gray-400 group-hover:text-white flex-shrink-0">
-                                                <span className="hidden md:inline">Briefing</span> <ChevronRight size={10} />
+                                            <span className="truncate mr-1">{article.source}</span>
+                                            <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform text-white">
+                                                Read <ChevronRight size={10} />
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             ))}
+                            {/* Fallback if no featured articles */}
+                            {articles.filter(a => a.isFeaturedDiscover).length === 0 && (
+                                <div className="col-span-full py-12 text-center text-gray-500 text-sm border border-dashed border-white/5 rounded-lg">
+                                    No featured stories selected yet. Use the CMS to feature articles.
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

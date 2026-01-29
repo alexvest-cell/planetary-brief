@@ -8,11 +8,11 @@ import About from './components/About';
 import Action from './components/Action';
 import Contact from './components/Contact';
 import ArticleView from './components/ArticleView';
-import TrustedSources from './components/TrustedSources';
+
 import EarthDashboard from './components/EarthDashboard';
 import DataExplanationView from './components/DataExplanationView';
 import ActionDetailsView from './components/ActionDetailsView';
-import MethodologyView from './components/MethodologyView';
+import AboutPage from './components/AboutPage';
 import SubscribeView from './components/SubscribeView';
 import AdminDashboard from './components/AdminDashboard';
 import { Section, Article, ExplanationData } from './types';
@@ -23,7 +23,7 @@ function App() {
   // Browser History Management: All view changes push state to history API,
   // allowing the browser back/forward buttons to work correctly across the entire site
   const [activeSection, setActiveSection] = useState<Section>(Section.HERO);
-  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'action-guide' | 'methodology' | 'subscribe' | 'admin'>('home');
+  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'action-guide' | 'about' | 'subscribe' | 'admin'>('home');
   const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
   const [explanationData, setExplanationData] = useState<ExplanationData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,9 +78,22 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     const articleId = params.get('article');
     const isAdmin = params.get('admin');
+    const viewParam = params.get('view');
+    const categoryParam = params.get('category');
 
-    if (isAdmin) {
+    if (isAdmin !== null) {
       setView('admin');
+    } else if (viewParam === 'dashboard') {
+      setView('dashboard');
+    } else if (viewParam === 'action') {
+      setView('action-guide');
+    } else if (viewParam === 'subscribe') {
+      setView('subscribe');
+    } else if (viewParam === 'methodology') {
+      setView('methodology');
+    } else if (categoryParam && categoryParam !== 'All' && categoryParam !== 'Discover') {
+      setActiveCategory(categoryParam);
+      setView('category');
     } else if (articleId && articles.length > 0) {
       const foundArticle = articles.find(a => a.id === articleId);
       if (foundArticle) {
@@ -182,16 +195,22 @@ function App() {
     window.history.back();
   };
 
-  const handleShowSources = () => {
-    setView('sources');
+  const handleShowAbout = () => {
+    setView('about');
     window.scrollTo(0, 0);
-    window.history.pushState({ view: 'sources' }, '', '');
+    window.history.pushState({ view: 'about' }, '', '?view=about');
   };
 
   const handleShowDashboard = () => {
     setView('dashboard');
     window.scrollTo(0, 0);
-    window.history.pushState({ view: 'dashboard' }, '', '');
+    window.history.pushState({ view: 'dashboard' }, '', '?view=dashboard');
+  };
+
+  const handleShowActionGuide = () => {
+    setView('action-guide');
+    window.scrollTo(0, 0);
+    window.history.pushState({ view: 'action-guide' }, '', '?view=action');
   };
 
   const handleExplainData = (data: ExplanationData) => {
@@ -204,22 +223,10 @@ function App() {
     window.history.back();
   };
 
-  const handleShowActionGuide = () => {
-    setView('action-guide');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'action-guide' }, '', '');
-  };
-
-  const handleShowMethodology = () => {
-    setView('methodology');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'methodology' }, '', '');
-  };
-
   const handleShowSubscribe = () => {
     setView('subscribe');
     window.scrollTo(0, 0);
-    window.history.pushState({ view: 'subscribe' }, '', '');
+    window.history.pushState({ view: 'subscribe' }, '', '?view=subscribe');
   };
 
   const handleSearch = (query: string) => {
@@ -250,11 +257,11 @@ function App() {
     if (category === 'All' || category === 'Discover') {
       setView('home');
       window.scrollTo(0, 0);
-      window.history.pushState({ view: 'home', category }, '', '');
+      window.history.pushState({ view: 'home', category }, '', '/');
     } else {
       setView('category');
       window.scrollTo(0, 0);
-      window.history.pushState({ view: 'category', category }, '', '');
+      window.history.pushState({ view: 'category', category }, '', `?category=${encodeURIComponent(category)}`);
     }
   };
 
@@ -277,6 +284,7 @@ function App() {
         onDashboardClick={handleShowDashboard}
         onActionGuideClick={handleShowActionGuide}
         onSubscribeClick={handleShowSubscribe}
+        onShowAbout={handleShowAbout}
         activeCategory={activeCategory}
         onCategorySelect={handleCategorySelect}
         newsArticles={articles}
@@ -313,8 +321,7 @@ function App() {
               searchQuery={searchQuery}
             />
             <About
-              onShowMethodology={handleShowMethodology}
-              onShowSources={handleShowSources}
+              onShowAbout={handleShowAbout}
             />
 
           </>
@@ -335,12 +342,12 @@ function App() {
             onBack={handleBackToFeed}
             onArticleSelect={handleArticleClick}
             allArticles={articles} // Pass dynamic articles
-            onShowMethodology={handleShowMethodology}
+            onShowAbout={handleShowAbout}
           />
         )}
 
-        {view === 'sources' && (
-          <TrustedSources onBack={handleBackToFeed} />
+        {view === 'about' && (
+          <AboutPage onBack={handleBackToFeed} />
         )}
 
         {view === 'dashboard' && (
@@ -367,11 +374,7 @@ function App() {
           />
         )}
 
-        {view === 'methodology' && (
-          <MethodologyView
-            onBack={handleBackFromMethodology}
-          />
-        )}
+
 
         {view === 'subscribe' && (
           <SubscribeView
@@ -381,7 +384,7 @@ function App() {
 
         {/* Global Footer available on all pages */}
         <Contact
-          onShowSources={handleShowSources}
+          onShowAbout={handleShowAbout}
           onSubscribeClick={handleShowSubscribe}
         />
       </main>

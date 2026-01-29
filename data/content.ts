@@ -48,11 +48,11 @@ const generateBodyContent = (category: string | string[], topic: string, excerpt
    ------------------------------------------------------------------------- */
 
 export const heroContent = {
-    headline: "The End of Cheap Plastic: Why Your Grocery Bill is About to Change Forever",
-    subheadline: "It's not just a treaty; it's a global ban. Here is how the new 2026 plastics law actually works, and why Coca-Cola and Pepsi are panicking.",
-    imageUrl: "https://placehold.co/1200x800?text=HERO_IMAGE", // Supermarket/Plastic shelves
-    source: "Planetary Brief Original",
-    date: "Jan 2026",
+    headline: "Planetary Brief",
+    subheadline: "Your source for global environmental intelligence. Create your first article in the CMS to get started.",
+    imageUrl: "https://placehold.co/1200x800?text=Welcome+to+Planetary+Brief",
+    source: "Planetary Brief",
+    date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
     url: "#"
 };
 
@@ -60,43 +60,8 @@ export const aboutContent = {
     mission: "Planetary Brief is a curated intelligence platform dedicated to the most critical story of our time: the health of our planet. We aggregate verified data, scientific breakthroughs, and policy shifts to empower action through information.",
 };
 
-const featuredBase: Article = {
-    id: 'gs-policy-2026',
-    title: 'The End of Cheap Plastic: Why Your Grocery Bill is About to Change Forever',
-    category: 'Pollution', topic: 'Pollution',
-    source: 'GreenShift Original',
-    imageUrl: 'https://placehold.co/1200x800?text=gs-policy-2026-main', // Supermarket context
-    secondaryImageUrl: 'https://placehold.co/1200x800?text=gs-policy-2026-secondary', // Plastic bottles
-    diagramUrl: 'https://placehold.co/1200x800?text=gs-policy-2026-diagram',
-    excerpt: 'The days of $1 water bottles are over. A new global law has just made virgin plastic more expensive than gold, and big corporations are scrambling. Here is what you need to know.',
-    date: 'Jan 2026',
-    originalReadTime: '6 min read',
-    url: '#',
-    contextBox: {
-        title: "The Production Cap",
-        content: "For 50 years, plastic companies could make as much as they wanted. The new 2026 Global Plastics Treaty changes the rules: it limits how much *new* plastic can be created, forcing companies to recycle what already exists.",
-        source: "UNEP 2026 Treaty Text"
-    },
-    content: [
-        "Imagine walking into a supermarket and realizing that every single soda bottle looks different. Some are scratched. Some are slightly different shapes. None of them are that shiny, perfect, crinkly plastic you are used to. Welcome to 2026. The era of 'virgin' plastic—the brand new stuff made directly from oil—is officially over.",
-        "For decades, we have been told that recycling is our responsibility. We were told to wash our yogurt cups and separate our trash. But while we were doing that, companies were churning out billions of tons of new plastic because it was cheaper than recycling the old stuff. It was a rigorous game of whack-a-mole where we were losing. Badly.",
-        "That changed on January 1st. The Global Plastics Treaty didn't just suggest that companies should recycle; it made it illegal to produce cheap new plastic. If a company like Coca-Cola or Nestle wants to make a bottle today, they have two choices: use recycled plastic, which is now a hot commodity, or pay a massive tax on new plastic. Suddenly, recycling isn't just 'nice to have'—it is the only way to stay in business.",
-        "The Panic in the Boardroom",
-        "You might think big companies would fight this. And they did. For years, lobbyists tried to water down this law. They argued it would raise prices. They argued it was impossible. But when the gavel finally came down, something interesting happened. The panic shifted from 'how do we stop this law' to 'how do we find enough old plastic?'",
-        "Right now, there is a gold rush happening. But people aren't digging for gold; they are digging for trash. Landfills that were seen as worthless piles of garbage are now being viewed as mines. Companies are literally buying trash because that trash is the only legal way they can package their products without going bankrupt.",
-        "What This Means for You",
-        "So, is your grocery bill going to go up? In the short term, yes. That $1 bottle of water might cost $1.50 for a while. Packaging is expensive right now. But here is the good news: the packaging you do buy is actually going to be recycled. For real this time.",
-        "Before this law, only about 9% of plastic was actually recycled. The rest was burned or buried. Now that old plastic has value, no company is going to let it go to waste. They want that bottle back. You might start seeing 'reverse vending machines' everywhere, where you put a bottle in and get 20 cents back. Your trash is now money.",
-        "The End of the Throwaway Culture",
-        "This law forces us to stop treating materials as if they are infinite. We lived in a bubble where we thought we could use something for 5 minutes and throw it away forever. That bubble has burst. The 'throwaway economy' is being replaced by the 'circular economy'.",
-        "It might feel annoying at first. You might have to carry a reusable cup more often. You might have to pay a deposit on your milk jug. But look at the alternative: an ocean filled with more plastic than fish. The price we are paying at the register today is the price of cleaning up the mess we made yesterday. And honestly? It’s a bargain."
-    ]
-};
-
-export const featuredArticle = {
-    ...featuredBase,
-    content: extendContent(featuredBase.content, featuredBase.category, featuredBase.topic)
-};
+// Empty featured article - will use first article from database when available
+export const featuredArticle: Article | null = null;
 
 // Helper for bulk creation
 const getRandomReadTime = () => {
@@ -129,102 +94,10 @@ const createArticle = (id: string, title: string, category: string | string[], t
 // -----------------------------------------------------------------------------
 
 export const newsArticles: Article[] = [
-    // --- 1. CLIMATE CHANGE ---
-    createArticle('cc-1', "Global Temp Hits 1.5°C for 12 Consecutive Months", 'Science', 'Climate Change', "For the first time in history, the 12-month global average has exceeded the Paris Agreement limit.", "Jan 2026", "https://placehold.co/1200x800?text=cc-1"), // Heat sun
-    createArticle('cc-2', "Antarctic Heatwave: 30°C Above Normal", 'Science', 'Climate Change', "Unprecedented temperatures in East Antarctica are rewriting climate models.", "Feb 2026", "https://placehold.co/1200x800?text=cc-2"), // Iceberg
-    createArticle('cc-3', "The Carbon Budget is Officially Depleted", 'Science', 'Climate Change', "New analysis suggests we have crossed the threshold for 50% probability of staying under 1.5°C.", "Jan 2026", "https://placehold.co/1200x800?text=cc-3"), // Industrial smoke
-    createArticle('cc-4', "The Cost of Extreme Weather: $3 Trillion in 2025", 'Economy', 'Climate Change', "Reinsurers warn that large parts of the globe are becoming uninsurable.", "Dec 2025", "https://placehold.co/1200x800?text=cc-4"), // Storm flood
-    createArticle('cc-5', "Methane Feedback Loops Detected in Siberia", 'Science', 'Climate Change', "Exploding permafrost craters are releasing ancient methane caches.", "Feb 2026", "https://placehold.co/1200x800?text=cc-5"), // Tundra
-    createArticle('cc-6', "Attribution Science: Naming the Hurricane", 'Science', 'Climate Change', "Scientists can now calculate exactly how much climate change intensified a specific storm.", "Jan 2026", "https://placehold.co/1200x800?text=cc-6"), // Hurricane space
-    createArticle('cc-7', "Global South Adaptation Fund Shortfall", 'Policy', 'Climate Change', "Developing nations demand fulfilled pledges at the latest summit.", "Dec 2025", "https://placehold.co/1200x800?text=cc-7"), // Dry cracked earth
-    createArticle('cc-8', "Jet Stream Instability: Why Winter is Weird", 'Science', 'Climate Change', "A weakening polar vortex is causing chaotic weather patterns in the Northern Hemisphere.", "Feb 2026", "https://placehold.co/1200x800?text=cc-8"), // Weather map
-    createArticle('cc-9', "Ocean Circulation Slowdown Confirmed", 'Science', 'Climate Change', "Sensors in the Atlantic confirm the AMOC is at its weakest in a millennium.", "Jan 2026", "https://placehold.co/1200x800?text=cc-9"), // Ocean waves
-    createArticle('cc-10', "Urban Heat Islands: Cities are 10°C Hotter", 'Science', 'Climate Change', "New thermal mapping exposes the deadly impact of concrete over greenery.", "Dec 2025", "https://placehold.co/1200x800?text=cc-10"), // City aerial
-
-    // --- 2. ENERGY ---
-    createArticle('en-1', "Perovskite Solar Record: 35% Efficiency", 'Innovation', 'Energy', "A breakthrough in tandem solar cells makes panels cheaper and more powerful.", "Feb 2026", "https://placehold.co/1200x800?text=en-1"), // Solar panels
-    createArticle('en-2', "Fusion Power: Commercial Pilot Announced", 'Innovation', 'Energy', "Following net energy gain, the first commercial fusion plant breaks ground in France.", "Feb 2026", "https://placehold.co/1200x800?text=en-2"), // Science reactor abstract
-    createArticle('en-3', "Iron-Air Batteries Scale Up", 'Innovation', 'Energy', "Rust-based batteries are solving the grid storage problem for days, not hours.", "Feb 2026", "https://placehold.co/1200x800?text=en-3"), // Power grid
-    createArticle('en-4', "Offshore Wind: Floating Turbines Go Deep", 'Innovation', 'Energy', "New floating tech unlocks wind energy in deep waters previously inaccessible.", "Feb 2026", "https://placehold.co/1200x800?text=en-4"), // Wind turbines
-    createArticle('en-5', "Geothermal: The Superhot Rock Revolution", 'Innovation', 'Energy', "Deep drilling allows geothermal energy to be accessed anywhere, not just volcanic zones.", "Feb 2026", "https://placehold.co/1200x800?text=en-5"), // Geothermal steam
-    createArticle('en-6', "Global Coal Peak: It Happened in 2025", 'Economy', 'Energy', "IEA confirms coal consumption has entered structural decline.", "Jan 2026", "https://placehold.co/1200x800?text=en-6"), // Coal pile
-    createArticle('en-7', "Hydrogen Transport: Heavy Trucking shifts", 'Innovation', 'Energy', "Green hydrogen infrastructure is finally ready for long-haul logistics.", "Feb 2026", "https://placehold.co/1200x800?text=en-7"), // Truck abstract
-    createArticle('en-8', "Solid State Batteries: EV Range Doubled", 'Innovation', 'Energy', "Toyota and VW release first mass-market cars with 1000km range.", "Jan 2026", "https://placehold.co/1200x800?text=en-8"), // EV charging
-    createArticle('en-9', "Small Modular Reactors (SMRs) Go Online", 'Innovation', 'Energy', "Factory-built nuclear reactors begin powering remote communities.", "Dec 2025", "https://placehold.co/1200x800?text=en-9"), // Nuclear cooling tower
-    createArticle('en-10', "Virtual Power Plants Stabilize the Grid", 'Action', 'Energy', "Home batteries networked together saved California from blackouts this winter.", "Feb 2026", "https://placehold.co/1200x800?text=en-10"), // Smart home grid
-
-    // --- 3. POLLUTION ---
-    createArticle('pol-1', "Global Plastics Treaty Signed", 'Policy', 'Pollution', "Legally binding caps on plastic production come into force.", "Jan 2026", "https://placehold.co/1200x800?text=pol-1"), // Plastic waste
-    createArticle('pol-2', "PFAS Total Ban: The End of Teflon", 'Policy', 'Pollution', "EU and US regulators agree on a complete phase-out of forever chemicals.", "Feb 2026", "https://placehold.co/1200x800?text=pol-2"), // Lab test tubes
-    createArticle('pol-3', "Microplastics Found in Human Hearts", 'Science', 'Pollution', "New medical study confirms plastic particles are crossing biological barriers.", "Dec 2025", "https://placehold.co/1200x800?text=pol-3"), // Microscope abstract
-    createArticle('pol-4', "E-Waste Recycling Hits 90% in Nordic Nations", 'Policy', 'Pollution', "Strict deposit schemes prove that circular electronics are possible.", "Jan 2026", "https://placehold.co/1200x800?text=pol-4"), // E-waste
-    createArticle('pol-5', "Ocean Cleanup: System 03 Success", 'Innovation', 'Pollution', "The Great Pacific Garbage Patch is shrinking for the first time.", "Feb 2026", "https://placehold.co/1200x800?text=pol-5"), // Ocean plastic
-    createArticle('pol-6', "Nitrogen Crisis: Farming Runoff Rules", 'Policy', 'Pollution', "New legislation targets algal blooms by capping fertilizer use.", "Jan 2026", "https://placehold.co/1200x800?text=pol-6"), // Algae/Water
-    createArticle('pol-7', "Air Quality AI: Street-Level Monitoring", 'Innovation', 'Pollution', "Hyper-local sensors reveal inequality in urban smog exposure.", "Dec 2025", "https://placehold.co/1200x800?text=pol-7"), // Smog city
-    createArticle('pol-8', "Right to Repair Electronics Act", 'Policy', 'Pollution', "Manufacturers must now provide parts and manuals for 10 years.", "Feb 2026", "https://placehold.co/1200x800?text=pol-8"), // Repair electronics
-    createArticle('pol-9', "Chemical Fertilizer Tax Implemented", 'Economy', 'Pollution', "Incentivizing regenerative agriculture through fiscal policy.", "Jan 2026", "https://placehold.co/1200x800?text=pol-9"), // Farm field
-    createArticle('pol-10', "Space Debris Removal Mission Launches", 'Innovation', 'Pollution', "First commercial satellite capture successfully demonstrates orbit cleanup.", "Feb 2026", "https://placehold.co/1200x800?text=pol-10"), // Satellite space
-
-    // --- 4. POLICY & ECONOMICS ---
-    createArticle('pe-1', "Carbon Border Tax (CBAM) Global Rollout", 'Policy', 'Policy & Economics', "Imports to the EU and UK now face levies based on their carbon footprint.", "Jan 2026", "https://placehold.co/1200x800?text=pe-1"), // Shipping containers
-    createArticle('pe-2', "Beyond GDP: Adopting Green Ecosystem Product", 'Economy', 'Policy & Economics', "Five nations replace GDP with GEP to measure true economic health.", "Feb 2026", "https://placehold.co/1200x800?text=pe-2"), // Economy graph
-    createArticle('pe-3', "Fossil Fuel Divestment Hits $50 Trillion", 'Economy', 'Policy & Economics', "Pension funds continue the mass exodus from oil and gas assets.", "Dec 2025", "https://placehold.co/1200x800?text=pe-3"), // Stock market
-    createArticle('pe-4', "Ecocide Law Recognized by ICC", 'Policy', 'Policy & Economics', "Destruction of ecosystems can now be prosecuted as a crime against humanity.", "Jan 2026", "https://placehold.co/1200x800?text=pe-4"), // Gavel
-    createArticle('pe-5', "Climate Migration Visas Established", 'Policy', 'Policy & Economics', "New Zealand creates legal pathway for Pacific islanders displaced by sea level rise.", "Feb 2026", "https://placehold.co/1200x800?text=pe-5"), // Island coast
-    createArticle('pe-6', "Corporate Liability: CEOs Sued Personally", 'Policy', 'Policy & Economics', "Landmark ruling holds directors accountable for climate risk negligence.", "Jan 2026", "https://placehold.co/1200x800?text=pe-6"), // Business suit
-    createArticle('pe-7', "Subsidies Shift: From Fossil to Green", 'Economy', 'Policy & Economics', "G20 nations agree to redirect $500B in oil subsidies to renewables.", "Dec 2025", "https://placehold.co/1200x800?text=pe-7"), // Wind turbine graph
-    createArticle('pe-8', "Circular Economy Act Enforced", 'Policy', 'Policy & Economics', "Mandatory recycling and durability standards for all consumer goods.", "Jan 2026", "https://placehold.co/1200x800?text=pe-8"), // Recycling symbol
-    createArticle('pe-9', "Just Transition Fund Operational", 'Policy', 'Policy & Economics', "Billions allocated to retrain coal workers for the clean energy sector.", "Jan 2026", "https://placehold.co/1200x800?text=pe-9"), // Industry worker
-    createArticle('pe-10', "Insurance Market Retreat", 'Economy', 'Policy & Economics', "Major insurers pull coverage from coastal zones, triggering real estate shock.", "Jan 2026", "https://placehold.co/1200x800?text=pe-10"), // House flooded
-
-    // --- 5. OCEANS ---
-    createArticle('oc-1', "High Seas Treaty Ratified", 'Policy', 'Oceans', "Protection now extends to international waters, covering 60% of the ocean.", "Jan 2026", "https://placehold.co/1200x800?text=oc-1"), // Open ocean
-    createArticle('oc-2', "Deep Sea Mining Moratorium", 'Policy', 'Oceans', "Nations vote to pause seabed mining until environmental impacts are understood.", "Feb 2026", "https://placehold.co/1200x800?text=oc-2"), // Deep sea abstract
-    createArticle('oc-3', "Coral Reef 3D Printing Success", 'Science', 'Oceans', "Artificial structures are successfully hosting new polyps in the Great Barrier Reef.", "Dec 2025", "https://placehold.co/1200x800?text=oc-3"), // Coral reef
-    createArticle('oc-4', "Seagrass Restoration Scales Up", 'Conservation', 'Oceans', "Robotic planting of seagrass meadows to capture blue carbon.", "Jan 2026", "https://placehold.co/1200x800?text=oc-4"), // Underwater grass
-    createArticle('oc-5', "Arctic Ocean Acidification Alert", 'Science', 'Oceans', "pH levels in the north are dropping faster than anywhere else on Earth.", "Feb 2026", "https://placehold.co/1200x800?text=oc-5"), // Arctic water
-    createArticle('oc-6', "Whale Carbon Credits Launched", 'Economy', 'Oceans', "Financial market now values whales for their carbon sequestration role.", "Jan 2026", "https://placehold.co/1200x800?text=oc-6"), // Whale tail
-    createArticle('oc-7', "Sustainable Fisheries Tech", 'Innovation', 'Oceans', "AI cameras on nets reduce bycatch by 95% in commercial fleets.", "Dec 2025", "https://placehold.co/1200x800?text=oc-7"), // Fishing boat
-    createArticle('oc-8', "Ocean Thermal Energy Conversion", 'Innovation', 'Oceans', "OTEC plant in Hawaii proves viability of temperature-gradient power.", "Feb 2026", "https://placehold.co/1200x800?text=oc-8"), // Ocean waves horizon
-    createArticle('oc-9', "Plastic Free Coastlines Initiative", 'Action', 'Oceans', "Global volunteer network clears record tonnage from beaches.", "Jan 2026", "https://placehold.co/1200x800?text=oc-9"), // Beach clean
-    createArticle('oc-10', "Marine Protected Areas Hit 30%", 'Conservation', 'Oceans', "The world achieves the 30x30 target for ocean conservation early.", "Dec 2025", "https://placehold.co/1200x800?text=oc-10"), // School of fish
-
-    // --- 6. BIODIVERSITY ---
-    createArticle('bio-1', "30x30 Target Met on Land", 'Policy', 'Biodiversity', "30% of global land is now under protection status.", "Jan 2026", "https://placehold.co/1200x800?text=bio-1"), // Green forest aerial
-    createArticle('bio-2', "De-Extinction: Mammoth Genes Edited", 'Science', 'Biodiversity', "Colossal Biosciences creates first viable mammoth hybrid embryo.", "Feb 2026", "https://placehold.co/1200x800?text=bio-2"), // Elephant
-    createArticle('bio-3', "Indigenous Guardianship Programs", 'Policy', 'Biodiversity', "Returning land management rights to indigenous groups boosts biodiversity.", "Dec 2025", "https://placehold.co/1200x800?text=bio-3"), // Nature person
-    createArticle('bio-4', "Pollinator Recovery Plan", 'Conservation', 'Biodiversity', "Banning neonics leads to bounce back in wild bee populations.", "Jan 2026", "https://placehold.co/1200x800?text=bio-4"), // Bee
-    createArticle('bio-5', "Invasive Species AI Monitoring", 'Innovation', 'Biodiversity', "Autonomous drones identify and map invasive plants in real-time.", "Feb 2026", "https://placehold.co/1200x800?text=bio-5"), // Drone forest
-    createArticle('bio-6', "Soil Microbiome Mapping", 'Science', 'Biodiversity', "Global census of soil bacteria reveals the hidden web of life.", "Jan 2026", "https://placehold.co/1200x800?text=bio-6"), // Plant sprout soil
-    createArticle('bio-7', "Wildlife Corridors Connect Continents", 'Conservation', 'Biodiversity', "New 'Highway for Nature' links national parks across borders.", "Dec 2025", "https://placehold.co/1200x800?text=bio-7"), // Landscape
-    createArticle('bio-8', "Amazon Tipping Point Averted?", 'Science', 'Biodiversity', "Deforestation rates drop to near zero, giving the rainforest a chance.", "Feb 2026", "https://placehold.co/1200x800?text=bio-8"), // Amazon aerial
-    createArticle('bio-9', "Global Seed Vault Expansion", 'Conservation', 'Biodiversity', "Svalbard receives largest ever deposit of crop varieties.", "Jan 2026", "https://placehold.co/1200x800?text=bio-9"), // Svalbard
-    createArticle('bio-10', "Rewilding Europe: The Bison Return", 'Conservation', 'Biodiversity', "Herds of wild bison roam the UK and Germany for the first time in centuries.", "Dec 2025", "https://placehold.co/1200x800?text=bio-10"), // Bison
-
-    // --- 7. CONSERVATION ---
-    createArticle('con-1', "Congo Basin Protection Deal", 'Policy', 'Conservation', "Historic agreement to preserve the world's second lung.", "Jan 2026", "https://placehold.co/1200x800?text=con-1"), // Jungle river
-    createArticle('con-2', "Wetland Credits Market Booms", 'Economy', 'Conservation', "Financial incentives drive massive peatland restoration.", "Feb 2026", "https://placehold.co/1200x800?text=con-2"), // Wetland
-    createArticle('con-3', "Anti-Poaching Drones Success", 'Innovation', 'Conservation', "Thermal imaging drones reduce Rhino poaching to zero in key parks.", "Dec 2025", "https://placehold.co/1200x800?text=con-3"), // Rhino
-    createArticle('con-4', "River Rights Movement", 'Policy', 'Conservation', "More rivers granted legal personhood status in South America.", "Jan 2026", "https://placehold.co/1200x800?text=con-4"), // River
-    createArticle('con-5', "Forest Stewardship Council 2.0", 'Policy', 'Conservation', "Stricter standards for sustainable timber eradicate loopholes.", "Feb 2026", "https://placehold.co/1200x800?text=con-5"), // Forest lumber
-    createArticle('con-6', "Desert Greening Projects", 'Innovation', 'Conservation', "Great Green Wall in Africa shows visible progress from space.", "Jan 2026", "https://placehold.co/1200x800?text=con-6"), // Desert plant
-    createArticle('con-7', "Urban Nature Reserves", 'Action', 'Conservation', "Cities converting golf courses into public wildlands.", "Dec 2025", "https://placehold.co/1200x800?text=con-7"), // Park city
-    createArticle('con-8', "National Parks Digital Twin", 'Innovation', 'Conservation', "VR tourism generates revenue for parks without the foot traffic.", "Feb 2026", "https://placehold.co/1200x800?text=con-8"), // VR nature
-    createArticle('con-9', "Community Conservation Fund", 'Action', 'Conservation', "Crowdfunding buys huge tracts of Patagonian wilderness.", "Jan 2026", "https://placehold.co/1200x800?text=con-9"), // Mountains
-    createArticle('con-10', "Endangered Species Recovery", 'Science', 'Conservation', "Tiger numbers double in Nepal thanks to habitat corridors.", "Dec 2025", "https://placehold.co/1200x800?text=con-10"), // Tiger
-
-    // --- 8. SOLUTIONS ---
-    createArticle('sol-1', "Direct Air Capture Hubs Online", 'Innovation', 'Solutions', "Massive carbon sucking plants in Texas and Iceland begin operations.", "Jan 2026", "https://placehold.co/1200x800?text=sol-1"), // Industrial plant
-    createArticle('sol-2', "Lab-Grown Meat Price Parity", 'Economy', 'Solutions', "Cultivated chicken is now cheaper than farmed chicken in Singapore.", "Feb 2026", "https://placehold.co/1200x800?text=sol-2"), // Lab petri dish
-    createArticle('sol-3', "15-Minute Cities Success", 'Policy', 'Solutions', "Paris report shows 40% drop in car traffic and improved mental health.", "Dec 2025", "https://placehold.co/1200x800?text=sol-3"), // Biking city
-    createArticle('sol-4', "Hempcrete Construction Boom", 'Innovation', 'Solutions', "Carbon-negative building materials gain mainstream adoption.", "Jan 2026", "https://placehold.co/1200x800?text=sol-4"), // Construction
-    createArticle('sol-5', "Algae Bioplastics", 'Innovation', 'Solutions', "Seaweed-based packaging replaces single-use plastics in major supermarkets.", "Feb 2026", "https://placehold.co/1200x800?text=sol-5"), // Seaweed
-    createArticle('sol-6', "Passive Cooling Architecture", 'Innovation', 'Solutions', "Ancient techniques revived to cool buildings without AC.", "Jan 2026", "https://placehold.co/1200x800?text=sol-6"), // Modern architecture
-    createArticle('sol-7', "Precision Agriculture AI", 'Innovation', 'Solutions', "Robots reduce herbicide use by 90% through spot-spraying.", "Dec 2025", "https://placehold.co/1200x800?text=sol-7"), // Farm drone
-    createArticle('sol-8', "Desalination Solar Tech", 'Innovation', 'Solutions', "New zero-brine solar domes provide water for arid regions.", "Feb 2026", "https://placehold.co/1200x800?text=sol-8"), // Water plant
-    createArticle('sol-9', "Circular Fashion Industry", 'Economy', 'Solutions', "Resale market overtakes fast fashion for the first time.", "Jan 2026", "https://placehold.co/1200x800?text=sol-9"), // Clothes rack
-    createArticle('sol-10', "Carbon Negative Concrete", 'Innovation', 'Solutions', "New cement recipe absorbs CO2 as it cures.", "Feb 2026", "https://placehold.co/1200x800?text=sol-10"), // Concrete
+    // Empty - ready for real content!
+    // Articles created in the CMS will be served from MongoDB
 ];
+
 
 export const upcomingEvents: Article[] = [
     {

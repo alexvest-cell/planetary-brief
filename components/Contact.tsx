@@ -3,11 +3,11 @@ import { Section } from '../types';
 import { Bell, ShieldCheck } from 'lucide-react';
 
 interface ContactProps {
-  onShowSources: () => void;
+  onShowAbout: () => void;
   onSubscribeClick: () => void;
 }
 
-const Contact: React.FC<ContactProps> = ({ onShowSources, onSubscribeClick }) => {
+const Contact: React.FC<ContactProps> = ({ onShowAbout, onSubscribeClick }) => {
   return (
     <footer id={Section.CONTACT} className="py-12 bg-black border-t border-white/10">
       <div className="container mx-auto px-6 md:px-12">
@@ -22,17 +22,17 @@ const Contact: React.FC<ContactProps> = ({ onShowSources, onSubscribeClick }) =>
           {/* Actions */}
           <div className="flex items-center gap-4">
             <button
-              onClick={onShowSources}
+              onClick={onShowAbout}
               className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors"
             >
               <ShieldCheck size={14} />
-              Complete List of Sources
+              About
             </button>
             <button
               onClick={onSubscribeClick}
               className="bg-white hover:bg-gray-200 text-black px-5 py-2 rounded-full font-bold uppercase tracking-widest text-[10px] flex items-center gap-2 transition-colors"
             >
-              <span>Keep me up to date</span>
+              <span>Subscribe</span>
               <Bell size={10} className="fill-black" />
             </button>
           </div>

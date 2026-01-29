@@ -10,7 +10,7 @@ interface ArticleViewProps {
   onBack: () => void;
   onArticleSelect: (article: Article) => void;
   allArticles: Article[];
-  onShowMethodology: () => void;
+  onShowAbout: () => void;
 }
 
 // Audio Helpers
@@ -82,8 +82,8 @@ const ArticleDataVisual = ({ article }: { article: Article }) => {
 };
 
 // Combined Footer Component
-const ArticleFooter = ({ onShowMethodology }: { onShowMethodology: () => void }) => (
-  <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8 my-10 flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
+const ArticleFooter = ({ onShowAbout }: { onShowAbout: () => void }) => (
+  <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8 my-6 md:my-10 flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
     {/* Brand Block */}
     <div className="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
       <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-500/10 flex items-center justify-center font-serif font-bold text-emerald-500 text-base md:text-lg ring-1 ring-emerald-500/20 flex-shrink-0">
@@ -92,10 +92,10 @@ const ArticleFooter = ({ onShowMethodology }: { onShowMethodology: () => void })
       <div className="flex flex-col">
         <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
         <button
-          onClick={onShowMethodology}
+          onClick={onShowAbout}
           className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
         >
-          Verified Intelligence <Info size={12} className="group-hover:scale-110 transition-transform" />
+          About Verification <Info size={12} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
     </div>
@@ -117,7 +117,7 @@ const ArticleFooter = ({ onShowMethodology }: { onShowMethodology: () => void })
   </div>
 );
 
-const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSelect, allArticles, onShowMethodology }) => {
+const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSelect, allArticles, onShowAbout }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
 
@@ -237,12 +237,16 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         <div className="h-full bg-news-accent w-full animate-[width_1s_ease-out]"></div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-12 pt-44 md:pt-32 pb-24 max-w-4xl">
+      <div className="container mx-auto px-4 md:px-12 pt-44 md:pt-32 pb-12 md:pb-24 max-w-4xl">
 
 
         <header className="mb-8 md:mb-10 text-left">
           <div className="text-news-accent font-bold uppercase tracking-widest text-xs mb-3">
-            {Array.isArray(article.category) ? article.category.join(', ') : article.category}
+            {(() => {
+              const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+              const categories = Array.isArray(article.category) ? article.category : [article.category];
+              return categories.map(displayCategory).join(', ');
+            })()}
           </div>
 
 
@@ -283,14 +287,25 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         </header>
 
         <figure className="mb-12 md:mb-16 -mx-4 md:-mx-12 lg:mx-0">
-          <div className="relative aspect-[21/9] md:rounded-sm overflow-hidden">
+          <div className="relative aspect-square md:rounded-sm overflow-hidden">
             <img
               src={article.originalImageUrl || article.imageUrl}
               alt={article.title}
               className="w-full h-full object-cover"
+              style={{
+                imageRendering: 'high-quality',
+                WebkitBackfaceVisibility: 'hidden',
+                backfaceVisibility: 'hidden',
+                transform: 'translateZ(0)',
+                filter: 'blur(0.4px) saturate(1.05)'
+              }}
             />
           </div>
-
+          {article.imageAttribution && (
+            <figcaption className="text-[10px] text-gray-500 mt-2 text-right px-4 md:px-0">
+              {article.imageAttribution}
+            </figcaption>
+          )}
         </figure>
 
         <div className="prose prose-lg md:prose-xl prose-invert max-w-none md:px-8 font-sans leading-relaxed text-gray-200">
@@ -299,23 +314,29 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
             let firstParagraphRendered = false;
 
             return article.content?.map((paragraph, index) => {
-              const isSubheader = paragraph.length < 80 && !paragraph.endsWith('.') && !paragraph.endsWith('"');
+              const isSubheader = paragraph.length < 80 && !paragraph.endsWith('.') && !paragraph.endsWith('"') && !paragraph.startsWith('//');
 
               // Parse for // highlight // pattern
               const parseContent = (text: string) => {
-                // Use [\s\S] to match newlines too, and handle potential spacing variations
-                const parts = text.split(/\/\/([\s\S]*?)\/\//g);
-                if (parts.length === 1) return text;
+                // Match text wrapped in // markers
+                const parts = text.split(/(\/\/[\s\S]*?\/\/)/g);
 
                 return parts.map((part, i) => {
-                  if (i % 2 === 1) { // Matched part
-                    return (
-                      <span key={i} className="block my-8 pl-4 md:pl-8 border-l-2 border-news-accent text-2xl md:text-3xl font-serif font-bold text-white italic leading-tight">
-                        {part.replace(/^\/+|\/+$/g, '').trim()}
-                      </span>
-                    );
+                  // Check if this part is wrapped in // markers
+                  if (part.startsWith('//') && part.endsWith('//')) {
+                    // Remove the // markers and create highlighted block
+                    const cleanText = part.slice(2, -2).trim();
+                    if (cleanText) {
+                      return (
+                        <span key={i} className="block my-8 pl-4 md:pl-8 border-l-2 border-news-accent text-2xl md:text-3xl font-serif font-bold text-white italic leading-tight">
+                          {cleanText}
+                        </span>
+                      );
+                    }
+                    return null;
                   }
-                  return part;
+                  // Regular text - return as is (but trim any empty strings)
+                  return part || null;
                 });
               };
 
@@ -361,7 +382,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         </div>
 
         {/* Combined Footer Component */}
-        <ArticleFooter onShowMethodology={onShowMethodology} />
+        <ArticleFooter onShowAbout={onShowAbout} />
 
         {relatedArticles.length > 0 && (
           <div className="mt-12 mb-12 pt-8">

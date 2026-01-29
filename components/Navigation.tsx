@@ -12,6 +12,7 @@ interface NavigationProps {
   onDashboardClick: () => void;
   onActionGuideClick: () => void;
   onSubscribeClick: () => void;
+  onShowAbout: () => void;
   activeCategory: string;
   onCategorySelect: (category: string) => void;
   newsArticles: Article[];
@@ -30,6 +31,7 @@ const Navigation: React.FC<NavigationProps> = ({
   onDashboardClick,
   onActionGuideClick,
   onSubscribeClick,
+  onShowAbout,
   activeCategory,
   onCategorySelect,
   newsArticles
@@ -147,6 +149,9 @@ const Navigation: React.FC<NavigationProps> = ({
               <button onClick={toggleSearch} className="text-gray-400 hover:text-white transition-colors">
                 <Search size={18} />
               </button>
+              <button onClick={onSubscribeClick} className="text-gray-400 hover:text-white transition-colors">
+                <Bell size={18} />
+              </button>
               <button
                 className="text-white"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -162,13 +167,13 @@ const Navigation: React.FC<NavigationProps> = ({
               onClick={() => { onCategorySelect('All'); }}
               className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${activeCategory === 'All' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
-              Discover
+              Briefing
             </button>
             <button
               onClick={onActionGuideClick}
               className="flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition-all"
             >
-              Act
+              Guides
             </button>
             <button
               onClick={onDashboardClick}
@@ -239,10 +244,7 @@ const Navigation: React.FC<NavigationProps> = ({
         <div className="fixed inset-0 top-28 bg-black z-40 p-6 animate-fade-in md:hidden border-t border-white/10">
           <div className="flex flex-col gap-6 text-sm font-bold uppercase tracking-widest">
             <button onClick={() => { onCategorySelect('All'); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">Home</button>
-            <button onClick={() => { onActionGuideClick(); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">Act Now</button>
-            <button onClick={() => { onDashboardClick(); setIsMobileMenuOpen(false); }} className="text-left text-news-accent border-b border-white/10 pb-4 flex items-center gap-2">
-              Earth Dashboard <Activity size={16} className="animate-pulse" />
-            </button>
+            <button onClick={() => { onShowAbout(); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">About</button>
             <button onClick={() => { onSubscribeClick(); setIsMobileMenuOpen(false); }} className="text-left text-white flex items-center gap-2">
               Subscribe
             </button>
@@ -271,7 +273,10 @@ const Navigation: React.FC<NavigationProps> = ({
               <div className="flex-grow min-w-0">
                 <h4 className="text-xs font-bold text-white truncate">{article.title}</h4>
                 <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-1 flex items-center gap-2">
-                  <span>{Array.isArray(article.category) ? article.category[0] : article.category}</span>
+                  <span>{(() => {
+                    const cat = Array.isArray(article.category) ? article.category[0] : article.category;
+                    return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+                  })()}</span>
                   <span className="text-gray-600">•</span>
                   <span>{article.date}</span>
                 </p>

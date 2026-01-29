@@ -91,7 +91,7 @@ const SubscribeView: React.FC<SubscribeViewProps> = ({ onBack }) => {
   }
 
   return (
-    <div className="bg-zinc-950 min-h-screen animate-fade-in text-white pt-32 pb-24">
+    <div className="bg-zinc-950 min-h-screen animate-fade-in text-white pt-48 pb-24">
       {/* Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-5"
         style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)', backgroundSize: '30px 30px' }}>
@@ -99,15 +99,7 @@ const SubscribeView: React.FC<SubscribeViewProps> = ({ onBack }) => {
 
       <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-3xl">
 
-        <button
-          onClick={onBack}
-          className="group flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-12 font-medium text-xs tracking-widest uppercase"
-        >
-          <div className="p-2 rounded-full border border-white/10 group-hover:border-news-accent transition-colors">
-            <ArrowLeft size={16} />
-          </div>
-          Return
-        </button>
+
 
         <div className="text-center mb-12">
           <span className="text-news-accent font-bold uppercase tracking-widest text-xs mb-4 block animate-pulse">Weekly Digest</span>

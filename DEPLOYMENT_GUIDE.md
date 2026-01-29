@@ -32,7 +32,7 @@ Fill in the following settings:
 - **Root Directory:** `.` (Leave blank)
 - **Runtime:** `Node`
 - **Build Command:** `npm install && npm run build`
-- **Start Command:** `npm run start:server`
+- **Start Command:** `npm start`
   - *Note:* We run the server `start:server` command because your Express server serves *both* the API and the React frontend (via static files in `dist` if configured, or you might need to adjust `server.js` to serve `dist` for production. *See "Important Note below"*).
 
 ## Step 4: Add Environment Variables
