@@ -18,12 +18,12 @@ export const generateEcoAnalysis = async (userPrompt: string): Promise<string> =
   }
 };
 
-export const generateSpeech = async (text: string): Promise<string | null> => {
+export const generateSpeech = async (text: string, articleId?: string): Promise<string | null> => {
   try {
     const response = await fetch('/api/speech', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text, articleId })
     });
 
     if (!response.ok) throw new Error('Speech Request Failed');

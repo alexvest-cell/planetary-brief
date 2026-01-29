@@ -181,7 +181,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
     setIsAudioLoading(true);
 
     const textToRead = `Title: ${article.title}. ${article.content.join(' ')}`;
-    const base64Audio = await generateSpeech(textToRead);
+    const base64Audio = await generateSpeech(textToRead, article.id);
 
     if (!base64Audio) {
       alert("Could not generate audio summary. Please try again.");

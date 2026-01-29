@@ -787,9 +787,26 @@ app.post('/api/analyze', async (req, res) => {
 
 app.post('/api/speech', async (req, res) => {
   if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: 'Server AI Key missing' });
-  const { text } = req.body;
+  const { text, articleId } = req.body;
 
   try {
+    // 1. Check Cache (if articleId provided)
+    if (articleId) {
+      const article = await Article.findOne({ id: articleId });
+      if (article && article.audioUrl) {
+        console.log(`Audio Cache Hit for ${articleId}`);
+        // Fetch from Cloudinary
+        const cloudParams = await fetch(article.audioUrl);
+        if (cloudParams.ok) {
+          const buffer = await cloudParams.arrayBuffer();
+          const audioData = Buffer.from(buffer).toString('base64');
+          return res.json({ audioData });
+        }
+      }
+    }
+
+    // 2. Generate if no cache
+    console.log(`Generating new audio for ${articleId || 'unknown'}`);
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash-exp",
@@ -807,7 +824,25 @@ app.post('/api/speech', async (req, res) => {
     const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
     if (!audioData) throw new Error('Audio generation failed');
 
+    // Return early to user
     res.json({ audioData });
+
+    // 3. Background Upload & Cache (Fire and Forget)
+    if (articleId && process.env.CLOUDINARY_API_KEY) {
+      (async () => {
+        try {
+          const buffer = Buffer.from(audioData, 'base64');
+          const result = await streamUpload(buffer);
+          if (result && result.secure_url) {
+            await Article.findOneAndUpdate({ id: articleId }, { audioUrl: result.secure_url });
+            console.log(`Audio cached for ${articleId}: ${result.secure_url}`);
+          }
+        } catch (err) {
+          console.error("Background Audio Upload Failed:", err);
+        }
+      })();
+    }
+
   } catch (error) {
     console.error("Gemini Speech API Error:", error);
     res.status(500).json({ error: 'TTS Error' });
