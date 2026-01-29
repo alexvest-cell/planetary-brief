@@ -45,7 +45,7 @@ const SubscribeView: React.FC<SubscribeViewProps> = ({ onBack }) => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     try {
-      const response = await fetch('http://localhost:3000/api/subscribe', {
+      const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
