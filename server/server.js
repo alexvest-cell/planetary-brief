@@ -12,6 +12,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import streamifier from 'streamifier';
 import seedArticles from './seed_data.js';
 import dns from 'dns';
+import { GoogleGenAI } from "@google/genai";
 
 // Fix DNS resolution issues on Windows
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -33,7 +34,9 @@ const port = 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // Middleware
 app.use(cors());
@@ -748,14 +751,68 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
 
 // --- SERVE FRONTEND (Production) ---
 // This allows the Node server to serve the React app after it's built
-const distPath = path.join(__dirname, '../dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+res.sendFile(path.join(distPath, 'index.html'));
   });
 }
 
+// --- AI Endpoints ---
+
+app.post('/api/analyze', async (req, res) => {
+  if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: 'Server AI Key missing' });
+  const { prompt } = req.body;
+
+  try {
+    const ai = new GoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: `You are the Planetary Brief AI, an intelligent environmental assistant.
+        Goal: Answer user questions on environment, climate, sustainability with high accuracy.
+        Tone: Helpful, authoritative, scientific, yet accessible. Avoid alarmism.
+        Format: Keep responses concise (under 200 words) unless asked for deep dive. Use markdown.
+        Verification: Rely on consensus science (IPCC, NOAA, etc.).`,
+      }
+    });
+
+    res.json({ text: response.text() || "Analysis incomplete." });
+  } catch (error) {
+    console.error("Gemini Analysis API Error:", error);
+    res.status(500).json({ error: 'AI Error' });
+  }
+});
+
+app.post('/api/speech', async (req, res) => {
+  if (!process.env.GEMINI_API_KEY) return res.status(500).json({ error: 'Server AI Key missing' });
+  const { text } = req.body;
+
+  try {
+    const ai = new GoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash-exp",
+      contents: { parts: [{ text }] },
+      config: {
+        responseModalities: ["AUDIO"],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: { voiceName: 'Kore' },
+          },
+        },
+      },
+    });
+
+    const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (!audioData) throw new Error('Audio generation failed');
+
+    res.json({ audioData });
+  } catch (error) {
+    console.error("Gemini Speech API Error:", error);
+    res.status(500).json({ error: 'TTS Error' });
+  }
+});
+
+
+// Start Server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
