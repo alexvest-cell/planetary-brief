@@ -151,23 +151,19 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                         </p>
                     </div>
 
-                    <div className="space-y-8">
+                    <div className="grid gap-4 md:grid-cols-2">
                         {methodologySteps.map((step, idx) => {
                             const Icon = step.icon;
                             return (
                                 <div
                                     key={idx}
-                                    className={`p-6 md:p-8 rounded-2xl ${step.bg} border ${step.borderColor} hover:scale-[1.02] transition-transform duration-300`}
+                                    className={`p-5 rounded-xl bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all`}
                                 >
-                                    <div className="flex items-start gap-4">
-                                        <div className={`p-3 rounded-xl bg-zinc-950 border-2 ${step.borderColor} flex-shrink-0`}>
-                                            <Icon size={28} className={step.color} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className={`text-xl md:text-2xl font-bold mb-3 ${step.color}`}>{step.title}</h3>
-                                            <p className="text-gray-300 leading-relaxed">{step.desc}</p>
-                                        </div>
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <Icon size={20} className={step.color} />
+                                        <h3 className="font-bold text-white text-base md:text-lg">{step.title}</h3>
                                     </div>
+                                    <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
                                 </div>
                             );
                         })}
@@ -194,31 +190,28 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                         </p>
                     </div>
 
-                    <div className="grid gap-8 md:grid-cols-2">
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {sourceCategories.map((category, idx) => {
                             const Icon = category.icon;
                             return (
                                 <div
                                     key={idx}
-                                    className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6 hover:border-news-accent/30 transition-colors"
+                                    className="bg-zinc-900/30 border border-white/5 rounded-xl p-5"
                                 >
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 rounded-lg bg-news-accent/10 border border-news-accent/20">
-                                            <Icon size={24} className="text-news-accent" />
-                                        </div>
+                                    <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3">
+                                        <Icon size={18} className="text-news-accent" />
                                         <div>
-                                            <h3 className="text-lg font-bold text-white">{category.title}</h3>
-                                            <p className="text-xs text-gray-500 uppercase tracking-wider">{category.description}</p>
+                                            <h3 className="text-sm font-bold text-white leading-none mb-1">{category.title}</h3>
+                                            <p className="text-[10px] text-gray-500 uppercase tracking-wider">{category.description}</p>
                                         </div>
                                     </div>
-                                    <ul className="space-y-2">
+                                    <div className="flex flex-wrap gap-2">
                                         {category.items.map((item, itemIdx) => (
-                                            <li key={itemIdx} className="flex items-start gap-2 text-sm text-gray-400">
-                                                <span className="text-news-accent mt-1 flex-shrink-0">•</span>
-                                                <span>{item}</span>
-                                            </li>
+                                            <span key={itemIdx} className="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded-md border border-white/5">
+                                                {item}
+                                            </span>
                                         ))}
-                                    </ul>
+                                    </div>
                                 </div>
                             );
                         })}
