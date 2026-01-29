@@ -219,6 +219,25 @@ const Navigation: React.FC<NavigationProps> = ({
         </div>
       </div>
 
+      {/* Mobile Search Bar (Only visible when search is open on mobile) */}
+      <div className={`md:hidden ${isSearchOpen ? 'block' : 'hidden'} w-full bg-zinc-900 border-b border-white/10 p-4 animate-fade-in`}>
+        <div className="flex items-center bg-black border border-white/20 rounded-lg px-3 py-2">
+          <Search size={16} className="text-gray-500 mr-2" />
+          <input
+            type="text"
+            value={searchValue}
+            onChange={handleSearchChange}
+            placeholder="Search..."
+            className="bg-transparent border-none focus:outline-none text-white text-sm w-full"
+            autoFocus
+            onKeyDown={(e) => e.key === 'Enter' && onSearch(searchValue)}
+          />
+          <button onClick={toggleSearch}>
+            <X size={16} className="text-gray-500" />
+          </button>
+        </div>
+      </div>
+
       {/* Secondary Bar (Categories) */}
       <div className={`w-full bg-black/80 backdrop-blur border-b border-white/10 transition-all duration-300 ${isScrolled ? 'h-10' : 'h-12'}`}>
         <div className="container mx-auto px-4 md:px-8 h-full flex items-center overflow-x-auto hide-scrollbar">
