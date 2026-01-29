@@ -125,39 +125,15 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                         <div className="h-1 w-20 bg-news-accent mx-auto mb-8"></div>
                     </div>
 
-                    <div className="space-y-8 text-gray-300 leading-relaxed">
-                        <div className="flex items-start gap-4 p-6 bg-news-accent/5 border border-news-accent/20 rounded-xl">
-                            <Heart className="text-news-accent mt-1 flex-shrink-0" size={28} />
-                            <div>
-                                <h3 className="text-xl font-bold text-white mb-3">Why We Exist</h3>
-                                <p className="text-base">
-                                    Environmental challenges are the defining crisis of our time, yet scientific knowledge remains locked behind paywalls, jargon, and inaccessible technical reports. We believe that understanding our planet's health shouldn't require a PhD.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4 p-6 bg-blue-500/5 border border-blue-500/20 rounded-xl">
-                            <Users className="text-blue-400 mt-1 flex-shrink-0" size={28} />
-                            <div>
-                                <h3 className="text-xl font-bold text-white mb-3">Reaching New Audiences</h3>
-                                <p className="text-base">
-                                    GreenShift exists to bridge the gap between climate science and everyday decision-makers. We translate complex environmental data into clear, actionable intelligence for citizens, educators, policymakers, and anyone who cares about our future.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4 p-6 bg-purple-500/5 border border-purple-500/20 rounded-xl">
-                            <TrendingUp className="text-purple-400 mt-1 flex-shrink-0" size={28} />
-                            <div>
-                                <h3 className="text-xl font-bold text-white mb-3">Why It Matters</h3>
-                                <p className="text-base">
-                                    Informed citizens drive systemic change. When communities understand the science behind wildfires, ocean acidification, or renewable energy breakthroughs, they can advocate smarter, vote better, and build resilient futures. Knowledge is the foundation of action—and action is what our planet needs now.
-                                </p>
-                            </div>
-                        </div>
-
-                        <p className="text-lg text-center pt-6 text-gray-200">
-                            <strong>Our commitment:</strong> Make environmental science accessible, transparent, and impossible to ignore.
+                    <div className="space-y-8 text-gray-300 leading-relaxed max-w-3xl mx-auto text-lg md:text-xl font-light">
+                        <p>
+                            <span className="text-white font-medium">Planetary Brief</span> is an independent environmental intelligence publication covering climate, oceans, biodiversity and the systems that sustain life on Earth. We report with newsroom rigor, drawing exclusively on trusted science and established journalism.
+                        </p>
+                        <p>
+                            Our goal is to make complex planetary change clear, relevant and engaging without exaggeration or alarmism. We translate research, data and expert reporting into stories that explain what is happening, why it matters, and how it connects to everyday life.
+                        </p>
+                        <p>
+                            Planetary Brief is written for a generation living through rapid environmental change. We focus on the signals that matter most, grounding every article in evidence and clarity, and treating the state of the planet as the defining story of our time.
                         </p>
                     </div>
                 </div>
