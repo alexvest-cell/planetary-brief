@@ -34,7 +34,6 @@ const port = 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
-const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -751,7 +750,11 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
 
 // --- SERVE FRONTEND (Production) ---
 // This allows the Node server to serve the React app after it's built
-res.sendFile(path.join(distPath, 'index.html'));
+const distPath = path.join(__dirname, '../dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get(/(.*)/, (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
   });
 }
 
@@ -762,7 +765,7 @@ app.post('/api/analyze', async (req, res) => {
   const { prompt } = req.body;
 
   try {
-    const ai = new GoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: prompt,
@@ -787,7 +790,7 @@ app.post('/api/speech', async (req, res) => {
   const { text } = req.body;
 
   try {
-    const ai = new GoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash-exp",
       contents: { parts: [{ text }] },
