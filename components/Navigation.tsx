@@ -196,6 +196,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   onChange={handleSearchChange}
                   placeholder="Search..."
                   className="bg-transparent border-none focus:outline-none text-white text-xs w-full placeholder:text-gray-500"
+                  onKeyDown={(e) => e.key === 'Enter' && onSearch(searchValue)}
                 />
                 <button onClick={toggleSearch} className="text-news-accent hover:text-white">
                   <X size={14} />
