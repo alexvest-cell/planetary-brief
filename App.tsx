@@ -288,6 +288,7 @@ function App() {
         activeCategory={activeCategory}
         onCategorySelect={handleCategorySelect}
         newsArticles={articles}
+        currentView={view} // Pass the current view state
       />
 
       <main>

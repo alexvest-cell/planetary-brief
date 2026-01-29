@@ -16,6 +16,7 @@ interface NavigationProps {
   activeCategory: string;
   onCategorySelect: (category: string) => void;
   newsArticles: Article[];
+  currentView: string;
 }
 
 import { CATEGORY_IDS } from '../data/categories';
@@ -34,7 +35,8 @@ const Navigation: React.FC<NavigationProps> = ({
   onShowAbout,
   activeCategory,
   onCategorySelect,
-  newsArticles
+  newsArticles,
+  currentView
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -165,13 +167,13 @@ const Navigation: React.FC<NavigationProps> = ({
           <div className="flex items-center gap-2 w-full md:w-auto md:ml-12">
             <button
               onClick={() => { onCategorySelect('All'); }}
-              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${activeCategory === 'All' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${currentView !== 'action-guide' && activeCategory === 'All' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               Briefing
             </button>
             <button
               onClick={onActionGuideClick}
-              className="flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${currentView === 'action-guide' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               Guides
             </button>
