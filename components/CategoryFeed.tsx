@@ -172,10 +172,10 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
 
                             if (index === 0) {
                                 // The first article of the remaining grid gets the "Featured" Bento treatment
-                                gridClass = "col-span-2 md:col-span-2 row-span-2";
-                                titleSize = "text-xl md:text-3xl";
-                                imageHeight = "aspect-video md:aspect-[16/9]";
-                                excerptClass = "line-clamp-3 md:line-clamp-4";
+                                gridClass = "col-span-2 md:col-span-2";
+                                titleSize = "text-xl md:text-2xl";
+                                imageHeight = "aspect-video md:aspect-[2/1]";
+                                excerptClass = "line-clamp-3";
                             } else if (index === 1 || index === 2) {
                                 // Medium cards
                                 gridClass = "col-span-2 md:col-span-1";
