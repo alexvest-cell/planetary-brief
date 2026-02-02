@@ -52,7 +52,7 @@ const ArticleDataVisual = ({ article }: { article: Article }) => {
 };
 
 // Combined Footer Component
-const ArticleFooter = ({ onShowAbout }: { onShowAbout: () => void }) => (
+const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout: () => void }) => (
   <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8 my-6 md:my-10 flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
     {/* Brand Block */}
     <div className="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
@@ -324,7 +324,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         </div>
 
         {/* Combined Footer Component */}
-        <ArticleFooter onShowAbout={onShowAbout} />
+        <ArticleFooter article={article} onShowAbout={onShowAbout} />
 
         {relatedArticles.length > 0 && (
           <div className="mt-12 mb-12 pt-8">
