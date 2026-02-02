@@ -97,7 +97,15 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                             <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500">
                                 <span>{displayDate}</span>
                                 <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-                                <span>{displaySource}</span>
+                                <span>
+                                    {featuredArticleOverride ? (() => {
+                                        const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+                                        const categories = Array.isArray(featuredArticleOverride.category)
+                                            ? featuredArticleOverride.category
+                                            : [featuredArticleOverride.category];
+                                        return categories.map(displayCategory).join(' • ');
+                                    })() : displaySource}
+                                </span>
                             </div>
 
                             {/* Play button for featured article (if it's a real article) */}
