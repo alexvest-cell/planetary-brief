@@ -60,13 +60,7 @@ const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout
         PB
       </div>
       <div className="flex flex-col">
-        <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">
-          {(() => {
-            const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
-            const categories = Array.isArray(article.category) ? article.category : [article.category];
-            return categories.map(displayCategory).join(' • ');
-          })()}
-        </span>
+        <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
         <button
           onClick={onShowAbout}
           className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
@@ -88,9 +82,9 @@ const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout
       <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
         {Array.isArray(article.sources) && article.sources.length > 0 ? (
           <>
-            Synthesized from verified data sources including{' '}
+            This article uses synthesized data from verified sources including{' '}
             {article.sources.map((source, i) => (
-              <span key={i} className="text-emerald-400/80 hover:text-emerald-400 transition-colors cursor-default">
+              <span key={i} className="text-gray-300">
                 {source}{i < article.sources.length - 1 ? ', ' : ''}
               </span>
             ))}.
@@ -98,7 +92,7 @@ const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout
           </>
         ) : (
           <>
-            Synthesized from verified data sources including IPCC, NOAA, and legislative filings.
+            This article uses synthesized data from verified sources including IPCC, NOAA, and legislative filings.
             <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
           </>
         )}
