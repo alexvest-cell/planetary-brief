@@ -119,7 +119,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             className={`group relative bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col ${gridClass}`}
                                             onClick={() => onArticleClick(article)}
                                         >
-                                            <div className={`w-full overflow-hidden bg-zinc-900 ${imageHeight} ${index === 0 ? 'md:h-full' : ''}`}>
+                                            <div className={`w-full overflow-hidden bg-zinc-900 ${imageHeight} ${index === 0 ? 'md:h-full' : ''} relative`}>
                                                 <img
                                                     src={article.imageUrl}
                                                     alt={article.title}
@@ -128,6 +128,23 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 {index === 0 && (
                                                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
                                                 )}
+
+                                                {/* Listen Button - Top Right (or Left if needed) */}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        playArticle(article);
+                                                    }}
+                                                    disabled={isLoading && currentArticle?.id === article.id}
+                                                    className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 ${index === 0 ? 'top-4 right-4 w-10 h-10' : ''}`}
+                                                    title="Listen to article"
+                                                >
+                                                    {isLoading && currentArticle?.id === article.id ? (
+                                                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                                    ) : (
+                                                        <Headphones size={index === 0 ? 16 : 14} />
+                                                    )}
+                                                </button>
                                             </div>
 
                                             <div className={`p-4 flex flex-col flex-grow ${index === 0 ? 'absolute bottom-0 left-0 w-full z-10' : ''}`}>
@@ -152,22 +169,6 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 {index !== 0 && (
                                                     <div className="mt-auto pt-2 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
                                                         <span>{article.date.split(',')[0]}</span>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                playArticle(article);
-                                                            }}
-                                                            disabled={isLoading && currentArticle?.id === article.id}
-                                                            className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 transition-all text-gray-400 hover:text-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                            title="Listen to article"
-                                                        >
-                                                            {isLoading && currentArticle?.id === article.id ? (
-                                                                <div className="w-3 h-3 border border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                                                            ) : (
-                                                                <Headphones size={12} />
-                                                            )}
-                                                            <span className="hidden md:inline">Listen</span>
-                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
@@ -233,6 +234,21 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
                                                 Guides
                                             </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    playArticle(article);
+                                                }}
+                                                disabled={isLoading && currentArticle?.id === article.id}
+                                                className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
+                                                title="Listen to guide"
+                                            >
+                                                {isLoading && currentArticle?.id === article.id ? (
+                                                    <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                                ) : (
+                                                    <Headphones size={14} />
+                                                )}
+                                            </button>
                                         </div>
                                         <div className="p-4 flex flex-col flex-grow">
                                             <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
@@ -241,24 +257,10 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
                                                 {article.excerpt}
                                             </p>
-                                            <div className="flex items-center justify-between text-[10px] text-gray-500 pt-2 border-t border-white/5">
+                                            <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
+                                                <span>{article.date}</span>
+                                                <span>•</span>
                                                 <span>{article.originalReadTime}</span>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        playArticle(article);
-                                                    }}
-                                                    disabled={isLoading && currentArticle?.id === article.id}
-                                                    className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 transition-all text-gray-400 hover:text-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    title="Listen to guide"
-                                                >
-                                                    {isLoading && currentArticle?.id === article.id ? (
-                                                        <div className="w-3 h-3 border border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                                                    ) : (
-                                                        <Headphones size={12} />
-                                                    )}
-                                                    <span>Listen</span>
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -295,6 +297,21 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
                                             })()}
                                         </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                playArticle(article);
+                                            }}
+                                            disabled={isLoading && currentArticle?.id === article.id}
+                                            className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
+                                            title="Listen to story"
+                                        >
+                                            {isLoading && currentArticle?.id === article.id ? (
+                                                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                            ) : (
+                                                <Headphones size={14} />
+                                            )}
+                                        </button>
                                     </div>
                                     <div className="p-4 flex flex-col flex-grow">
                                         <div className="text-[9px] font-bold uppercase tracking-widest text-news-accent mb-2 truncate">{article.topic}</div>
@@ -306,22 +323,9 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                         </p>
                                         <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-[9px] text-gray-500 uppercase font-bold">
                                             <span className="truncate mr-1">{article.source}</span>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    playArticle(article);
-                                                }}
-                                                disabled={isLoading && currentArticle?.id === article.id}
-                                                className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 transition-all text-gray-400 hover:text-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                title="Listen to story"
-                                            >
-                                                {isLoading && currentArticle?.id === article.id ? (
-                                                    <div className="w-3 h-3 border border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                                                ) : (
-                                                    <Headphones size={12} />
-                                                )}
-                                                <span>Listen</span>
-                                            </button>
+                                            <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform text-white">
+                                                Read <ChevronRight size={10} />
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
