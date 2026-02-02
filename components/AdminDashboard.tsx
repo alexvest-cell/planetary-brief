@@ -134,7 +134,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             source: ''
         },
         sources: [],
-        status: 'published',
+        status: 'draft', // Default to draft for new articles
         scheduledPublishDate: undefined
     });
 
