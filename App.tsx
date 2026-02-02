@@ -13,7 +13,7 @@ import EarthDashboard from './components/EarthDashboard';
 import DataExplanationView from './components/DataExplanationView';
 import ActionDetailsView from './components/ActionDetailsView';
 import AboutPage from './components/AboutPage';
-import SubscribeView from './components/SubscribeView';
+import SubscribeModal from './components/SubscribeModal';
 import AdminDashboard from './components/AdminDashboard';
 import { Section, Article, ExplanationData } from './types';
 import { featuredArticle, newsArticles as staticNewsArticles } from './data/content';
@@ -55,6 +55,7 @@ function App() {
 
   // Dynamic Articles State
   const [articles, setArticles] = useState<Article[]>(staticNewsArticles);
+  const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
 
   // Define fetchArticles outside useEffect to be reusable
   const fetchArticles = async () => {
@@ -123,8 +124,16 @@ function App() {
       setView('dashboard');
     } else if (viewParam === 'action') {
       setView('action-guide');
+    } else if (viewParam === 'action') {
+      setView('action-guide');
     } else if (viewParam === 'subscribe') {
-      setView('subscribe');
+      // Open modal instead of changing view
+      setIsSubscribeModalOpen(true);
+      // If we are just landing here, default to home view behind the modal
+      if (view === 'home' || view === 'subscribe') {
+        setView('home');
+      }
+      // Clean URL logic could go here but let's leave param for now so sharing works
     } else if (viewParam === 'methodology') {
       setView('methodology');
     } else if (categoryParam && categoryParam !== 'All' && categoryParam !== 'Discover') {
@@ -263,9 +272,9 @@ function App() {
   };
 
   const handleShowSubscribe = () => {
-    setView('subscribe');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'subscribe' }, '', '?view=subscribe');
+    setIsSubscribeModalOpen(true);
+    // Optional: Update URL without navigation?
+    // window.history.pushState({ view: 'home', subscribe: true }, '', '?view=subscribe');
   };
 
   const handleSearch = (query: string) => {
@@ -417,18 +426,23 @@ function App() {
 
 
 
-        {view === 'subscribe' && (
-          <SubscribeView
-            onBack={handleBackToFeed}
-          />
-        )}
-
         {/* Global Footer available on all pages */}
         <Contact
           onShowAbout={handleShowAbout}
           onSubscribeClick={handleShowSubscribe}
         />
       </main>
+
+      <SubscribeModal
+        isOpen={isSubscribeModalOpen}
+        onClose={() => {
+          setIsSubscribeModalOpen(false);
+          // If URL had ?view=subscribe, maybe revert it?
+          if (window.location.search.includes('view=subscribe')) {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+        }}
+      />
     </div>
   );
 }

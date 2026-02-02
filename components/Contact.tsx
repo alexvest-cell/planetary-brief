@@ -28,13 +28,6 @@ const Contact: React.FC<ContactProps> = ({ onShowAbout, onSubscribeClick }) => {
               <ShieldCheck size={14} />
               About
             </button>
-            <button
-              onClick={onSubscribeClick}
-              className="bg-white hover:bg-gray-200 text-black px-5 py-2 rounded-full font-bold uppercase tracking-widest text-[10px] flex items-center gap-2 transition-colors"
-            >
-              <span>Subscribe</span>
-              <Bell size={10} className="fill-black" />
-            </button>
           </div>
 
         </div>
