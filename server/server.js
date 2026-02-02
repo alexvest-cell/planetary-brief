@@ -873,8 +873,14 @@ app.post('/api/speech', async (req, res) => {
 
 // Admin-only: Generate audio for an article
 app.post('/api/generate-audio', requireAuth, async (req, res) => {
+  // Note: Text-to-Speech API requires enabling the API in Google Cloud Console
+  // and may require a different API key than Gemini
+
   if (!process.env.GEMINI_API_KEY) {
-    return res.status(500).json({ error: 'Server AI Key missing' });
+    return res.status(500).json({
+      error: 'Server AI Key missing',
+      details: 'Please add GEMINI_API_KEY to environment variables'
+    });
   }
 
   const { articleId } = req.body;
@@ -924,6 +930,12 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     if (!ttsResponse.ok) {
       const errorData = await ttsResponse.json().catch(() => ({}));
       console.error('TTS API error:', errorData);
+
+      // Provide helpful error message
+      if (errorData.error?.status === 'PERMISSION_DENIED') {
+        throw new Error('Text-to-Speech API not enabled. Please enable it in Google Cloud Console and ensure your API key has access.');
+      }
+
       throw new Error(`Text-to-Speech API failed: ${errorData.error?.message || ttsResponse.statusText}`);
     }
 
@@ -958,7 +970,10 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     });
   } catch (error) {
     console.error("Audio generation error:", error);
-    res.status(500).json({ error: 'Audio generation failed', details: error.message });
+    res.status(500).json({
+      error: 'Audio generation failed',
+      details: error.message
+    });
   }
 });
 
