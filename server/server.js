@@ -900,7 +900,7 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     // Generate audio via Gemini
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
+      model: "gemini-2.0-flash-exp-1219",  // Updated model that supports audio
       contents: { parts: [{ text: textToRead }] },
       config: {
         responseModalities: ["AUDIO"],
