@@ -120,8 +120,11 @@ function App() {
       const category = slugToCategory(slug);
       setActiveCategory(category);
       setView('category');
-    } else if (viewParam === 'dashboard') {
+    } else if (pathname === '/dashboard' || viewParam === 'dashboard') {
       setView('dashboard');
+      if (pathname !== '/dashboard') {
+        window.history.replaceState({}, '', '/dashboard');
+      }
     } else if (pathname === '/guides' || viewParam === 'action') {
       setView('action-guide');
       if (pathname !== '/guides') {
@@ -134,318 +137,336 @@ function App() {
       if (view === 'home' || view === 'subscribe') {
         setView('home');
       }
-      // Clean URL logic could go here but let's leave param for now so sharing works
-    } else if (viewParam === 'methodology') {
-      setView('methodology');
+    } else if (pathname === '/methodology' || viewParam === 'methodology') {
+      // Methodology is part of the About page
+      setView('about');
+      if (pathname !== '/about') {
+        window.history.replaceState({}, '', '/about');
+      }
+    } else if (pathname === '/about' || viewParam === 'about' || (window.location.hash === '#about' && view !== 'home')) {
+      // Also catching #about if linking directly, though usually About is a section on Home or a separate page? 
+      // In this app 'About' seems to be a separate view 'AboutPage'.
+      setView('about');
+      if (pathname !== '/about') {
+        window.history.replaceState({}, '', '/about');
+      }
     } else if (categoryParam && categoryParam !== 'All' && categoryParam !== 'Discover') {
       // Backward compatibility: redirect old query param URLs to new clean URLs
       const slug = categoryToSlug(categoryParam);
       window.history.replaceState({}, '', `/category/${slug}`);
       setActiveCategory(categoryParam);
       setView('category');
-    } else if (articleId && articles.length > 0) {
-      const foundArticle = articles.find(a => a.id === articleId);
-      if (foundArticle) {
-        setCurrentArticle(foundArticle);
-        setView('article');
-        // Clear param to avoid re-triggering if state changes elsewhere
-        window.history.replaceState({}, '', window.location.pathname);
+    }
+  } else if ((pathname.startsWith('/article/') || articleId) && articles.length > 0) {
+    // Support both clean URL and legacy query param
+    const idToFind = articleId || pathname.replace('/article/', '');
+    const foundArticle = articles.find(a => a.id === idToFind);
+    if (foundArticle) {
+      setCurrentArticle(foundArticle);
+      setView('article');
+      // Normalize URL if needed
+      if (pathname !== `/article/${foundArticle.id}`) {
+        window.history.replaceState({ view: 'article', articleId: foundArticle.id }, '', `/article/${foundArticle.id}`);
       }
     }
-    // Handle Browser Back Button
-    const handlePopState = (event: PopStateEvent) => {
-      if (event.state && event.state.view) {
-        const viewState = event.state.view;
+  }
+  // Handle Browser Back Button
+  const handlePopState = (event: PopStateEvent) => {
+    // ... existing popstate logic ...
 
-        switch (viewState) {
-          case 'article':
-            const found = articles.find(a => a.id === event.state.articleId);
-            if (found) {
-              setCurrentArticle(found);
-              setView('article');
-            }
-            break;
-          case 'category':
-            setActiveCategory(event.state.category || 'All');
-            setView('category');
-            break;
-          case 'sources':
-            setView('sources');
-            break;
-          case 'dashboard':
-            setView('dashboard');
-            break;
-          case 'explanation':
-            setView('explanation');
-            if (event.state.explanationData) {
-              setExplanationData(event.state.explanationData);
-            }
-            break;
-          case 'action-guide':
-            setView('action-guide');
-            break;
-          case 'methodology':
-            setView('methodology');
-            break;
-          case 'subscribe':
-            setView('subscribe');
-            break;
-          case 'home':
-          default:
-            setView('home');
-            setCurrentArticle(null);
-            setSearchQuery('');
-            break;
-        }
-      } else {
-        // No state means we're at the initial page (home)
-        setView('home');
-        setCurrentArticle(null);
-        setSearchQuery('');
+    if (event.state && event.state.view) {
+      const viewState = event.state.view;
+
+      switch (viewState) {
+        case 'article':
+          const found = articles.find(a => a.id === event.state.articleId);
+          if (found) {
+            setCurrentArticle(found);
+            setView('article');
+          }
+          break;
+        case 'category':
+          setActiveCategory(event.state.category || 'All');
+          setView('category');
+          break;
+        case 'sources':
+          setView('sources');
+          break;
+        case 'dashboard':
+          setView('dashboard');
+          break;
+        case 'explanation':
+          setView('explanation');
+          if (event.state.explanationData) {
+            setExplanationData(event.state.explanationData);
+          }
+          break;
+        case 'action-guide':
+          setView('action-guide');
+          break;
+        case 'methodology':
+          setView('methodology');
+          break;
+        case 'subscribe':
+          setView('subscribe');
+          break;
+        case 'home':
+        default:
+          setView('home');
+          setCurrentArticle(null);
+          setSearchQuery('');
+          break;
       }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [articles]);
-
-  const scrollToSection = (sectionId: Section) => {
-    if (view !== 'home') {
-      setView('home');
-      setActiveCategory('All');
-      setTimeout(() => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-          setActiveSection(sectionId);
-        }
-      }, 50);
     } else {
+      // No state means we're at the initial page (home)
+      setView('home');
+      setCurrentArticle(null);
+      setSearchQuery('');
+    }
+  };
+
+  window.addEventListener('popstate', handlePopState);
+  return () => window.removeEventListener('popstate', handlePopState);
+}, [articles]);
+
+const scrollToSection = (sectionId: Section) => {
+  if (view !== 'home') {
+    setView('home');
+    setActiveCategory('All');
+    setTimeout(() => {
       const element = document.getElementById(sectionId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
         setActiveSection(sectionId);
       }
+    }, 50);
+  } else {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setActiveSection(sectionId);
     }
-  };
+  }
+};
 
-  const handleArticleClick = (article: Article) => {
-    setCurrentArticle(article);
-    setView('article');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'article', articleId: article.id }, '', `?article=${article.id}`);
-  };
+const handleArticleClick = (article: Article) => {
+  setCurrentArticle(article);
+  setView('article');
+  window.scrollTo(0, 0);
+  window.history.pushState({ view: 'article', articleId: article.id }, '', `/article/${article.id}`);
+};
 
-  const handleBackToFeed = () => {
-    window.history.back();
-  };
 
-  const handleBackFromMethodology = () => {
-    window.history.back();
-  };
+const handleBackToFeed = () => {
+  window.history.back();
+};
 
-  const handleShowAbout = () => {
-    setView('about');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'about' }, '', '?view=about');
-  };
+const handleBackFromMethodology = () => {
+  window.history.back();
+};
 
-  const handleShowDashboard = () => {
-    setView('dashboard');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'dashboard' }, '', '?view=dashboard');
-  };
+const handleShowAbout = () => {
+  setView('about');
+  window.scrollTo(0, 0);
+  window.history.pushState({ view: 'about' }, '', '/about');
+};
 
-  const handleShowActionGuide = () => {
-    setView('action-guide');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'action-guide' }, '', '/guides');
-  };
+const handleShowDashboard = () => {
+  setView('dashboard');
+  window.scrollTo(0, 0);
+  window.history.pushState({ view: 'dashboard' }, '', '/dashboard');
+};
 
-  const handleExplainData = (data: ExplanationData) => {
-    setExplanationData(data);
-    setView('explanation');
-    window.history.pushState({ view: 'explanation', explanationData: data }, '', '');
-  };
+const handleShowActionGuide = () => {
+  setView('action-guide');
+  window.scrollTo(0, 0);
+  window.history.pushState({ view: 'action-guide' }, '', '/guides');
+};
 
-  const handleBackToDashboard = () => {
-    window.history.back();
-  };
+const handleExplainData = (data: ExplanationData) => {
+  setExplanationData(data);
+  setView('explanation');
+  window.history.pushState({ view: 'explanation', explanationData: data }, '', '');
+};
 
-  const handleShowSubscribe = () => {
-    setIsSubscribeModalOpen(true);
-    // Optional: Update URL without navigation?
-    // window.history.pushState({ view: 'home', subscribe: true }, '', '?view=subscribe');
-  };
+const handleBackToDashboard = () => {
+  window.history.back();
+};
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    if (view !== 'home' && query.length > 0) {
-      setView('home');
-      setActiveCategory('All');
-      setTimeout(() => {
-        const newsSection = document.getElementById(Section.NEWS);
-        if (newsSection) {
-          newsSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } else if (view === 'home' && query.length > 0) {
+const handleShowSubscribe = () => {
+  setIsSubscribeModalOpen(true);
+  // Optional: Update URL without navigation?
+  // window.history.pushState({ view: 'home', subscribe: true }, '', '?view=subscribe');
+};
+
+const handleSearch = (query: string) => {
+  setSearchQuery(query);
+  if (view !== 'home' && query.length > 0) {
+    setView('home');
+    setActiveCategory('All');
+    setTimeout(() => {
       const newsSection = document.getElementById(Section.NEWS);
       if (newsSection) {
-        const rect = newsSection.getBoundingClientRect();
-        if (rect.top > window.innerHeight || rect.bottom < 0) {
-          newsSection.scrollIntoView({ behavior: 'smooth' });
-        }
+        newsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  } else if (view === 'home' && query.length > 0) {
+    const newsSection = document.getElementById(Section.NEWS);
+    if (newsSection) {
+      const rect = newsSection.getBoundingClientRect();
+      if (rect.top > window.innerHeight || rect.bottom < 0) {
+        newsSection.scrollIntoView({ behavior: 'smooth' });
       }
     }
-  };
-
-  const handleCategorySelect = (category: string) => {
-    setSearchQuery('');
-    setActiveCategory(category);
-    if (category === 'All' || category === 'Discover') {
-      setView('home');
-      window.scrollTo(0, 0);
-      window.history.pushState({ view: 'home', category }, '', '/');
-    } else {
-      setView('category');
-      window.scrollTo(0, 0);
-      const slug = categoryToSlug(category);
-      window.history.pushState({ view: 'category', category }, '', `/category/${slug}`);
-    }
-  };
-
-  if (view === 'admin') {
-    return <AdminDashboard onBack={() => {
-      setView('home');
-      fetchArticles(); // Refresh data on return
-      window.history.replaceState({}, '', window.location.pathname);
-    }} />;
   }
+};
 
-  return (
-    <div className="min-h-screen bg-news-bg text-news-text font-sans">
-      <Navigation
-        activeSection={activeSection}
-        scrollToSection={scrollToSection}
-        onSearch={handleSearch}
-        searchQuery={searchQuery}
-        onArticleSelect={handleArticleClick}
-        onDashboardClick={handleShowDashboard}
-        onActionGuideClick={handleShowActionGuide}
-        onSubscribeClick={handleShowSubscribe}
-        onShowAbout={handleShowAbout}
-        activeCategory={activeCategory}
-        onCategorySelect={handleCategorySelect}
-        newsArticles={articles}
-        currentView={view} // Pass the current view state
-      />
+const handleCategorySelect = (category: string) => {
+  setSearchQuery('');
+  setActiveCategory(category);
+  if (category === 'All' || category === 'Discover') {
+    setView('home');
+    window.scrollTo(0, 0);
+    window.history.pushState({ view: 'home', category }, '', '/');
+  } else {
+    setView('category');
+    window.scrollTo(0, 0);
+    const slug = categoryToSlug(category);
+    window.history.pushState({ view: 'category', category }, '', `/category/${slug}`);
+  }
+};
 
-      <main>
-        {view === 'home' && (
-          <>
-            <Hero
-              onReadFeatured={() => {
-                // Feature Logic:
-                // 1. Find all 'isFeaturedDiscover' articles
-                const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
-                // 2. Sort by 'createdAt' (newest upload first)
-                featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
+if (view === 'admin') {
+  return <AdminDashboard onBack={() => {
+    setView('home');
+    fetchArticles(); // Refresh data on return
+    window.history.replaceState({}, '', window.location.pathname);
+  }} />;
+}
 
-                // 3. Pick winner, or fallback to fixed ID, or fallback to static default
-                const featured = featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
-                handleArticleClick(featured);
-              }}
-              onArticleClick={handleArticleClick}
-              // Pass the featured discover article
-              featuredArticleOverride={(() => {
-                const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
-                featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
-                return featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026');
-              })()}
-              articles={articles}
-            />
-            {/* Pass DYNAMIC articles to Portfolio */}
-            <Portfolio
-              articles={articles}
-              onArticleClick={handleArticleClick}
-              searchQuery={searchQuery}
-            />
-            <About
-              onShowAbout={handleShowAbout}
-            />
+return (
+  <div className="min-h-screen bg-news-bg text-news-text font-sans">
+    <Navigation
+      activeSection={activeSection}
+      scrollToSection={scrollToSection}
+      onSearch={handleSearch}
+      searchQuery={searchQuery}
+      onArticleSelect={handleArticleClick}
+      onDashboardClick={handleShowDashboard}
+      onActionGuideClick={handleShowActionGuide}
+      onSubscribeClick={handleShowSubscribe}
+      onShowAbout={handleShowAbout}
+      activeCategory={activeCategory}
+      onCategorySelect={handleCategorySelect}
+      newsArticles={articles}
+      currentView={view} // Pass the current view state
+    />
 
-          </>
-        )}
+    <main>
+      {view === 'home' && (
+        <>
+          <Hero
+            onReadFeatured={() => {
+              // Feature Logic:
+              // 1. Find all 'isFeaturedDiscover' articles
+              const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
+              // 2. Sort by 'createdAt' (newest upload first)
+              featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
 
-        {view === 'category' && (
-          <CategoryFeed
-            category={activeCategory}
-            articles={articles} // Pass dynamic articles
+              // 3. Pick winner, or fallback to fixed ID, or fallback to static default
+              const featured = featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
+              handleArticleClick(featured);
+            }}
             onArticleClick={handleArticleClick}
-            onBack={() => handleCategorySelect('All')}
+            // Pass the featured discover article
+            featuredArticleOverride={(() => {
+              const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
+              featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
+              return featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026');
+            })()}
+            articles={articles}
           />
-        )}
-
-        {view === 'article' && currentArticle && (
-          <ArticleView
-            article={currentArticle}
-            onBack={handleBackToFeed}
-            onArticleSelect={handleArticleClick}
-            allArticles={articles} // Pass dynamic articles
-            onShowAbout={handleShowAbout}
-          />
-        )}
-
-        {view === 'about' && (
-          <AboutPage onBack={handleBackToFeed} />
-        )}
-
-        {view === 'dashboard' && (
-          <EarthDashboard
-            onBack={handleBackToFeed}
-            onExplain={handleExplainData}
-            onSearch={handleSearch}
-          />
-        )}
-
-        {view === 'explanation' && explanationData && (
-          <DataExplanationView
-            data={explanationData}
-            onBack={handleBackToDashboard}
-          />
-        )}
-
-        {view === 'action-guide' && (
-          <ActionDetailsView
-            onBack={handleBackToFeed}
-            onSearch={handleSearch}
+          {/* Pass DYNAMIC articles to Portfolio */}
+          <Portfolio
             articles={articles}
             onArticleClick={handleArticleClick}
+            searchQuery={searchQuery}
           />
-        )}
+          <About
+            onShowAbout={handleShowAbout}
+          />
 
+        </>
+      )}
 
-
-        {/* Global Footer available on all pages */}
-        <Contact
-          onShowAbout={handleShowAbout}
-          onSubscribeClick={handleShowSubscribe}
+      {view === 'category' && (
+        <CategoryFeed
+          category={activeCategory}
+          articles={articles} // Pass dynamic articles
+          onArticleClick={handleArticleClick}
+          onBack={() => handleCategorySelect('All')}
         />
-      </main>
+      )}
 
-      <SubscribeModal
-        isOpen={isSubscribeModalOpen}
-        onClose={() => {
-          setIsSubscribeModalOpen(false);
-          // If URL had ?view=subscribe, maybe revert it?
-          if (window.location.search.includes('view=subscribe')) {
-            window.history.replaceState({}, '', window.location.pathname);
-          }
-        }}
+      {view === 'article' && currentArticle && (
+        <ArticleView
+          article={currentArticle}
+          onBack={handleBackToFeed}
+          onArticleSelect={handleArticleClick}
+          allArticles={articles} // Pass dynamic articles
+          onShowAbout={handleShowAbout}
+        />
+      )}
+
+      {view === 'about' && (
+        <AboutPage onBack={handleBackToFeed} />
+      )}
+
+      {view === 'dashboard' && (
+        <EarthDashboard
+          onBack={handleBackToFeed}
+          onExplain={handleExplainData}
+          onSearch={handleSearch}
+        />
+      )}
+
+      {view === 'explanation' && explanationData && (
+        <DataExplanationView
+          data={explanationData}
+          onBack={handleBackToDashboard}
+        />
+      )}
+
+      {view === 'action-guide' && (
+        <ActionDetailsView
+          onBack={handleBackToFeed}
+          onSearch={handleSearch}
+          articles={articles}
+          onArticleClick={handleArticleClick}
+        />
+      )}
+
+
+
+      {/* Global Footer available on all pages */}
+      <Contact
+        onShowAbout={handleShowAbout}
+        onSubscribeClick={handleShowSubscribe}
       />
-    </div>
-  );
+    </main>
+
+    <SubscribeModal
+      isOpen={isSubscribeModalOpen}
+      onClose={() => {
+        setIsSubscribeModalOpen(false);
+        // If URL had ?view=subscribe, maybe revert it?
+        if (window.location.search.includes('view=subscribe')) {
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }}
+    />
+  </div>
+);
 }
 
 export default App;
