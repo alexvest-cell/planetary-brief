@@ -711,7 +711,7 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
       <div class="container">
         <div class="header"><h1><span class="accent">Planetary</span>Brief</h1></div>
         <div class="content">
-          ${isWelcome ? '<p style="text-align:center">Welcome to the inner circle.</p>' : '<p style="text-align:center">Your weekly briefing.</p>'}
+          ${isWelcome ? '<p style="text-align:center">Welcome to the inner circle.</p>' : '<p style="text-align:center">Your weekly articles.</p>'}
           ${articleRows.map(row => `
             <div style="display: flex; gap: 20px; margin-bottom: 30px;">
               ${row.map(a => `
@@ -741,7 +741,7 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
   const info = await transporter.sendMail({
     from: '"Planetary Brief Intelligence" <briefing@planetarybrief.com>',
     to: email,
-    subject: isWelcome ? "Welcome to Planetary Brief" : "Your Weekly Intelligence Brief",
+    subject: isWelcome ? "Welcome to Planetary Brief" : "Your Weekly Articles",
     html: emailHtml,
   });
 

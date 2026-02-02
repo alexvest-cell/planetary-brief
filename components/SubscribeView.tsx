@@ -77,7 +77,7 @@ const SubscribeView: React.FC<SubscribeViewProps> = ({ onBack }) => {
           <h2 className="text-3xl font-serif font-bold text-white mb-4">You're on the list.</h2>
           <p className="text-gray-300 mb-8 leading-relaxed">
             We've sent a confirmation email to <span className="text-white font-bold">{email}</span>.
-            Your first curated intelligence briefing will arrive next Friday.
+            Your first curated articles will arrive next Friday.
           </p>
           <button
             onClick={onBack}

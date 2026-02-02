@@ -169,7 +169,7 @@ const Navigation: React.FC<NavigationProps> = ({
               onClick={() => { onCategorySelect('All'); }}
               className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${currentView !== 'action-guide' && activeCategory === 'All' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
-              Briefing
+              Articles
             </button>
             <button
               onClick={onActionGuideClick}
