@@ -62,7 +62,17 @@ function App() {
   // Define fetchArticles outside useEffect to be reusable
   const fetchArticles = async () => {
     try {
-      const res = await fetch('/api/articles');
+      const headers: HeadersInit = {};
+      let url = '/api/articles';
+
+      // Check for admin token to preview drafts
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        url += '?includeUnpublished=true';
+      }
+
+      const res = await fetch(url, { headers });
       if (res.ok) {
         const apiArticles = await res.json();
         if (apiArticles.length > 0) {
@@ -83,7 +93,6 @@ function App() {
             return getSortableDate(b) - getSortableDate(a);
           });
           console.log('Articles loaded:', sorted.length);
-          console.log('Article titles:', sorted.map((a: any) => a.title));
           setArticles(sorted);
         } else {
           console.log('No API articles, using static data');
