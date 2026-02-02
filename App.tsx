@@ -122,10 +122,11 @@ function App() {
       setView('category');
     } else if (viewParam === 'dashboard') {
       setView('dashboard');
-    } else if (viewParam === 'action') {
+    } else if (pathname === '/guides' || viewParam === 'action') {
       setView('action-guide');
-    } else if (viewParam === 'action') {
-      setView('action-guide');
+      if (pathname !== '/guides') {
+        window.history.replaceState({}, '', '/guides');
+      }
     } else if (viewParam === 'subscribe') {
       // Open modal instead of changing view
       setIsSubscribeModalOpen(true);
@@ -258,7 +259,7 @@ function App() {
   const handleShowActionGuide = () => {
     setView('action-guide');
     window.scrollTo(0, 0);
-    window.history.pushState({ view: 'action-guide' }, '', '?view=action');
+    window.history.pushState({ view: 'action-guide' }, '', '/guides');
   };
 
   const handleExplainData = (data: ExplanationData) => {
