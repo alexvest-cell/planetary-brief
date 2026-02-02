@@ -232,8 +232,8 @@ app.get('/api/articles', async (req, res) => {
 
     let query = {};
 
-    // Only filter if not admin or if admin didn't request unpublished
-    if (!isAdmin || includeUnpublished !== 'true') {
+    // Only show all articles (including drafts) if admin AND requested unpublished
+    if (!(isAdmin && includeUnpublished === 'true')) {
       const now = new Date();
       query = {
         $or: [
