@@ -132,6 +132,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             content: '',
             source: ''
         },
+        sources: [],
         status: 'published',
         scheduledPublishDate: undefined
     });
@@ -228,6 +229,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         const keywordsRaw = parseTag('KEYWORDS');
         const metaDesc = parseTag('META');
 
+        // Parse Sources
+        const sourcesRaw = parseTag('MAIN_BODY_SOURCES');
+        const newSources = sourcesRaw ? sourcesRaw.split(/\n/).map(s => s.trim()).filter(s => s) : [];
+
         setFormData(prev => ({
             ...prev,
             title: newTitle || prev.title,
@@ -236,6 +241,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             excerpt: newExcerpt || prev.excerpt,
             content: mainBody.length > 0 ? mainBody : prev.content,
             seoDescription: metaDesc || prev.seoDescription,
+            sources: newSources.length > 0 ? newSources : prev.sources,
             contextBox: {
                 title: genTitle || prev.contextBox?.title || '',
                 content: genContent || prev.contextBox?.content || '',
@@ -1092,6 +1098,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                             value={formData.excerpt}
                                             onChange={e => setFormData({ ...formData, excerpt: e.target.value })}
                                             placeholder="Hook the reader..."
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Sources (One per line)</label>
+                                        <textarea
+                                            className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-xs font-mono text-zinc-400 focus:border-news-accent outline-none h-24"
+                                            value={formData.sources?.join('\n') || ''}
+                                            onChange={e => setFormData({ ...formData, sources: e.target.value.split('\n') })}
+                                            placeholder="IPCC Report 2024&#10;NOAA Climate Data&#10;..."
                                         />
                                     </div>
 

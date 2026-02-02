@@ -10,6 +10,7 @@ export interface Article {
   secondaryImageUrl?: string;
   diagramUrl?: string;
   audioUrl?: string;  // Cloudinary URL for pre-generated audio
+  sources?: string[]; // List of specific sources for this article
   excerpt: string;
   date: string;
   originalReadTime: string;

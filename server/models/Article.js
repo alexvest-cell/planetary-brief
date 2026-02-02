@@ -18,6 +18,8 @@ const articleSchema = new mongoose.Schema({
         content: String,
         source: String
     },
+    sources: [String], // List of specific sources
+    audioUrl: String,  // Cloudinary URL
     status: { type: String, enum: ['draft', 'published', 'scheduled'], default: 'published' },
     scheduledPublishDate: Date,
     publishedAt: Date,
