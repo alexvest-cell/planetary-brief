@@ -899,48 +899,57 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 
     // Generate audio via Gemini
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp-1219",  // Updated model that supports audio
-      contents: { parts: [{ text: textToRead }] },
-      config: {
+    const model = ai.getGenerativeModel({
+      model: "gemini-2.0-flash-exp",
+    });
+
+    const result = await model.generateContent({
+      contents: [{
+        role: 'user',
+        parts: [{ text: textToRead }]
+      }],
+      generationConfig: {
         responseModalities: ["AUDIO"],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' },
-          },
-        },
-      },
+            prebuiltVoiceConfig: { voiceName: 'Kore' }
+          }
+        }
+      }
     });
 
+    const response = await result.response;
     const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
     if (!audioData) {
-      throw new Error('Audio generation failed');
+      console.error('No audio data in response:', JSON.stringify(response, null, 2));
+      throw new Error('Audio generation failed - no audio data returned');
     }
 
     // Upload to Cloudinary
     const buffer = Buffer.from(audioData, 'base64');
-    const result = await streamUpload(buffer);
+    const uploadResult = await streamUpload(buffer);
 
-    if (!result || !result.secure_url) {
+    if (!uploadResult || !uploadResult.secure_url) {
       throw new Error('Cloudinary upload failed');
     }
 
     // Update article with audioUrl
     await Article.findOneAndUpdate(
       { id: articleId },
-      { audioUrl: result.secure_url }
+      { audioUrl: uploadResult.secure_url }
     );
 
-    console.log(`Audio generated and cached for ${articleId}: ${result.secure_url}`);
+    console.log(`Audio generated and cached for ${articleId}: ${uploadResult.secure_url}`);
 
     res.json({
       success: true,
-      audioUrl: result.secure_url,
+      audioUrl: uploadResult.secure_url,
       message: 'Audio generated successfully'
     });
   } catch (error) {
     console.error("Audio generation error:", error);
-    res.status(500).json({ error: 'Audio generation failed' });
+    res.status(500).json({ error: 'Audio generation failed', details: error.message });
   }
 });
 
