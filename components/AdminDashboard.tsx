@@ -1448,6 +1448,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                 </button>
 
                                 {articles.map(article => {
+                                    // Debug: log all article statuses
+                                    console.log(`Article: "${article.title.substring(0, 30)}..." - Status: ${article.status || 'undefined'}`);
+
                                     const statusColors = {
                                         draft: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
                                         published: 'bg-green-500/20 text-green-400 border-green-500/30',
