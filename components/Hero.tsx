@@ -101,23 +101,7 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                             </div>
 
                             {/* Play button for featured article (if it's a real article) */}
-                            {featuredArticleOverride && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        playArticle(featuredArticleOverride);
-                                    }}
-                                    disabled={isLoading && currentArticle?.id === featuredArticleOverride.id}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-emerald-500 hover:text-black border border-white/10 hover:border-emerald-500 transition-all text-white w-fit disabled:opacity-50 disabled:cursor-not-allowed group"
-                                >
-                                    {isLoading && currentArticle?.id === featuredArticleOverride.id ? (
-                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                    ) : (
-                                        <Headphones size={16} className="text-emerald-500 group-hover:text-black transition-colors" />
-                                    )}
-                                    <span className="text-xs font-bold uppercase tracking-widest">Listen to Story</span>
-                                </button>
-                            )}
+                            {/* Play button moved to image overlay */}
                         </div>
                     </div>
 
@@ -133,6 +117,25 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                            {/* Listen Button - Top Right Overlay */}
+                            {featuredArticleOverride && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        playArticle(featuredArticleOverride);
+                                    }}
+                                    disabled={isLoading && currentArticle?.id === featuredArticleOverride.id}
+                                    className="absolute top-4 right-4 w-12 h-12 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 group/btn"
+                                    title="Listen to story"
+                                >
+                                    {isLoading && currentArticle?.id === featuredArticleOverride.id ? (
+                                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <Headphones size={20} />
+                                    )}
+                                </button>
+                            )}
                         </div>
 
                     </div>
