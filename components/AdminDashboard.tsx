@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Upload, Loader2, Save, Search, Sparkles, LogOut, Download } from 'lucide-react';
+import { ArrowLeft, Upload, Loader2, Save, Search, Sparkles, LogOut, Download, Headphones } from 'lucide-react';
 import { Article } from '../types';
 import { newsArticles as staticArticles } from '../data/content';
 import AdminLogin from './AdminLogin';
@@ -50,6 +50,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     const [socialLoading, setSocialLoading] = useState(false);
     const [imagePrompt, setImagePrompt] = useState('');
     const [imagePromptLoading, setImagePromptLoading] = useState(false);
+
+    // Audio Generation State
+    const [audioLoading, setAudioLoading] = useState(false);
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
     // Database Status
     const [dbOnline, setDbOnline] = useState(true);

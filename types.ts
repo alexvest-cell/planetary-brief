@@ -9,6 +9,7 @@ export interface Article {
   originalImageUrl?: string;
   secondaryImageUrl?: string;
   diagramUrl?: string;
+  audioUrl?: string;  // Cloudinary URL for pre-generated audio
   excerpt: string;
   date: string;
   originalReadTime: string;
