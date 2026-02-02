@@ -15,7 +15,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     }, []);
 
     return (
-        <div className="bg-zinc-950 min-h-screen text-white pt-24 pb-24 relative overflow-hidden">
+        <div className="bg-zinc-950 min-h-screen text-white pt-32 pb-24 relative overflow-hidden">
             {/* Background Ambience */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
@@ -25,23 +25,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
 
             <div className="container mx-auto px-4 md:px-6 relative z-10 max-w-5xl">
 
-                {/* Header / Nav */}
-                <button
-                    onClick={onBack}
-                    className="group mb-12 flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
-                >
-                    <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-all">
-                        <ArrowLeft size={14} />
-                    </div>
-                    <span className="text-sm font-medium tracking-wide">Back to Brief</span>
-                </button>
-
                 {/* Hero Section */}
                 <header className="mb-24 md:mb-32">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-6 animate-fade-in">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                        System Online
-                    </div>
 
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight text-white mb-8 leading-[0.9]">
                         Intelligence for a <br className="hidden md:block" />
@@ -193,7 +178,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                 {/* Footer simple mark */}
                 <div className="mt-32 pt-12 border-t border-white/5 text-center">
                     <p className="text-zinc-600 text-sm font-mono">
-                        Planetary Brief v1.0 • Running on GreenShift Intelligence
+                        Planetary Brief v1.0
                     </p>
                 </div>
 
