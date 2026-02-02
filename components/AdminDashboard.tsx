@@ -191,16 +191,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
         setLoading(true);
         try {
+            const token = localStorage.getItem('adminToken');
+            const headers: HeadersInit = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             const res = await fetch('/api/upload', {
                 method: 'POST',
+                headers,
                 body: formData
             });
+
             if (res.ok) {
                 const data = await res.json();
                 setFormData(prev => ({ ...prev, imageUrl: data.url }));
+            } else {
+                const error = await res.json().catch(() => ({ error: 'Upload failed' }));
+                alert(error.error || 'Upload failed. Please check your permissions.');
             }
         } catch (err) {
-            alert('Upload failed');
+            console.error('Upload error:', err);
+            alert('Upload failed. Please try again.');
         } finally {
             setLoading(false);
         }
