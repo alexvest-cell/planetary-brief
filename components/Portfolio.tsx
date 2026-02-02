@@ -129,14 +129,14 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
                                                 )}
 
-                                                {/* Listen Button - Top Right (or Left if needed) */}
+                                                {/* Listen Button - Top Left */}
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         playArticle(article);
                                                     }}
                                                     disabled={isLoading && currentArticle?.id === article.id}
-                                                    className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 ${index === 0 ? 'top-4 right-4 w-10 h-10' : ''}`}
+                                                    className={`absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 ${index === 0 ? 'top-4 left-4 w-10 h-10' : ''}`}
                                                     title="Listen to article"
                                                 >
                                                     {isLoading && currentArticle?.id === article.id ? (
