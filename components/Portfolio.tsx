@@ -129,14 +129,14 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
                                                 )}
 
-                                                {/* Listen Button - Top Left */}
+                                                {/* Listen Button - Top Right */}
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         playArticle(article);
                                                     }}
                                                     disabled={isLoading && currentArticle?.id === article.id}
-                                                    className={`absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 ${index === 0 ? 'top-4 left-4 w-10 h-10' : ''}`}
+                                                    className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 ${index === 0 ? 'top-4 right-4 w-10 h-10' : ''}`}
                                                     title="Listen to article"
                                                 >
                                                     {isLoading && currentArticle?.id === article.id ? (
@@ -231,24 +231,26 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 alt={article.title}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                                             />
-                                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
-                                                Guides
+                                            <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
+                                                <div className="bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
+                                                    Guides
+                                                </div>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        playArticle(article);
+                                                    }}
+                                                    disabled={isLoading && currentArticle?.id === article.id}
+                                                    className="w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                                    title="Listen to guide"
+                                                >
+                                                    {isLoading && currentArticle?.id === article.id ? (
+                                                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                                    ) : (
+                                                        <Headphones size={14} />
+                                                    )}
+                                                </button>
                                             </div>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    playArticle(article);
-                                                }}
-                                                disabled={isLoading && currentArticle?.id === article.id}
-                                                className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
-                                                title="Listen to guide"
-                                            >
-                                                {isLoading && currentArticle?.id === article.id ? (
-                                                    <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                                ) : (
-                                                    <Headphones size={14} />
-                                                )}
-                                            </button>
                                         </div>
                                         <div className="p-4 flex flex-col flex-grow">
                                             <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
@@ -291,27 +293,29 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             alt={article.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                                         />
-                                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
-                                            {(() => {
-                                                const cat = Array.isArray(article.category) ? article.category[0] : article.category;
-                                                return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
-                                            })()}
+                                        <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
+                                            <div className="bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
+                                                {(() => {
+                                                    const cat = Array.isArray(article.category) ? article.category[0] : article.category;
+                                                    return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+                                                })()}
+                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    playArticle(article);
+                                                }}
+                                                disabled={isLoading && currentArticle?.id === article.id}
+                                                className="w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                                title="Listen to story"
+                                            >
+                                                {isLoading && currentArticle?.id === article.id ? (
+                                                    <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                                ) : (
+                                                    <Headphones size={14} />
+                                                )}
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                playArticle(article);
-                                            }}
-                                            disabled={isLoading && currentArticle?.id === article.id}
-                                            className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
-                                            title="Listen to story"
-                                        >
-                                            {isLoading && currentArticle?.id === article.id ? (
-                                                <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                            ) : (
-                                                <Headphones size={14} />
-                                            )}
-                                        </button>
                                     </div>
                                     <div className="p-4 flex flex-col flex-grow">
                                         <div className="text-[9px] font-bold uppercase tracking-widest text-news-accent mb-2 truncate">{article.topic}</div>
