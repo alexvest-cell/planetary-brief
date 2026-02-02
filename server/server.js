@@ -169,6 +169,13 @@ function requireAuth(req, res, next) {
 app.post('/api/auth/login', (req, res) => {
   const { password } = req.body;
 
+  // Debug logging (remove after fixing)
+  console.log('Login attempt:');
+  console.log('Received password length:', password?.length);
+  console.log('Expected password length:', ADMIN_PASSWORD?.length);
+  console.log('ADMIN_PASSWORD is set:', !!ADMIN_PASSWORD);
+  console.log('Passwords match:', password === ADMIN_PASSWORD);
+
   if (password === ADMIN_PASSWORD) {
     const token = generateToken();
     validTokens.add(token);
