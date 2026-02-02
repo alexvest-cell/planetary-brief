@@ -941,10 +941,9 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 // Serve static files from the React app (root)
 app.use(express.static(path.join(__dirname, '../')));
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-// Express 5 requires '/*' instead of '*' for wildcard routes
-app.get('/*', (req, res) => {
+// SPA fallback: serve index.html for any request that doesn't match API routes or static files
+// Express 5 doesn't support wildcard routes, so we use middleware instead
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
 
