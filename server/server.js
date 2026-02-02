@@ -897,32 +897,41 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 
     console.log(`Generating audio for article: ${articleId}`);
 
-    // Generate audio via Gemini
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const model = ai.getGenerativeModel({
-      model: "gemini-2.0-flash-exp",
-    });
+    // Use Google Cloud Text-to-Speech API instead of Gemini
+    const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 
-    const result = await model.generateContent({
-      contents: [{
-        role: 'user',
-        parts: [{ text: textToRead }]
-      }],
-      generationConfig: {
-        responseModalities: ["AUDIO"],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Kore' }
-          }
+    const ttsResponse = await fetch(textToSpeechUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': process.env.GEMINI_API_KEY // Using same API key
+      },
+      body: JSON.stringify({
+        input: { text: textToRead },
+        voice: {
+          languageCode: 'en-US',
+          name: 'en-US-Neural2-J', // Natural sounding male voice
+          ssmlGender: 'MALE'
+        },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          speakingRate: 1.0,
+          pitch: 0.0
         }
-      }
+      })
     });
 
-    const response = await result.response;
-    const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (!ttsResponse.ok) {
+      const errorData = await ttsResponse.json().catch(() => ({}));
+      console.error('TTS API error:', errorData);
+      throw new Error(`Text-to-Speech API failed: ${errorData.error?.message || ttsResponse.statusText}`);
+    }
+
+    const ttsData = await ttsResponse.json();
+    const audioData = ttsData.audioContent;
 
     if (!audioData) {
-      console.error('No audio data in response:', JSON.stringify(response, null, 2));
+      console.error('No audio data in TTS response');
       throw new Error('Audio generation failed - no audio data returned');
     }
 
