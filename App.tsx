@@ -76,13 +76,19 @@ function App() {
   // Separate useEffect for Deep Linking to ensure 'articles' state is ready
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const pathname = window.location.pathname;
     const articleId = params.get('article');
     const isAdmin = params.get('admin');
     const viewParam = params.get('view');
     const categoryParam = params.get('category');
 
-    if (isAdmin !== null) {
+    // Check both query param and pathname for admin access
+    if (isAdmin !== null || pathname === '/admin') {
       setView('admin');
+      // Clean URL by removing query param if present
+      if (pathname !== '/admin') {
+        window.history.replaceState({}, '', '/admin');
+      }
     } else if (viewParam === 'dashboard') {
       setView('dashboard');
     } else if (viewParam === 'action') {
