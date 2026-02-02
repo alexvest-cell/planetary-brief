@@ -141,9 +141,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     // SEO State
     const [seoKeywords, setSeoKeywords] = useState('');
 
+    // Load articles only after authentication is verified
     useEffect(() => {
-        loadArticles();
-    }, []);
+        if (isAuthenticated && !checkingAuth) {
+            loadArticles();
+        }
+    }, [isAuthenticated, checkingAuth]);
 
     const loadArticles = async () => {
         try {
