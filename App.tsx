@@ -15,6 +15,8 @@ import ActionDetailsView from './components/ActionDetailsView';
 import AboutPage from './components/AboutPage';
 import SubscribeModal from './components/SubscribeModal';
 import AdminDashboard from './components/AdminDashboard';
+import AudioPlayer from './components/AudioPlayer';
+import { AudioProvider } from './contexts/AudioContext';
 import { Section, Article, ExplanationData } from './types';
 import { featuredArticle, newsArticles as staticNewsArticles } from './data/content';
 
@@ -345,127 +347,131 @@ if (view === 'admin') {
 }
 
 return (
-  <div className="min-h-screen bg-news-bg text-news-text font-sans">
-    <Navigation
-      activeSection={activeSection}
-      scrollToSection={scrollToSection}
-      onSearch={handleSearch}
-      searchQuery={searchQuery}
-      onArticleSelect={handleArticleClick}
-      onDashboardClick={handleShowDashboard}
-      onActionGuideClick={handleShowActionGuide}
-      onSubscribeClick={handleShowSubscribe}
-      onShowAbout={handleShowAbout}
-      activeCategory={activeCategory}
-      onCategorySelect={handleCategorySelect}
-      newsArticles={articles}
-      currentView={view} // Pass the current view state
-    />
+  <AudioProvider>
+    <div className="min-h-screen bg-news-bg text-news-text font-sans">
+      <Navigation
+        activeSection={activeSection}
+        scrollToSection={scrollToSection}
+        onSearch={handleSearch}
+        searchQuery={searchQuery}
+        onArticleSelect={handleArticleClick}
+        onDashboardClick={handleShowDashboard}
+        onActionGuideClick={handleShowActionGuide}
+        onSubscribeClick={handleShowSubscribe}
+        onShowAbout={handleShowAbout}
+        activeCategory={activeCategory}
+        onCategorySelect={handleCategorySelect}
+        newsArticles={articles}
+        currentView={view} // Pass the current view state
+      />
 
-    <main>
-      {view === 'home' && (
-        <>
-          <Hero
-            onReadFeatured={() => {
-              // Feature Logic:
-              // 1. Find all 'isFeaturedDiscover' articles
-              const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
-              // 2. Sort by 'createdAt' (newest upload first)
-              featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
+      <main>
+        {view === 'home' && (
+          <>
+            <Hero
+              onReadFeatured={() => {
+                // Feature Logic:
+                // 1. Find all 'isFeaturedDiscover' articles
+                const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
+                // 2. Sort by 'createdAt' (newest upload first)
+                featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
 
-              // 3. Pick winner, or fallback to fixed ID, or fallback to static default
-              const featured = featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
-              handleArticleClick(featured);
-            }}
+                // 3. Pick winner, or fallback to fixed ID, or fallback to static default
+                const featured = featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
+                handleArticleClick(featured);
+              }}
+              onArticleClick={handleArticleClick}
+              // Pass the featured discover article
+              featuredArticleOverride={(() => {
+                const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
+                featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
+                return featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026');
+              })()}
+              articles={articles}
+            />
+            {/* Pass DYNAMIC articles to Portfolio */}
+            <Portfolio
+              articles={articles}
+              onArticleClick={handleArticleClick}
+              searchQuery={searchQuery}
+            />
+            <About
+              onShowAbout={handleShowAbout}
+            />
+
+          </>
+        )}
+
+        {view === 'category' && (
+          <CategoryFeed
+            category={activeCategory}
+            articles={articles} // Pass dynamic articles
             onArticleClick={handleArticleClick}
-            // Pass the featured discover article
-            featuredArticleOverride={(() => {
-              const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
-              featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
-              return featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026');
-            })()}
-            articles={articles}
+            onBack={() => handleCategorySelect('All')}
           />
-          {/* Pass DYNAMIC articles to Portfolio */}
-          <Portfolio
-            articles={articles}
-            onArticleClick={handleArticleClick}
-            searchQuery={searchQuery}
-          />
-          <About
+        )}
+
+        {view === 'article' && currentArticle && (
+          <ArticleView
+            article={currentArticle}
+            onBack={handleBackToFeed}
+            onArticleSelect={handleArticleClick}
+            allArticles={articles} // Pass dynamic articles
             onShowAbout={handleShowAbout}
           />
+        )}
 
-        </>
-      )}
+        {view === 'about' && (
+          <AboutPage onBack={handleBackToFeed} />
+        )}
 
-      {view === 'category' && (
-        <CategoryFeed
-          category={activeCategory}
-          articles={articles} // Pass dynamic articles
-          onArticleClick={handleArticleClick}
-          onBack={() => handleCategorySelect('All')}
-        />
-      )}
+        {view === 'dashboard' && (
+          <EarthDashboard
+            onBack={handleBackToFeed}
+            onExplain={handleExplainData}
+            onSearch={handleSearch}
+          />
+        )}
 
-      {view === 'article' && currentArticle && (
-        <ArticleView
-          article={currentArticle}
-          onBack={handleBackToFeed}
-          onArticleSelect={handleArticleClick}
-          allArticles={articles} // Pass dynamic articles
+        {view === 'explanation' && explanationData && (
+          <DataExplanationView
+            data={explanationData}
+            onBack={handleBackToDashboard}
+          />
+        )}
+
+        {view === 'action-guide' && (
+          <ActionDetailsView
+            onBack={handleBackToFeed}
+            onSearch={handleSearch}
+            articles={articles}
+            onArticleClick={handleArticleClick}
+          />
+        )}
+
+
+
+        {/* Global Footer available on all pages */}
+        <Contact
           onShowAbout={handleShowAbout}
+          onSubscribeClick={handleShowSubscribe}
         />
-      )}
+      </main>
 
-      {view === 'about' && (
-        <AboutPage onBack={handleBackToFeed} />
-      )}
-
-      {view === 'dashboard' && (
-        <EarthDashboard
-          onBack={handleBackToFeed}
-          onExplain={handleExplainData}
-          onSearch={handleSearch}
-        />
-      )}
-
-      {view === 'explanation' && explanationData && (
-        <DataExplanationView
-          data={explanationData}
-          onBack={handleBackToDashboard}
-        />
-      )}
-
-      {view === 'action-guide' && (
-        <ActionDetailsView
-          onBack={handleBackToFeed}
-          onSearch={handleSearch}
-          articles={articles}
-          onArticleClick={handleArticleClick}
-        />
-      )}
-
-
-
-      {/* Global Footer available on all pages */}
-      <Contact
-        onShowAbout={handleShowAbout}
-        onSubscribeClick={handleShowSubscribe}
+      <SubscribeModal
+        isOpen={isSubscribeModalOpen}
+        onClose={() => {
+          setIsSubscribeModalOpen(false);
+          // If URL had ?view=subscribe, maybe revert it?
+          if (window.location.search.includes('view=subscribe')) {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+        }}
       />
-    </main>
 
-    <SubscribeModal
-      isOpen={isSubscribeModalOpen}
-      onClose={() => {
-        setIsSubscribeModalOpen(false);
-        // If URL had ?view=subscribe, maybe revert it?
-        if (window.location.search.includes('view=subscribe')) {
-          window.history.replaceState({}, '', window.location.pathname);
-        }
-      }}
-    />
-  </div>
+      <AudioPlayer />
+    </div>
+  </AudioProvider>
 );
 }
 

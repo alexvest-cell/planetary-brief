@@ -1,9 +1,10 @@
 import React from 'react';
 import { Section, Article } from '../types';
 
-import { ChevronRight, Filter, Sparkles } from 'lucide-react';
+import { ChevronRight, Filter, Sparkles, Headphones } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
+import { useAudio } from '../contexts/AudioContext';
 
 interface PortfolioProps {
     articles: Article[];
@@ -16,6 +17,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
     onArticleClick,
     searchQuery = '',
 }) => {
+    const { playArticle, isLoading, currentArticle } = useAudio();
 
     // Discover Mode: Show mixed content, prioritized by date/relevance (simulated by array order)
     // Filter only by search query
@@ -150,6 +152,22 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 {index !== 0 && (
                                                     <div className="mt-auto pt-2 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
                                                         <span>{article.date.split(',')[0]}</span>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                playArticle(article);
+                                                            }}
+                                                            disabled={isLoading && currentArticle?.id === article.id}
+                                                            className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 transition-all text-gray-400 hover:text-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            title="Listen to article"
+                                                        >
+                                                            {isLoading && currentArticle?.id === article.id ? (
+                                                                <div className="w-3 h-3 border border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                                            ) : (
+                                                                <Headphones size={12} />
+                                                            )}
+                                                            <span className="hidden md:inline">Listen</span>
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>

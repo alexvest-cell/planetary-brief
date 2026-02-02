@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Article } from '../types';
-import { generateSpeech } from '../services/geminiService';
-import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck } from 'lucide-react';
+import { useAudio } from '../contexts/AudioContext';
+import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck, Headphones, Pause, Play } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 
@@ -118,30 +118,13 @@ const ArticleFooter = ({ onShowAbout }: { onShowAbout: () => void }) => (
 );
 
 const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSelect, allArticles, onShowAbout }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isAudioLoading, setIsAudioLoading] = useState(false);
-
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  const { playArticle, pauseAudio, resumeAudio, isPlaying, isLoading, currentArticle } = useAudio();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    return () => stopAudio();
   }, [article.id]);
 
-  const stopAudio = () => {
-    if (sourceNodeRef.current) {
-      sourceNodeRef.current.stop();
-      sourceNodeRef.current = null;
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    setIsPlaying(false);
-  };
 
-  // SEO Optimization
   useEffect(() => {
     if (article) {
       document.title = `${article.title} | GreenShift`;
@@ -172,50 +155,20 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
     }
   }, [article]);
 
-  const handleToggleAudio = async () => {
-    if (isPlaying) {
-      stopAudio();
-      return;
-    }
 
-    setIsAudioLoading(true);
 
-    const textToRead = `Title: ${article.title}. ${article.content.join(' ')}`;
-    const base64Audio = await generateSpeech(textToRead, article.id);
+  const isThisArticlePlaying = currentArticle?.id === article.id && isPlaying;
+  const isThisArticleLoading = currentArticle?.id === article.id && isLoading;
 
-    if (!base64Audio) {
-      alert("Could not generate audio summary. Please try again.");
-      setIsAudioLoading(false);
-      return;
-    }
-
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-      audioContextRef.current = audioCtx;
-      const audioBytes = decode(base64Audio);
-      const alignedBytes = new Uint8Array(audioBytes);
-      const audioBuffer = await decodeAudioData(alignedBytes, audioCtx, 24000, 1);
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioCtx.destination);
-
-      source.onended = () => {
-        setIsPlaying(false);
-        stopAudio();
-      };
-
-      source.start();
-      sourceNodeRef.current = source;
-      setIsPlaying(true);
-    } catch (e) {
-      console.error("Audio playback error", e);
-      alert("Error playing audio.");
-    } finally {
-      setIsAudioLoading(false);
+  const handleToggleAudio = () => {
+    if (isThisArticlePlaying) {
+      pauseAudio();
+    } else if (currentArticle?.id === article.id && !isPlaying) {
+      resumeAudio();
+    } else {
+      playArticle(article);
     }
   };
-
-  // We use the pre-calculated random read time to ensure it adheres to the 3-6 minute requirement
   // independent of the generated content length.
   const readTime = article.originalReadTime || "5 min read";
 
@@ -264,23 +217,23 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
             <button
               onClick={handleToggleAudio}
-              disabled={isAudioLoading}
+              disabled={isThisArticleLoading}
               className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 group relative
-                    ${isPlaying
+                    ${isThisArticlePlaying
                   ? 'border-news-live text-news-live bg-news-live/10'
                   : 'border-white/10 hover:border-news-accent text-white hover:text-news-accent'
                 }`}
               title="Listen to Article"
             >
-              {isAudioLoading ? (
+              {isThisArticleLoading ? (
                 <Loader2 size={16} className="animate-spin" />
-              ) : isPlaying ? (
+              ) : isThisArticlePlaying ? (
                 <>
-                  <StopCircle size={16} className="fill-current" />
+                  <Pause size={16} className="fill-current" />
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-news-live rounded-full animate-pulse"></span>
                 </>
               ) : (
-                <Volume2 size={16} />
+                <Play size={16} />
               )}
             </button>
           </div>

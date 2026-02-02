@@ -76,3 +76,62 @@ If you haven't added this yet, the deployed site might only show the API, not th
 ## Troubleshooting
 - **"Application Error"**: Check the "Logs" tab in Render.
 - **"MongoTimeoutError"**: Check your "Network Access" in MongoDB Atlas. Ensure IP address `0.0.0.0/0` (Allow Access from Anywhere) is whitelisted so Render can connect.
+
+---
+
+## Post-Deployment: Custom Domain
+
+To make your site professional (e.g., `planetarybrief.com` instead of `.onrender.com`), follow these steps:
+
+### 1. Buy a Domain (Cheap & Easy Options)
+- **Namecheap**: Great for beginners, excellent 24/7 support, cheap first-year prices. (~$8-10/year)
+- **Porkbun**: Very transparent pricing (no hidden renewal fees), quirky but great interface. (~$9-10/year)
+- **Cloudflare**: "Wholesale" pricing (no markup), slightly more technical but best performance/security. (~$9/year)
+
+### 2. Connect to Render
+1.  Go to your Render Dashboard -> **Settings** -> **Custom Domains**.
+2.  Click **"Add Custom Domain"**.
+3.  Enter your domain (e.g., `planetarybrief.com`).
+4.  Render will show you **DNS Records** to add (usually a `CNAME` pointing to `planetary-brief.onrender.com` and an `A` record).
+    > **Note:** You must click the **"Save"** or **"Verify"** button for the domain first. If it says "Verification Pending", look just below that status—you will see a table with "Type", "Host", and "Value". **Those are the values.**
+5.  Log in to your Domain Provider (Namecheap/Porkbun) -> **DNS Settings**.
+6.  Add the records Render gave you.
+7.  Wait 10-30 minutes for it to verify. Render verifies SSL automatically!
+
+#### Namecheap Specifics:
+- Go to **Domain List** -> Click **Manage** next to your domain.
+- Click the **Advanced DNS** tab (top menu).
+- Click the red **Add New Record** button.
+- **First Record:**
+  - **Type**: Select **"A Record"** from the list.
+  - **Host**: `@`
+  - **Value**: `216.24...` (The IP address Render gave you).
+- **Second Record:**
+  - **Type**: Select **"CNAME Record"**.
+  - **Host**: `www`
+  - **Value**: `planetary-brief.onrender.com` (Your Render URL).
+
+---
+
+## 🔄 How to Update Your Site
+
+Now that you are live, you have two ways to update the site:
+
+### 1. Updating Content (New Articles)
+**Do not** deploy code for this!
+1.  Go to `planetarybrief.com/admin`.
+2.  Log in with your password.
+3.  Use the AI Assistant or manual form to create new articles.
+4.  **Instant:** These appear immediately because they are saved to your MongoDB database.
+
+### 2. Updating Code (Design/Features)
+If you want to change colors, layout, or fix bugs:
+1.  Make changes locally on your computer.
+2.  Test with `npm run dev`.
+3.  Push to GitHub:
+    ```bash
+    git add .
+    git commit -m "Description of changes"
+    git push origin main
+    ```
+4.  **Automatic:** Render will see the push, build the new site, and deploy it automatically (takes ~3 mins).
