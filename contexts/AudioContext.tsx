@@ -24,6 +24,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (audioRef.current) {
             audioRef.current.pause();
             audioRef.current.currentTime = 0;
+            // Remove all event listeners to prevent memory leaks
+            audioRef.current.onended = null;
+            audioRef.current.onerror = null;
+            audioRef.current.oncanplaythrough = null;
+            // Set src to empty to fully release the audio resource
+            audioRef.current.src = '';
+            audioRef.current.load();
             audioRef.current = null;
         }
         setIsPlaying(false);
