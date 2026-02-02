@@ -1,106 +1,13 @@
 import React, { useEffect } from 'react';
-import { Database, Cpu, ShieldCheck, FileCheck, Globe, BookOpen, Microscope, Newspaper, Radio, Heart, Users, TrendingUp } from 'lucide-react';
+import {
+    Database, Cpu, ShieldCheck, FileCheck, Globe, BookOpen,
+    Microscope, Newspaper, Radio, ArrowLeft, Activity,
+    Layers, Search, Share2, Server
+} from 'lucide-react';
 
 interface AboutPageProps {
     onBack: () => void;
 }
-
-const methodologySteps = [
-    {
-        icon: Database,
-        title: "1. Global Data Ingestion",
-        desc: "Our system continuously monitors high-integrity data streams from verified scientific institutions including NASA, the IPCC, NOAA, and peer-reviewed journals. We do not scrape social media or unverified blogs.",
-        color: "text-blue-400",
-        bg: "bg-blue-500/10",
-        borderColor: "border-blue-500/20"
-    },
-    {
-        icon: Cpu,
-        title: "2. AI Synthesis & Analysis",
-        desc: "Raw scientific reports are dense and often inaccessible. We utilize advanced Large Language Models (LLMs) to parse thousands of pages of technical documentation, extracting key findings, statistical trends, and actionable insights.",
-        color: "text-purple-400",
-        bg: "bg-purple-500/10",
-        borderColor: "border-purple-500/20"
-    },
-    {
-        icon: ShieldCheck,
-        title: "3. Verification Protocol",
-        desc: "Every data point is cross-referenced against the original source material. Our 'Hallucination Check' layer ensures that figures, dates, and attributions match the primary source documents exactly.",
-        color: "text-emerald-400",
-        bg: "bg-emerald-500/10",
-        borderColor: "border-emerald-500/20"
-    },
-    {
-        icon: FileCheck,
-        title: "4. Editorial Calibration",
-        desc: "The final output is structured for clarity, stripping away jargon while retaining nuance. The result is a 'GreenShift Original'—a concise, accurate, and deeply researched report designed for the modern reader.",
-        color: "text-orange-400",
-        bg: "bg-orange-500/10",
-        borderColor: "border-orange-500/20"
-    }
-];
-
-const sourceCategories = [
-    {
-        title: "Primary Scientific Bodies",
-        icon: Globe,
-        description: "Data & Assessments",
-        items: [
-            "Intergovernmental Panel on Climate Change (IPCC)",
-            "World Meteorological Organization (WMO)",
-            "United Nations Environment Programme (UNEP)",
-            "NASA Earth / Climate",
-            "National Oceanic and Atmospheric Administration (NOAA)",
-            "European Environment Agency (EEA)",
-            "Copernicus Climate Change Service"
-        ]
-    },
-    {
-        title: "Peer-Reviewed Journals",
-        icon: BookOpen,
-        description: "Academic Research",
-        items: [
-            "PLOS Climate",
-            "Environmental Research Letters",
-            "Science Advances"
-        ]
-    },
-    {
-        title: "Scientific Research Platforms",
-        icon: Microscope,
-        description: "Pre-prints & Databases",
-        items: [
-            "Google Scholar",
-            "arXiv (Earth & Environmental Sciences)"
-        ]
-    },
-    {
-        title: "Science Journalism & Explainers",
-        icon: Newspaper,
-        description: "Deep Dives & Analysis",
-        items: [
-            "Carbon Brief",
-            "ScienceDaily",
-            "The Conversation",
-            "Inside Climate News",
-            "RealClimate",
-            "Skeptical Science",
-            "Climate Feedback"
-        ]
-    },
-    {
-        title: "General News Outlets",
-        icon: Radio,
-        description: "Strong Science/Environment Desks",
-        items: [
-            "Reuters",
-            "Associated Press (AP News)",
-            "National Geographic",
-            "BBC News (Science & Environment)",
-            "The Guardian (Environment)"
-        ]
-    }
-];
 
 const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     useEffect(() => {
@@ -108,114 +15,186 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     }, []);
 
     return (
-        <div className="bg-zinc-950 min-h-screen animate-fade-in text-white pt-44 md:pt-36 pb-24">
-            {/* Background Pattern */}
-            <div className="fixed inset-0 pointer-events-none opacity-5"
-                style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)', backgroundSize: '30px 30px' }}>
+        <div className="bg-zinc-950 min-h-screen text-white pt-24 pb-24 relative overflow-hidden">
+            {/* Background Ambience */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -ml-32 -mb-32"></div>
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]"></div>
             </div>
 
-            <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-4xl">
+            <div className="container mx-auto px-4 md:px-6 relative z-10 max-w-5xl">
 
-                {/* OUR MISSION SECTION */}
-                <div className="mb-32">
+                {/* Header / Nav */}
+                <button
+                    onClick={onBack}
+                    className="group mb-12 flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
+                >
+                    <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-all">
+                        <ArrowLeft size={14} />
+                    </div>
+                    <span className="text-sm font-medium tracking-wide">Back to Brief</span>
+                </button>
+
+                {/* Hero Section */}
+                <header className="mb-24 md:mb-32">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-6 animate-fade-in">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        System Online
+                    </div>
+
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight text-white mb-8 leading-[0.9]">
+                        Intelligence for a <br className="hidden md:block" />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">Changing Planet.</span>
+                    </h1>
+
+                    <p className="text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed font-light border-l border-white/10 pl-6">
+                        Planetary Brief is an experimental news engine blending <span className="text-white font-medium">NASA-grade data</span> with <span className="text-white font-medium">AI synthesis</span> to track the vital signs of Earth in real-time.
+                    </p>
+                </header>
+
+                {/* The Mission - Manifesto Style */}
+                <section className="mb-32 grid md:grid-cols-12 gap-8 items-start">
+                    <div className="md:col-span-4">
+                        <div className="sticky top-24">
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Our Mission</span>
+                            <h2 className="text-2xl font-bold text-white mb-4">Signal in the Noise</h2>
+                            <p className="text-sm text-zinc-400 leading-relaxed">
+                                We live in the age of data overload. Our goal is to filter the flood of information into clarity, focusing only on the structural shifts that define our future.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="md:col-span-8 space-y-8">
+                        <div className="p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                            <h3 className="text-xl font-serif font-bold text-white mb-4">No Hype. No Doomstreaming.</h3>
+                            <p className="text-zinc-300 leading-relaxed">
+                                Environmental news often swings between apocalyptic panic and greenwashed optimism. We reject both.
+                                We believe that clear, data-grounded reality—however stark—is the only foundation for meaningful action.
+                            </p>
+                        </div>
+                        <div className="p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                            <h3 className="text-xl font-serif font-bold text-white mb-4">Rigorous Sourcing</h3>
+                            <p className="text-zinc-300 leading-relaxed">
+                                We do not scrape social media. We do not aggregate opinion pieces.
+                                Our inputs are strictly limited to peer-reviewed journals, government monitoring agencies (NOAA, NASA, ESA), and established scientific reporting.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* The Engine - Methodology Pipeline */}
+                <section className="mb-32">
                     <div className="text-center mb-16">
-                        <h1 className="text-4xl md:text-6xl font-serif font-bold mb-8 leading-tight">
-                            Our Mission
-                        </h1>
-                        <div className="h-1 w-20 bg-news-accent mx-auto mb-8"></div>
-                    </div>
-
-                    <div className="space-y-8 text-gray-300 leading-relaxed max-w-3xl mx-auto text-lg md:text-xl font-light">
-                        <p>
-                            <span className="text-white font-medium">Planetary Brief</span> is an independent environmental intelligence publication covering climate, oceans, biodiversity and the systems that sustain life on Earth. We report with newsroom rigor, drawing exclusively on trusted science and established journalism.
-                        </p>
-                        <p>
-                            Our goal is to make complex planetary change clear, relevant and engaging without exaggeration or alarmism. We translate research, data and expert reporting into stories that explain what is happening, why it matters, and how it connects to everyday life.
-                        </p>
-                        <p>
-                            Planetary Brief is written for a generation living through rapid environmental change. We focus on the signals that matter most, grounding every article in evidence and clarity, and treating the state of the planet as the defining story of our time.
-                        </p>
-                    </div>
-                </div>
-
-                {/* METHODOLOGY SECTION */}
-                <div className="mb-32">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-serif font-bold mb-8 leading-tight">
-                            How We Work
-                        </h2>
-                        <div className="h-1 w-20 bg-news-accent mx-auto mb-6"></div>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            GreenShift Intelligence is a hybrid of human editorial rigor and advanced AI infrastructure.
-                            Every article you read here is the product of a multi-layered verification process.
+                        <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">The Intelligence Engine</h2>
+                        <p className="text-zinc-400 max-w-2xl mx-auto">
+                            How we turn raw planetary data into the briefing you read.
                         </p>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {methodologySteps.map((step, idx) => {
-                            const Icon = step.icon;
-                            return (
-                                <div
-                                    key={idx}
-                                    className={`p-5 rounded-xl bg-zinc-900/40 border border-white/5 hover:border-white/10 transition-all`}
-                                >
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <Icon size={20} className={step.color} />
-                                        <h3 className="font-bold text-white text-base md:text-lg">{step.title}</h3>
+                    <div className="relative">
+                        {/* Connecting Line (Desktop) */}
+                        <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-y-1/2 z-0"></div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
+                            {[
+                                {
+                                    icon: Database,
+                                    title: "Ingestion",
+                                    desc: "Monitoring 50+ trusted scientific feeds daily.",
+                                    color: "text-blue-400"
+                                },
+                                {
+                                    icon: Cpu,
+                                    title: "Synthesis",
+                                    desc: "LLMs extract key findings & statistical trends.",
+                                    color: "text-purple-400"
+                                },
+                                {
+                                    icon: ShieldCheck,
+                                    title: "Verification",
+                                    desc: "Fact-checking against source documents.",
+                                    color: "text-emerald-400"
+                                },
+                                {
+                                    icon: FileCheck,
+                                    title: "Briefing",
+                                    desc: "Structured, concise delivery to you.",
+                                    color: "text-orange-400"
+                                }
+                            ].map((step, idx) => (
+                                <div key={idx} className="group relative bg-black border border-white/10 p-6 rounded-2xl hover:border-white/20 transition-all">
+                                    <div className={`w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 group-hover:bg-white/10 transition-colors ${step.color}`}>
+                                        <step.icon size={24} />
                                     </div>
-                                    <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                                    <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Step 0{idx + 1}</div>
+                                    <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
+                                    <p className="text-sm text-zinc-400 leading-relaxed">{step.desc}</p>
                                 </div>
-                            );
-                        })}
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Trust Architecture - Source Grid */}
+                <section>
+                    <div className="flex items-center justify-between mb-12 border-b border-white/10 pb-6">
+                        <div>
+                            <h2 className="text-2xl font-serif font-bold text-white">Trust Architecture</h2>
+                            <p className="text-zinc-400 text-sm mt-1">Primary sources powering our consensus engine.</p>
+                        </div>
+                        <Globe className="text-zinc-600" />
                     </div>
 
-                    <div className="mt-12 text-center p-8 bg-zinc-900/50 border border-white/10 rounded-2xl">
-                        <p className="text-gray-400 text-sm leading-relaxed">
-                            <strong className="text-white">Transparency Note:</strong> We are not a primary research institution.
-                            We synthesize, verify, and distribute findings from established scientific authorities. Our role is education, not original data generation.
-                        </p>
-                    </div>
-                </div>
-
-                {/* SOURCES SECTION */}
-                <div>
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-serif font-bold mb-8">
-                            Trusted Sources
-                        </h2>
-                        <div className="h-1 w-20 bg-news-accent mx-auto mb-6"></div>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            We curate knowledge from the world's most credible institutions. Below is a non-exhaustive list of sources
-                            that inform our reporting.
-                        </p>
-                    </div>
-
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {sourceCategories.map((category, idx) => {
-                            const Icon = category.icon;
-                            return (
-                                <div
-                                    key={idx}
-                                    className="bg-zinc-900/30 border border-white/5 rounded-xl p-5"
-                                >
-                                    <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-3">
-                                        <Icon size={18} className="text-news-accent" />
-                                        <div>
-                                            <h3 className="text-sm font-bold text-white leading-none mb-1">{category.title}</h3>
-                                            <p className="text-[10px] text-gray-500 uppercase tracking-wider">{category.description}</p>
-                                        </div>
+                    <div className="grid gap-6 md:grid-cols-3">
+                        {/* Scientific Bodies */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                <Server size={12} /> Scientific Bodies
+                            </h3>
+                            <div className="grid gap-2">
+                                {["IPCC", "NASA Earth", "NOAA", "WMO", "Copernicus EU"].map(item => (
+                                    <div key={item} className="px-4 py-3 bg-white/5 border border-white/5 rounded-lg text-sm text-zinc-300 font-mono">
+                                        {item}
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {category.items.map((item, itemIdx) => (
-                                            <span key={itemIdx} className="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded-md border border-white/5">
-                                                {item}
-                                            </span>
-                                        ))}
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Journals */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                <BookOpen size={12} /> Peer-Reviewed Journals
+                            </h3>
+                            <div className="grid gap-2">
+                                {["Nature Climate", "Science Advances", "PLOS One", "Env. Research Letters"].map(item => (
+                                    <div key={item} className="px-4 py-3 bg-white/5 border border-white/5 rounded-lg text-sm text-zinc-300 font-mono">
+                                        {item}
                                     </div>
-                                </div>
-                            );
-                        })}
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Analysis */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                <Activity size={12} /> Analysis & Data
+                            </h3>
+                            <div className="grid gap-2">
+                                {["Carbon Brief", "Our World in Data", "Global Carbon Project", "IEA"].map(item => (
+                                    <div key={item} className="px-4 py-3 bg-white/5 border border-white/5 rounded-lg text-sm text-zinc-300 font-mono">
+                                        {item}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
+                </section>
+
+                {/* Footer simple mark */}
+                <div className="mt-32 pt-12 border-t border-white/5 text-center">
+                    <p className="text-zinc-600 text-sm font-mono">
+                        Planetary Brief v1.0 • Running on GreenShift Intelligence
+                    </p>
                 </div>
 
             </div>
