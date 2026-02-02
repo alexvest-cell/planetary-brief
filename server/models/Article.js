@@ -18,6 +18,9 @@ const articleSchema = new mongoose.Schema({
         content: String,
         source: String
     },
+    status: { type: String, enum: ['draft', 'published', 'scheduled'], default: 'published' },
+    scheduledPublishDate: Date,
+    publishedAt: Date,
     createdAt: { type: Date, default: Date.now }
 }, { strict: false }); // strict: false allows for flexible fields if legacy data varies
 

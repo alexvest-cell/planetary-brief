@@ -207,6 +207,10 @@ app.get('/api/auth/verify', (req, res) => {
 // GET Articles (public - no auth required)
 app.get('/api/articles', async (req, res) => {
   try {
+    const { includeUnpublished } = req.query;
+    const token = req.headers['authorization']?.replace('Bearer ', '');
+    const isAdmin = token && validTokens.has(token);
+
     // If no DB, return local file storage or seed data
     if (mongoose.connection.readyState !== 1) {
       console.log('No DB connection - checking local storage');
@@ -218,7 +222,22 @@ app.get('/api/articles', async (req, res) => {
       console.log('Returning seed data (no local storage yet)');
       return res.json(seedArticles);
     }
-    const articles = await Article.find().sort({ createdAt: -1 });
+
+    let query = {};
+
+    // Only filter if not admin or if admin didn't request unpublished
+    if (!isAdmin || includeUnpublished !== 'true') {
+      const now = new Date();
+      query = {
+        $or: [
+          { status: 'published' },
+          { status: 'scheduled', scheduledPublishDate: { $lte: now } },
+          { status: { $exists: false } } // Backward compatibility for old articles
+        ]
+      };
+    }
+
+    const articles = await Article.find(query).sort({ createdAt: -1 });
     res.json(articles);
   } catch (error) {
     console.error(error);
@@ -668,6 +687,32 @@ cron.schedule('0 * * * *', async () => {
     });
   } catch (err) {
     console.error('Scheduler DB Error:', err);
+  }
+});
+
+// Auto-publish scheduled articles (runs every minute)
+cron.schedule('* * * * *', async () => {
+  if (mongoose.connection.readyState !== 1) return; // Skip if no DB
+
+  try {
+    const now = new Date();
+    const articlesToPublish = await Article.find({
+      status: 'scheduled',
+      scheduledPublishDate: { $lte: now }
+    });
+
+    if (articlesToPublish.length > 0) {
+      console.log(`Auto-publishing ${articlesToPublish.length} scheduled article(s)...`);
+
+      for (const article of articlesToPublish) {
+        article.status = 'published';
+        article.publishedAt = now;
+        await article.save();
+        console.log(`✓ Published: ${article.title}`);
+      }
+    }
+  } catch (err) {
+    console.error('Auto-publish scheduler error:', err);
   }
 });
 

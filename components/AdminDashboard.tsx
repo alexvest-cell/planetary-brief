@@ -127,7 +127,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             title: '',
             content: '',
             source: ''
-        }
+        },
+        status: 'published',
+        scheduledPublishDate: undefined
     });
 
     // SEO State
@@ -140,7 +142,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     const loadArticles = async () => {
         try {
             // Cache-busting to ensure we see latest edits
-            const res = await fetch(`/api/articles?t=${Date.now()}`);
+            // Admin view - include all articles (drafts, scheduled, published)
+            const res = await fetch(`/api/articles?includeUnpublished=true&t=${Date.now()}`, {
+                headers: getAuthHeaders()
+            });
             if (res.ok) {
                 const data = await res.json();
                 console.log('Loaded articles from API:', data.length);
@@ -1133,6 +1138,53 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
                                     </div>
 
+                                    {/* PUBLICATION SETTINGS */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider">Publication Settings</h3>
+
+                                        <div className="space-y-3">
+                                            <label className="block">
+                                                <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Status</span>
+                                                <select
+                                                    value={formData.status || 'published'}
+                                                    onChange={e => {
+                                                        const newStatus = e.target.value as 'draft' | 'published' | 'scheduled';
+                                                        setFormData({
+                                                            ...formData,
+                                                            status: newStatus,
+                                                            scheduledPublishDate: newStatus === 'scheduled' ? formData.scheduledPublishDate : undefined
+                                                        });
+                                                    }}
+                                                    className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-sm text-white mt-2"
+                                                >
+                                                    <option value="draft">Draft (Save Without Publishing)</option>
+                                                    <option value="published">Publish Now</option>
+                                                    <option value="scheduled">Schedule for Later</option>
+                                                </select>
+                                            </label>
+
+                                            {formData.status === 'scheduled' && (
+                                                <label className="block">
+                                                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Publish Date & Time</span>
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={formData.scheduledPublishDate
+                                                            ? new Date(formData.scheduledPublishDate).toISOString().slice(0, 16)
+                                                            : ''
+                                                        }
+                                                        onChange={e => setFormData({
+                                                            ...formData,
+                                                            scheduledPublishDate: e.target.value ? new Date(e.target.value).toISOString() : undefined
+                                                        })}
+                                                        min={new Date().toISOString().slice(0, 16)}
+                                                        className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-sm text-white mt-2"
+                                                    />
+                                                    <span className="text-[10px] text-zinc-600 mt-1 block">Article will automatically publish at this time</span>
+                                                </label>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     {/* SOCIAL MEDIA TRANSFORMER */}
                                     <div className="pt-6 border-t border-white/5 space-y-4">
                                         <div className="flex justify-between items-center">
@@ -1308,41 +1360,65 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                     <Upload size={14} /> Create New
                                 </button>
 
-                                {articles.map(article => (
-                                    <div
-                                        key={article.id}
-                                        onClick={() => startEdit(article)}
-                                        className={`p-3 rounded-lg border cursor-pointer transition-all group relative text-left
+                                {articles.map(article => {
+                                    const statusColors = {
+                                        draft: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+                                        published: 'bg-green-500/20 text-green-400 border-green-500/30',
+                                        scheduled: 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                                    };
+                                    const statusLabels = {
+                                        draft: 'Draft',
+                                        published: 'Published',
+                                        scheduled: 'Scheduled'
+                                    };
+                                    const status = article.status || 'published';
+
+                                    return (
+                                        <div
+                                            key={article.id}
+                                            onClick={() => startEdit(article)}
+                                            className={`p-3 rounded-lg border cursor-pointer transition-all group relative text-left
                                             ${editingId === article.id
-                                                ? 'bg-news-accent/10 border-news-accent/50 shadow-lg shadow-news-accent/5'
-                                                : 'bg-transparent border-transparent hover:bg-white/5 border-b-white/5'}`}
-                                    >
-                                        <h4 className={`font-bold text-sm leading-tight mb-1.5 ${editingId === article.id ? 'text-news-accent' : 'text-zinc-300'}`}>
-                                            {article.title}
-                                        </h4>
-                                        <div className="flex justify-between items-end">
-                                            <div className="text-[10px] text-zinc-600 font-mono space-y-0.5">
-                                                <div>{article.date}</div>
-                                                <div className="flex items-center gap-1">
-                                                    {formData.updatedAt === article.updatedAt && editingId === article.id ? <span className="w-1.5 h-1.5 rounded-full bg-news-accent animate-pulse"></span> : null}
-                                                    {article.updatedAt ? new Date(article.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                                    ? 'bg-news-accent/10 border-news-accent/50 shadow-lg shadow-news-accent/5'
+                                                    : 'bg-transparent border-transparent hover:bg-white/5 border-b-white/5'}`}
+                                        >
+                                            <div className="flex items-center gap-2 mb-1.5">
+                                                <span className={`text-[8px] px-1.5 py-0.5 rounded border font-bold uppercase ${statusColors[status as keyof typeof statusColors]}`}>
+                                                    {statusLabels[status as keyof typeof statusLabels]}
+                                                </span>
+                                                {article.status === 'scheduled' && article.scheduledPublishDate && (
+                                                    <span className="text-[8px] text-zinc-500">
+                                                        📅 {new Date(article.scheduledPublishDate).toLocaleString()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h4 className={`font-bold text-sm leading-tight mb-1.5 ${editingId === article.id ? 'text-news-accent' : 'text-zinc-300'}`}>
+                                                {article.title}
+                                            </h4>
+                                            <div className="flex justify-between items-end">
+                                                <div className="text-[10px] text-zinc-600 font-mono space-y-0.5">
+                                                    <div>{article.date}</div>
+                                                    <div className="flex items-center gap-1">
+                                                        {formData.updatedAt === article.updatedAt && editingId === article.id ? <span className="w-1.5 h-1.5 rounded-full bg-news-accent animate-pulse"></span> : null}
+                                                        {article.updatedAt ? new Date(article.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    {(Array.isArray(article.category) ? article.category.slice(0, 2) : [article.category]).map(c => (
+                                                        <span key={c} className={`w-1.5 h-1.5 rounded-full ${CATEGORY_COLORS[c]?.replace('text-', 'bg-') || 'bg-gray-500'}`} title={c}></span>
+                                                    ))}
                                                 </div>
                                             </div>
-                                            <div className="flex gap-1">
-                                                {(Array.isArray(article.category) ? article.category.slice(0, 2) : [article.category]).map(c => (
-                                                    <span key={c} className={`w-1.5 h-1.5 rounded-full ${CATEGORY_COLORS[c]?.replace('text-', 'bg-') || 'bg-gray-500'}`} title={c}></span>
-                                                ))}
-                                            </div>
+                                            {/* Hover Delete */}
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); handleDelete(article.id); }}
+                                                className="absolute top-2 right-2 p-1.5 text-zinc-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                                            </button>
                                         </div>
-                                        {/* Hover Delete */}
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleDelete(article.id); }}
-                                            className="absolute top-2 right-2 p-1.5 text-zinc-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                                        </button>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
