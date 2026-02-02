@@ -241,10 +241,24 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
                                                 {article.excerpt}
                                             </p>
-                                            <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
-                                                <span>{article.date}</span>
-                                                <span>•</span>
+                                            <div className="flex items-center justify-between text-[10px] text-gray-500 pt-2 border-t border-white/5">
                                                 <span>{article.originalReadTime}</span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        playArticle(article);
+                                                    }}
+                                                    disabled={isLoading && currentArticle?.id === article.id}
+                                                    className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 transition-all text-gray-400 hover:text-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    title="Listen to guide"
+                                                >
+                                                    {isLoading && currentArticle?.id === article.id ? (
+                                                        <div className="w-3 h-3 border border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                                    ) : (
+                                                        <Headphones size={12} />
+                                                    )}
+                                                    <span>Listen</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -292,9 +306,22 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                         </p>
                                         <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-[9px] text-gray-500 uppercase font-bold">
                                             <span className="truncate mr-1">{article.source}</span>
-                                            <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform text-white">
-                                                Read <ChevronRight size={10} />
-                                            </span>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    playArticle(article);
+                                                }}
+                                                disabled={isLoading && currentArticle?.id === article.id}
+                                                className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 transition-all text-gray-400 hover:text-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                title="Listen to story"
+                                            >
+                                                {isLoading && currentArticle?.id === article.id ? (
+                                                    <div className="w-3 h-3 border border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                                ) : (
+                                                    <Headphones size={12} />
+                                                )}
+                                                <span>Listen</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

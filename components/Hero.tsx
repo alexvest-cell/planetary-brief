@@ -1,7 +1,8 @@
 import React from 'react';
 import { Section, Article } from '../types';
 import { heroContent, newsArticles } from '../data/content';
-import { FileText, ArrowRight, Clock } from 'lucide-react';
+import { FileText, ArrowRight, Clock, Headphones } from 'lucide-react';
+import { useAudio } from '../contexts/AudioContext';
 
 interface HeroProps {
     onReadFeatured: () => void;
@@ -32,6 +33,8 @@ const getRelativeTime = (dateString: string) => {
 };
 
 const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArticleOverride, articles = [] }) => {
+    const { playArticle, isLoading, currentArticle } = useAudio();
+
     // Priority: Override (from DB) > Static heroContent
     const displayHeadline = featuredArticleOverride?.title || heroContent.headline;
     const displaySubheadline = featuredArticleOverride?.excerpt || heroContent.subheadline;
@@ -90,10 +93,31 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                             {displaySubheadline}
                         </p>
 
-                        <div className="mt-auto flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500">
-                            <span>{displayDate}</span>
-                            <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-                            <span>{displaySource}</span>
+                        <div className="mt-auto flex flex-col gap-4">
+                            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500">
+                                <span>{displayDate}</span>
+                                <span className="w-1 h-1 rounded-full bg-gray-600"></span>
+                                <span>{displaySource}</span>
+                            </div>
+
+                            {/* Play button for featured article (if it's a real article) */}
+                            {featuredArticleOverride && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        playArticle(featuredArticleOverride);
+                                    }}
+                                    disabled={isLoading && currentArticle?.id === featuredArticleOverride.id}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-emerald-500 hover:text-black border border-white/10 hover:border-emerald-500 transition-all text-white w-fit disabled:opacity-50 disabled:cursor-not-allowed group"
+                                >
+                                    {isLoading && currentArticle?.id === featuredArticleOverride.id ? (
+                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <Headphones size={16} className="text-emerald-500 group-hover:text-black transition-colors" />
+                                    )}
+                                    <span className="text-xs font-bold uppercase tracking-widest">Listen to Story</span>
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -131,6 +155,7 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                                         <span>•</span>
                                         <span className="flex items-center gap-1"><Clock size={10} /> {news.date || getRelativeTime(news.createdAt)}</span>
                                     </div>
+                                    {/* Intentionally NO audio button here per user request */}
                                 </div>
                             ))}
                         </div>

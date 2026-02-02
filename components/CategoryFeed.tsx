@@ -2,9 +2,10 @@ import React from 'react';
 import { Article } from '../types';
 import { newsArticles } from '../data/content';
 import { CATEGORIES, mapTopicToCategory } from '../data/categories';
-import { Filter, ArrowRight } from 'lucide-react';
+import { Filter, ArrowRight, Headphones } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
+import { useAudio } from '../contexts/AudioContext';
 
 interface CategoryFeedProps {
     category: string;
@@ -13,9 +14,8 @@ interface CategoryFeedProps {
     onBack: () => void;
 }
 
-
-
 const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArticleClick }) => {
+    const { playArticle, isLoading, currentArticle } = useAudio();
 
     // Ensure we have articles, fallback to empty array if undefined
     const sourceArticles = articles || [];
@@ -126,8 +126,25 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                     <p className="text-gray-300 line-clamp-2 text-xs md:text-sm mb-4 drop-shadow-md font-medium">
                                         {heroArticle.excerpt}
                                     </p>
-                                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white">
-                                        <span>Read Full Story</span> <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white">
+                                            <span>Read Full Story</span> <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                playArticle(heroArticle);
+                                            }}
+                                            disabled={isLoading && currentArticle?.id === heroArticle.id}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-[10px] font-bold uppercase tracking-wide transition-all shadow-lg hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isLoading && currentArticle?.id === heroArticle.id ? (
+                                                <div className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                                            ) : (
+                                                <Headphones size={12} className="fill-black" />
+                                            )}
+                                            <span>Listen</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -220,6 +237,44 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                             {index !== 0 && (
                                                 <div className="mt-auto pt-2 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
                                                     <span>{article.date.split(',')[0]}</span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            playArticle(article);
+                                                        }}
+                                                        disabled={isLoading && currentArticle?.id === article.id}
+                                                        className="flex items-center gap-1 px-2 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/30 transition-all text-gray-400 hover:text-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        title="Listen to article"
+                                                    >
+                                                        {isLoading && currentArticle?.id === article.id ? (
+                                                            <div className="w-3 h-3 border border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                                        ) : (
+                                                            <Headphones size={12} />
+                                                        )}
+                                                        <span className="hidden md:inline">Listen</span>
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {index === 0 && (
+                                                <div className="mt-auto pt-2 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                                                    <div className="flex items-center gap-2">
+                                                        <span>{article.date.split(',')[0]}</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            playArticle(article);
+                                                        }}
+                                                        disabled={isLoading && currentArticle?.id === article.id}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/10 hover:bg-emerald-500 hover:text-black hover:border-emerald-500 border border-white/20 transition-all text-white backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        {isLoading && currentArticle?.id === article.id ? (
+                                                            <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin"></div>
+                                                        ) : (
+                                                            <Headphones size={12} />
+                                                        )}
+                                                        <span>Listen</span>
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>
