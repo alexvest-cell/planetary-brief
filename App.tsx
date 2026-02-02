@@ -18,6 +18,30 @@ import AdminDashboard from './components/AdminDashboard';
 import { Section, Article, ExplanationData } from './types';
 import { featuredArticle, newsArticles as staticNewsArticles } from './data/content';
 
+// Helper functions for clean URLs
+const categoryToSlug = (category: string): string => {
+  return category
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+const slugToCategory = (slug: string): string => {
+  const categoryMap: Record<string, string> = {
+    'climate-change': 'Climate Change',
+    'energy': 'Energy',
+    'pollution': 'Pollution',
+    'policy-and-economics': 'Policy & Economics',
+    'oceans': 'Oceans',
+    'biodiversity': 'Biodiversity',
+    'conservation': 'Conservation',
+    'solutions': 'Solutions',
+    'guides': 'Guides'
+  };
+  return categoryMap[slug] || slug;
+};
+
 function App() {
   // Search now includes all dynamic articles
   // Browser History Management: All view changes push state to history API,
@@ -89,6 +113,12 @@ function App() {
       if (pathname !== '/admin') {
         window.history.replaceState({}, '', '/admin');
       }
+    } else if (pathname.startsWith('/category/')) {
+      // Handle clean category URLs like /category/policy-economics
+      const slug = pathname.replace('/category/', '');
+      const category = slugToCategory(slug);
+      setActiveCategory(category);
+      setView('category');
     } else if (viewParam === 'dashboard') {
       setView('dashboard');
     } else if (viewParam === 'action') {
@@ -98,6 +128,9 @@ function App() {
     } else if (viewParam === 'methodology') {
       setView('methodology');
     } else if (categoryParam && categoryParam !== 'All' && categoryParam !== 'Discover') {
+      // Backward compatibility: redirect old query param URLs to new clean URLs
+      const slug = categoryToSlug(categoryParam);
+      window.history.replaceState({}, '', `/category/${slug}`);
       setActiveCategory(categoryParam);
       setView('category');
     } else if (articleId && articles.length > 0) {
@@ -267,7 +300,8 @@ function App() {
     } else {
       setView('category');
       window.scrollTo(0, 0);
-      window.history.pushState({ view: 'category', category }, '', `?category=${encodeURIComponent(category)}`);
+      const slug = categoryToSlug(category);
+      window.history.pushState({ view: 'category', category }, '', `/category/${slug}`);
     }
   };
 
