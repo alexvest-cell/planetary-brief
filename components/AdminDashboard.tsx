@@ -561,6 +561,38 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         link.click();
     };
 
+    // Generate Audio Handler
+    const handleGenerateAudio = async () => {
+        if (!editingId) {
+            alert('Please save the article first before generating audio.');
+            return;
+        }
+
+        setAudioLoading(true);
+        try {
+            const res = await fetch('/api/generate-audio', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ articleId: editingId })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setAudioUrl(data.audioUrl);
+                alert('Audio generated successfully!');
+                await loadArticles();
+            } else {
+                alert(data.error || 'Failed to generate audio');
+            }
+        } catch (error) {
+            console.error('Audio generation error:', error);
+            alert('Failed to generate audio. Please try again.');
+        } finally {
+            setAudioLoading(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -1285,6 +1317,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Generate Audio Button */}
+                                    {editingId && (
+                                        <button
+                                            type="button"
+                                            onClick={handleGenerateAudio}
+                                            disabled={audioLoading}
+                                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all flex justify-center items-center gap-2 mb-3"
+                                        >
+                                            {audioLoading ? <Loader2 size={16} className="animate-spin" /> : <Headphones size={16} />}
+                                            {audioLoading ? 'Generating Audio...' : (audioUrl ? 'Regenerate Audio' : 'Generate Audio')}
+                                        </button>
+                                    )}
 
                                     <button
                                         type="submit"
