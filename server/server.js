@@ -947,9 +947,24 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
       throw new Error('Audio generation failed - no audio data returned');
     }
 
-    // Upload to Cloudinary
+    // Upload to Cloudinary with explicit audio configuration
     const buffer = Buffer.from(audioData, 'base64');
-    const uploadResult = await streamUpload(buffer);
+
+    // Upload with explicit resource type and format
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'video', // Cloudinary treats audio as 'video'
+          format: 'mp3',
+          folder: 'planetary_brief_audio'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      streamifier.createReadStream(buffer).pipe(uploadStream);
+    });
 
     if (!uploadResult || !uploadResult.secure_url) {
       throw new Error('Cloudinary upload failed');
