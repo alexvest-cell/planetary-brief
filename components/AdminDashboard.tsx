@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Upload, Loader2, Save, Search, Sparkles, LogOut, Download, Headphones } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Trash2, Edit, Save, Plus, Download, Upload, Calendar, Eye, EyeOff, Sparkles, Image as ImageIcon, Clock, Copy, FileImage, Volume2, Loader2, ArrowLeft, LogOut, Search, Headphones } from 'lucide-react';
+import { generateSlug } from '../utils/slugify';
 import { Article } from '../types';
 import { newsArticles as staticArticles } from '../data/content';
 import AdminLogin from './AdminLogin';
@@ -606,8 +607,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         try {
             const contentArray = Array.isArray(formData.content) ? formData.content : (formData.content as any).split('\n');
 
+            // Generate slug from title if not already set
+            const slug = formData.slug || generateSlug(formData.title);
+
             const payload = {
                 ...formData,
+                slug, // Add slug to article data
                 content: contentArray,
                 // Parse CSV string to array for backend
                 keywords: seoKeywords.split(',').map(s => s.trim()).filter(Boolean),

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const articleSchema = new mongoose.Schema({
     id: { type: String, unique: true, required: true }, // Keeping the string ID for frontend compatibility
+    slug: { type: String, unique: true, sparse: true }, // URL-friendly slug, sparse index allows nulls
     title: String,
     excerpt: String,
     content: [String], // Array of paragraphs

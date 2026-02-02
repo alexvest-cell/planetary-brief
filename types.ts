@@ -1,5 +1,6 @@
 export interface Article {
   id: string;
+  slug?: string; // URL-friendly slug generated from title
   title: string;
   category: string | string[];
   topic: string;

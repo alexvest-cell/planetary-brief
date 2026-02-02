@@ -168,15 +168,23 @@ function App() {
       setActiveCategory(categoryParam);
       setView('category');
     } else if ((pathname.startsWith('/article/') || articleId) && articles.length > 0) {
-      // Support both clean URL and legacy query param
-      const idToFind = articleId || pathname.replace('/article/', '');
-      const foundArticle = articles.find(a => a.id === idToFind);
+      // Support both slug-based clean URLs and legacy ID-based URLs
+      const identifier = articleId || pathname.replace('/article/', '');
+
+      // Try to find by slug first, then fall back to ID
+      let foundArticle = articles.find(a => a.slug === identifier);
+      if (!foundArticle) {
+        foundArticle = articles.find(a => a.id === identifier);
+      }
+
       if (foundArticle) {
         setCurrentArticle(foundArticle);
         setView('article');
-        // Normalize URL if needed
-        if (pathname !== `/article/${foundArticle.id}`) {
-          window.history.replaceState({ view: 'article', articleId: foundArticle.id }, '', `/article/${foundArticle.id}`);
+
+        // Normalize URL to use slug if available
+        const preferredPath = `/article/${foundArticle.slug || foundArticle.id}`;
+        if (pathname !== preferredPath) {
+          window.history.replaceState({ view: 'article', articleId: foundArticle.id }, '', preferredPath);
         }
       }
     }
