@@ -80,22 +80,24 @@ const ArticleFooter = ({ onShowAbout }: { onShowAbout: () => void }) => (
         <span>Editorial Integrity</span>
       </div>
       <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
-        {article.sources && article.sources.length > 0 ? (
-          <>
-            Synthesized from verified data sources including{' '}
-            {article.sources.map((source, i) => (
-              <span key={i} className="text-emerald-400/80 hover:text-emerald-400 transition-colors cursor-default">
-                {source}{i < article.sources.length - 1 ? ', ' : ''}
-              </span>
-            ))}.
-            <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
-          </>
-        ) : (
-          <>
-            Synthesized from verified data sources including IPCC, NOAA, and legislative filings.
-            <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
-          </>
-        )}
+        <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
+          {Array.isArray(article.sources) && article.sources.length > 0 ? (
+            <>
+              Synthesized from verified data sources including{' '}
+              {article.sources.map((source, i) => (
+                <span key={i} className="text-emerald-400/80 hover:text-emerald-400 transition-colors cursor-default">
+                  {source}{i < article.sources.length - 1 ? ', ' : ''}
+                </span>
+              ))}.
+              <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
+            </>
+          ) : (
+            <>
+              Synthesized from verified data sources including IPCC, NOAA, and legislative filings.
+              <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
+            </>
+          )}
+        </p>
       </p>
     </div>
   </div>
@@ -250,7 +252,9 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
             let excerptRendered = false;
             let firstParagraphRendered = false;
 
-            return article.content?.map((paragraph, index) => {
+            if (!Array.isArray(article.content)) return null;
+
+            return article.content.map((paragraph, index) => {
               const isSubheader = paragraph.length < 80 && !paragraph.endsWith('.') && !paragraph.endsWith('"') && !paragraph.startsWith('//');
 
               // Parse for // highlight // pattern
