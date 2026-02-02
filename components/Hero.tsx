@@ -126,13 +126,13 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                                         playArticle(featuredArticleOverride);
                                     }}
                                     disabled={isLoading && currentArticle?.id === featuredArticleOverride.id}
-                                    className="absolute top-4 right-4 w-12 h-12 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 group/btn"
+                                    className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 group/btn"
                                     title="Listen to story"
                                 >
                                     {isLoading && currentArticle?.id === featuredArticleOverride.id ? (
-                                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                                     ) : (
-                                        <Headphones size={20} />
+                                        <Headphones size={16} />
                                     )}
                                 </button>
                             )}

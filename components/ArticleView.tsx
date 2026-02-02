@@ -60,7 +60,13 @@ const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout
         PB
       </div>
       <div className="flex flex-col">
-        <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
+        <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">
+          {(() => {
+            const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+            const categories = Array.isArray(article.category) ? article.category : [article.category];
+            return categories.map(displayCategory).join(' • ');
+          })()}
+        </span>
         <button
           onClick={onShowAbout}
           className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
