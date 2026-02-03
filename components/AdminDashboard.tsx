@@ -66,6 +66,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         };
     };
 
+    // Extract voiceover text from article content using VO tags
+    const extractVoiceoverText = (content: string[]): string => {
+        const fullText = content.join('\n');
+        const voMatch = fullText.match(/<<<VO>>>([\s\S]*?)<<<END_VO>>>/);
+        return voMatch ? voMatch[1].trim() : '';
+    };
+
     // Check authentication on mount
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
@@ -128,6 +135,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         originalReadTime: '5 min read',
         imageUrl: '',
         audioUrl: '',
+        voiceoverText: '',
         contextBox: {
             title: '',
             content: '',
@@ -147,6 +155,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             loadArticles();
         }
     }, [isAuthenticated, checkingAuth]);
+
+    // Auto-extract voiceover text when article content changes
+    useEffect(() => {
+        if (formData.content && Array.isArray(formData.content) && formData.content.length > 0) {
+            const extractedVO = extractVoiceoverText(formData.content);
+            if (extractedVO && extractedVO !== formData.voiceoverText) {
+                setFormData(prev => ({ ...prev, voiceoverText: extractedVO }));
+            }
+        }
+    }, [formData.content]);
 
     const loadArticles = async () => {
         try {
@@ -1212,6 +1230,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                     <audio controls className="w-full" src={formData.audioUrl}></audio>
                                                 </div>
                                             )}
+
+                                            {/* Voiceover Text Field */}
+                                            <div className="space-y-2 mt-4">
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                        Voiceover Script (Auto-extracted from VO tags)
+                                                    </label>
+                                                    {formData.voiceoverText && (
+                                                        <span className="text-[9px] text-emerald-500 font-mono">
+                                                            {formData.voiceoverText.length} chars
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <textarea
+                                                    className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-sm text-gray-300 focus:border-emerald-500 outline-none h-32 font-mono text-xs leading-relaxed"
+                                                    value={formData.voiceoverText || ''}
+                                                    onChange={e => setFormData({ ...formData, voiceoverText: e.target.value })}
+                                                    placeholder="Voiceover text will be auto-extracted from content between <<<VO>>> and <<<END_VO>>> tags, or you can manually enter it here..."
+                                                />
+                                                <p className="text-[9px] text-zinc-600 italic">
+                                                    This text will be used for audio generation instead of the full article.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

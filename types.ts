@@ -11,6 +11,7 @@ export interface Article {
   secondaryImageUrl?: string;
   diagramUrl?: string;
   audioUrl?: string;  // Cloudinary URL for pre-generated audio
+  voiceoverText?: string; // Dedicated text for audio narration, extracted from VO tags
   sources?: string[]; // List of specific sources for this article
   excerpt: string;
   date: string;

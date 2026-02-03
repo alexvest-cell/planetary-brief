@@ -918,11 +918,18 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Article not found' });
     }
 
-    // Prepare text to read
-    const contentArray = Array.isArray(article.content) ? article.content : [article.content];
-    const textToRead = `${article.title}. ${article.excerpt}. ${contentArray.join(' ')}`;
+    // Prepare text to read - use voiceoverText if available, otherwise use full article
+    let textToRead;
+    if (article.voiceoverText && article.voiceoverText.trim().length > 0) {
+      textToRead = article.voiceoverText;
+      console.log(`Using dedicated voiceover text (${textToRead.length} chars)`);
+    } else {
+      const contentArray = Array.isArray(article.content) ? article.content : [article.content];
+      textToRead = `${article.title}. ${article.excerpt}. ${contentArray.join(' ')}`;
+      console.log(`Using full article content for audio (${textToRead.length} chars)`);
+    }
 
-    console.log(`Generating audio for article: ${articleId}`);
+    console.log(`Generating audio for article: ${articleId} using Google Journey voice`);
 
     // Use Google Cloud Text-to-Speech API instead of Gemini
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
