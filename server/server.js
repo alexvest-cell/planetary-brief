@@ -27,10 +27,6 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 import Article from './models/Article.js';
 import Subscriber from './models/Subscriber.js';
 
-// Replicate __dirname in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 const port = 3000;
 
@@ -941,7 +937,7 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         input: { text: textToRead },
         voice: {
           languageCode: 'en-US',
-          name: 'en-US-Neural2-J', // Natural sounding male voice
+          name: 'en-US-Journey-D', // Premium Journey voice - much more natural than Neural2
           ssmlGender: 'MALE'
         },
         audioConfig: {
