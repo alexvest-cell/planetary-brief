@@ -221,10 +221,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         }
     };
 
+
     const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return;
 
         const file = e.target.files[0];
+        console.log('Uploading audio file:', file.name, file.type, file.size);
+
         const formData = new FormData();
         formData.append('audio', file);
 
@@ -236,20 +239,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 body: formData
             });
 
+            console.log('Upload response status:', res.status);
+
             if (res.ok) {
                 const data = await res.json();
+                console.log('Upload successful:', data);
                 setAudioUrl(data.url);
+                alert('Audio uploaded successfully!');
             } else {
-                const error = await res.json().catch(() => ({ error: 'Upload failed' }));
-                alert(error.error || 'Audio upload failed. Please check your permissions.');
+                const errorText = await res.text();
+                console.error('Upload failed with status:', res.status, errorText);
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    alert(`Upload failed: ${errorJson.error || errorText}`);
+                } catch {
+                    alert(`Upload failed (${res.status}): ${errorText}`);
+                }
             }
         } catch (err) {
             console.error('Audio upload error:', err);
-            alert('Audio upload failed. Please try again.');
+            alert(`Audio upload failed: ${err.message}`);
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleImport = () => {
         if (!importText.trim()) return;

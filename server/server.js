@@ -456,22 +456,31 @@ app.post('/api/upload', upload.fields([{ name: 'image' }, { name: 'audio' }]), a
   const imageFile = req.files?.image?.[0];
   const audioFile = req.files?.audio?.[0];
 
+  console.log('Upload request received');
+  console.log('Files:', req.files);
+  console.log('Image file:', imageFile ? `${imageFile.originalname} (${imageFile.size} bytes)` : 'none');
+  console.log('Audio file:', audioFile ? `${audioFile.originalname} (${audioFile.size} bytes)` : 'none');
+
   if (!imageFile && !audioFile) {
+    console.error('No file in request');
     return res.status(400).json({ error: 'No file uploaded.' });
   }
 
   try {
     let result;
     if (imageFile) {
+      console.log('Uploading image to Cloudinary...');
       result = await streamUpload(imageFile.buffer, 'image');
     } else if (audioFile) {
+      console.log('Uploading audio to Cloudinary as video resource...');
       result = await streamUpload(audioFile.buffer, 'video'); // Cloudinary uses 'video' for audio files
     }
 
+    console.log('Upload successful:', result.secure_url);
     res.json({ url: result.secure_url });
   } catch (error) {
     console.error('Upload failed:', error);
-    res.status(500).json({ error: 'Upload failed. Cloudinary configured?' });
+    res.status(500).json({ error: `Upload failed: ${error.message}. Cloudinary configured?` });
   }
 });
 
