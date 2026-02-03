@@ -313,6 +313,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         const keywordsRaw = parseTag('KEYWORDS');
         const metaDesc = parseTag('META');
 
+        // Parse Voiceover Text
+        const voText = parseTag('VO');
+
         // Parse Sources
         const sourcesRaw = parseTag('MAIN_BODY_SOURCES');
         const newSources = sourcesRaw ? sourcesRaw.split(/\n/).map(s => s.trim()).filter(s => s) : [];
@@ -326,6 +329,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             content: mainBody.length > 0 ? mainBody : prev.content,
             seoDescription: metaDesc || prev.seoDescription,
             sources: newSources.length > 0 ? newSources : prev.sources,
+            voiceoverText: voText || prev.voiceoverText,
             contextBox: {
                 title: genTitle || prev.contextBox?.title || '',
                 content: genContent || prev.contextBox?.content || '',
