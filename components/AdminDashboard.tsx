@@ -221,6 +221,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         }
     };
 
+    const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || e.target.files.length === 0) return;
+
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append('audio', file);
+
+        setLoading(true);
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: formData
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setAudioUrl(data.url);
+            } else {
+                const error = await res.json().catch(() => ({ error: 'Upload failed' }));
+                alert(error.error || 'Audio upload failed. Please check your permissions.');
+            }
+        } catch (err) {
+            console.error('Audio upload error:', err);
+            alert('Audio upload failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleImport = () => {
         if (!importText.trim()) return;
 
@@ -1110,6 +1140,57 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                     placeholder="Photo by Jane Doe / Unsplash"
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    {/* AUDIO NARRATION */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                            <Headphones size={14} className="text-emerald-500" />
+                                            Audio Narration
+                                        </h3>
+                                        <div className="space-y-3">
+                                            <div className="flex gap-2">
+                                                <label className="flex-1 cursor-pointer">
+                                                    <input
+                                                        type="file"
+                                                        accept=".mp3,.wav,.m4a"
+                                                        onChange={handleAudioUpload}
+                                                        className="hidden"
+                                                    />
+                                                    <div className="bg-zinc-950/30 border border-white/10 hover:border-emerald-500/30 rounded-lg p-3 text-xs text-center text-white hover:text-emerald-400 transition-all flex items-center justify-center gap-2">
+                                                        <Upload size={14} />
+                                                        Upload Audio
+                                                    </div>
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleGenerateAudio}
+                                                    disabled={audioLoading || !editingId}
+                                                    className="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 disabled:bg-zinc-800 disabled:text-zinc-600 text-emerald-400 border border-emerald-500/30 px-3 py-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    {audioLoading ? (
+                                                        <>
+                                                            <Loader2 size={14} className="animate-spin" />
+                                                            Generating...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Sparkles size={14} />
+                                                            Generate Audio
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                            {audioUrl && (
+                                                <div className="bg-black/40 border border-emerald-500/20 rounded-lg p-3">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Headphones size={12} className="text-emerald-500" />
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Audio Ready</span>
+                                                    </div>
+                                                    <audio controls className="w-full" src={audioUrl}></audio>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
