@@ -63,14 +63,10 @@ function App() {
   const fetchArticles = async () => {
     try {
       const headers: HeadersInit = {};
-      let url = '/api/articles';
+      const url = '/api/articles';
 
-      // Check for admin token to preview drafts
-      const token = localStorage.getItem('adminToken');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-        url += '?includeUnpublished=true';
-      }
+      // Note: We don't include unpublished articles on the public site
+      // Even for admins - they should use the Admin Dashboard to view drafts
 
       const res = await fetch(url, { headers });
       if (res.ok) {

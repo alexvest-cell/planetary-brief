@@ -40,8 +40,7 @@ const ArticleDataVisual = ({ article }: { article: Article }) => {
 
         {article.contextBox.source && (
           <div className="pt-4 border-t border-white/5 mt-6">
-            <div className="flex items-center gap-2 text-[9px] text-gray-500 uppercase tracking-widest font-bold">
-              <Database size={10} />
+            <div className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
               Verified Data: <span className="text-gray-400">{article.contextBox.source}</span>
             </div>
           </div>
