@@ -918,12 +918,21 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Article not found' });
     }
 
-    // Prepare text to read - use voiceoverText if available, otherwise use full article
+    // Prepare text to read
     let textToRead;
-    if (article.voiceoverText && article.voiceoverText.trim().length > 0) {
+
+    // Priority 1: Use voiceover text provided in request (real-time preview from CMS)
+    if (req.body.voiceoverText && req.body.voiceoverText.trim().length > 0) {
+      textToRead = req.body.voiceoverText;
+      console.log(`Using provided voiceover text from request (${textToRead.length} chars)`);
+    }
+    // Priority 2: Use saved voiceover text from database
+    else if (article.voiceoverText && article.voiceoverText.trim().length > 0) {
       textToRead = article.voiceoverText;
-      console.log(`Using dedicated voiceover text (${textToRead.length} chars)`);
-    } else {
+      console.log(`Using saved voiceover text from DB (${textToRead.length} chars)`);
+    }
+    // Priority 3: Fallback to full article content
+    else {
       const contentArray = Array.isArray(article.content) ? article.content : [article.content];
       textToRead = `${article.title}. ${article.excerpt}. ${contentArray.join(' ')}`;
       console.log(`Using full article content for audio (${textToRead.length} chars)`);

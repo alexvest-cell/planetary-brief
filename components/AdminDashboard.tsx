@@ -667,7 +667,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             const res = await fetch('/api/generate-audio', {
                 method: 'POST',
                 headers: getAuthHeaders(),
-                body: JSON.stringify({ articleId: editingId })
+                body: JSON.stringify({
+                    articleId: editingId,
+                    voiceoverText: formData.voiceoverText // Send current text from form
+                })
             });
 
             const data = await res.json();
