@@ -54,7 +54,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
     // Audio Generation State
     const [audioLoading, setAudioLoading] = useState(false);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
     // Database Status
     const [dbOnline, setDbOnline] = useState(true);
@@ -128,6 +127,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
         originalReadTime: '5 min read',
         imageUrl: '',
+        audioUrl: '',
         contextBox: {
             title: '',
             content: '',
@@ -250,7 +250,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             if (res.ok) {
                 const data = await res.json();
                 console.log('Upload successful:', data);
-                setAudioUrl(data.url);
+                setFormData(prev => ({ ...prev, audioUrl: data.url }));
                 alert('Audio uploaded successfully!');
             } else {
                 const errorText = await res.text();
@@ -651,7 +651,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             const data = await res.json();
 
             if (res.ok) {
-                setAudioUrl(data.audioUrl);
+                setFormData(prev => ({ ...prev, audioUrl: data.audioUrl }));
                 alert('Audio generated successfully!');
                 await loadArticles();
             } else {
@@ -720,6 +720,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                     date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
                     originalReadTime: '5 min read',
                     imageUrl: '',
+                    audioUrl: '',
                     contextBox: { title: '', content: '', source: '' }
                 });
                 loadArticles();
@@ -1202,13 +1203,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                     )}
                                                 </button>
                                             </div>
-                                            {audioUrl && (
+                                            {formData.audioUrl && (
                                                 <div className="bg-black/40 border border-emerald-500/20 rounded-lg p-3">
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <Headphones size={12} className="text-emerald-500" />
                                                         <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Audio Ready</span>
                                                     </div>
-                                                    <audio controls className="w-full" src={audioUrl}></audio>
+                                                    <audio controls className="w-full" src={formData.audioUrl}></audio>
                                                 </div>
                                             )}
                                         </div>
@@ -1469,7 +1470,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                             className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all flex justify-center items-center gap-2 mb-3"
                                         >
                                             {audioLoading ? <Loader2 size={16} className="animate-spin" /> : <Headphones size={16} />}
-                                            {audioLoading ? 'Generating Audio...' : (audioUrl ? 'Regenerate Audio' : 'Generate Audio')}
+                                            {audioLoading ? 'Generating Audio...' : (formData.audioUrl ? 'Regenerate Audio' : 'Generate Audio')}
                                         </button>
                                     )}
 
