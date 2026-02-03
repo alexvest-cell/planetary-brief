@@ -91,12 +91,13 @@ async function seedDatabase() {
   }
 }
 
-// Image Upload Helper
-const streamUpload = (buffer) => {
+// Upload Helper (supports images, audio, video)
+const streamUpload = (buffer, resourceType = 'image') => {
   return new Promise((resolve, reject) => {
     let stream = cloudinary.uploader.upload_stream(
       {
         folder: "planetary_brief_uploads",
+        resource_type: resourceType, // 'image', 'video', or 'auto'
         quality: "auto:best",
         fetch_format: "auto",
         invalidate: true
@@ -450,18 +451,27 @@ app.delete('/api/articles/:id', requireAuth, async (req, res) => {
   }
 });
 
-// UPLOAD Image (Cloudinary)
-app.post('/api/upload', upload.single('image'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No file uploaded.');
+// UPLOAD Image or Audio (Cloudinary)
+app.post('/api/upload', upload.fields([{ name: 'image' }, { name: 'audio' }]), async (req, res) => {
+  const imageFile = req.files?.image?.[0];
+  const audioFile = req.files?.audio?.[0];
+
+  if (!imageFile && !audioFile) {
+    return res.status(400).json({ error: 'No file uploaded.' });
   }
 
   try {
-    const result = await streamUpload(req.file.buffer);
+    let result;
+    if (imageFile) {
+      result = await streamUpload(imageFile.buffer, 'image');
+    } else if (audioFile) {
+      result = await streamUpload(audioFile.buffer, 'video'); // Cloudinary uses 'video' for audio files
+    }
+
     res.json({ url: result.secure_url });
   } catch (error) {
     console.error('Upload failed:', error);
-    res.status(500).json({ error: 'Image upload failed. Cloudinary configured?' });
+    res.status(500).json({ error: 'Upload failed. Cloudinary configured?' });
   }
 });
 
