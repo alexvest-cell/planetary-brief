@@ -13,6 +13,12 @@ import streamifier from 'streamifier';
 import seedArticles from './seed_data.js';
 import dns from 'dns';
 import { GoogleGenAI } from "@google/genai";
+import dotenv from 'dotenv';
+
+// Load environment variables from .env.local
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
 // Fix DNS resolution issues on Windows
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -20,10 +26,6 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 // Models
 import Article from './models/Article.js';
 import Subscriber from './models/Subscriber.js';
-
-// Replicate __dirname in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3000;
