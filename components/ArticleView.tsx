@@ -84,7 +84,7 @@ const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout
           <>
             This article uses synthesized data from verified sources including{' '}
             {article.sources.map((source, i) => (
-              <span key={i} className="text-gray-300">
+              <span key={i}>
                 {source}{i < article.sources.length - 1 ? ', ' : ''}
               </span>
             ))}.
