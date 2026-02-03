@@ -27,6 +27,10 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 import Article from './models/Article.js';
 import Subscriber from './models/Subscriber.js';
 
+// Replicate __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const port = 3000;
 
