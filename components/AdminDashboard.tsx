@@ -233,9 +233,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
         setLoading(true);
         try {
+            // Don't set Content-Type - let browser set multipart/form-data with boundary
+            const headers: HeadersInit = {};
+            if (authToken) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+
             const res = await fetch('/api/upload', {
                 method: 'POST',
-                headers: getAuthHeaders(),
+                headers,
                 body: formData
             });
 
