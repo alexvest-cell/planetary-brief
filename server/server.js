@@ -983,7 +983,8 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
           ssmlGender: 'MALE'
         },
         audioConfig: {
-          audioEncoding: 'LINEAR16', // WAV (Uncompressed) for higher quality
+          audioEncoding: 'MP3',
+          sampleRateHertz: 48000, // High quality audio 
           speakingRate: 1.0,
           pitch: 0.0
         }
