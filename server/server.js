@@ -954,8 +954,8 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     console.log(`Text length: ${textToRead.length} characters`);
 
 
-    // Slow down slightly to prevent sentence glitches (safer than SSML)
-    const speakingRate = 0.95; // 5% slower for smoother transitions
+    // Use normal speaking rate - slower rate didn't fix glitches
+    const speakingRate = 1.0;
 
     // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
@@ -967,14 +967,14 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         'X-Goog-Api-Key': process.env.GEMINI_API_KEY
       },
       body: JSON.stringify({
-        input: { text: textToRead }, // Plain text - SSML caused API errors
+        input: { text: textToRead },
         voice: {
           languageCode: 'en-US',
-          name: 'en-US-Journey-D' // Natural-sounding Journey voice
+          name: 'en-US-Journey-F' // Natural-sounding female Journey voice
         },
         audioConfig: {
           audioEncoding: 'MP3',
-          speakingRate: speakingRate, // Slightly slower to prevent glitches
+          speakingRate: speakingRate,
           pitch: 0.0
         }
       })
