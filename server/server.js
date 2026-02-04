@@ -966,7 +966,7 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         input: { text: textToRead },
         voice: {
           languageCode: 'en-US',
-          name: 'en-US-Neural2-J' // Reliable Neural2 voice
+          name: 'en-US-Journey-D' // Natural-sounding Journey voice
         },
         audioConfig: {
           audioEncoding: 'MP3',
