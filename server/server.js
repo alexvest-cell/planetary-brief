@@ -938,7 +938,33 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
       console.log(`Using full article content for audio (${textToRead.length} chars)`);
     }
 
+
     console.log(`Generating audio for article: ${articleId} using Google Journey voice`);
+
+    // Helper to escape XML characters for SSML
+    const escapeXml = (unsafe) => {
+      return unsafe.replace(/[<>&'"]/g, c => {
+        switch (c) {
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '&': return '&amp;';
+          case '\'': return '&apos;';
+          case '"': return '&quot;';
+        }
+      });
+    };
+
+    // Construct SSML with explicit breaks between paragraphs to prevent glitches
+    // Normalize newlines and split by double newlines to identify paragraphs
+    const paragraphs = textToRead.split(/\n\s*\n/);
+    const escapedParagraphs = paragraphs.map(p => escapeXml(p.trim())).filter(p => p.length > 0);
+
+    // Join with 500ms breaks
+    const ssml = `<speak>
+      ${escapedParagraphs.join('<break time="500ms"/>')}
+    </speak>`;
+
+    console.log(`Generated SSML with ${escapedParagraphs.length} paragraphs`);
 
     // Use Google Cloud Text-to-Speech API instead of Gemini
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
@@ -950,19 +976,20 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         'X-Goog-Api-Key': process.env.GEMINI_API_KEY // Using same API key
       },
       body: JSON.stringify({
-        input: { text: textToRead },
+        input: { ssml: ssml },
         voice: {
           languageCode: 'en-US',
           name: 'en-US-Journey-D', // Premium Journey voice - much more natural than Neural2
           ssmlGender: 'MALE'
         },
         audioConfig: {
-          audioEncoding: 'MP3',
+          audioEncoding: 'LINEAR16', // WAV (Uncompressed) for higher quality
           speakingRate: 1.0,
           pitch: 0.0
         }
       })
     });
+
 
     if (!ttsResponse.ok) {
       const errorData = await ttsResponse.json().catch(() => ({}));
