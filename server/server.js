@@ -953,22 +953,9 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     console.log(`Text source: ${textToRead ? 'voiceoverText' : 'full article'}`);
     console.log(`Text length: ${textToRead.length} characters`);
 
-    // Prepare SSML with sentence breaks to prevent glitches
-    // Escape XML special characters
-    const escapeXml = (text) => {
-      return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
-    };
 
-    // Add small breaks after sentences to prevent voice glitches
-    const textWithBreaks = escapeXml(textToRead)
-      .replace(/([.!?])\s+/g, '$1<break time="300ms"/> '); // 300ms pause after sentences
-
-    const ssml = `<speak>${textWithBreaks}</speak>`;
+    // Slow down slightly to prevent sentence glitches (safer than SSML)
+    const speakingRate = 0.95; // 5% slower for smoother transitions
 
     // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
@@ -980,14 +967,14 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         'X-Goog-Api-Key': process.env.GEMINI_API_KEY
       },
       body: JSON.stringify({
-        input: { ssml: ssml }, // Using SSML with sentence breaks
+        input: { text: textToRead }, // Plain text - SSML caused API errors
         voice: {
           languageCode: 'en-US',
           name: 'en-US-Journey-D' // Natural-sounding Journey voice
         },
         audioConfig: {
           audioEncoding: 'MP3',
-          speakingRate: 1.0,
+          speakingRate: speakingRate, // Slightly slower to prevent glitches
           pitch: 0.0
         }
       })
