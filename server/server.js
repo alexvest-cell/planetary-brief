@@ -984,7 +984,6 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         },
         audioConfig: {
           audioEncoding: 'MP3',
-          sampleRateHertz: 48000, // High quality audio 
           speakingRate: 1.0,
           pitch: 0.0
         }
