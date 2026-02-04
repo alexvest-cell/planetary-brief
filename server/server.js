@@ -157,6 +157,12 @@ function generateToken() {
 // Store valid tokens (in-memory, resets on server restart)
 const validTokens = new Set();
 
+// Global request logger to debug routing issues
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
 // Middleware to verify admin token
 function requireAuth(req, res, next) {
   const token = req.headers['authorization']?.replace('Bearer ', '');
@@ -906,6 +912,10 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 
   const { articleId } = req.body;
 
+  console.log('=== GENERATE AUDIO ENDPOINT HIT ===');
+  console.log('Article ID:', articleId);
+  console.log('Request body:', JSON.stringify(req.body, null, 2));
+
   if (!articleId) {
     return res.status(400).json({ error: 'Article ID required' });
   }
@@ -939,48 +949,24 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     }
 
 
-    console.log(`Generating audio for article: ${articleId} using Google Journey voice`);
+    console.log(`Generating audio for article: ${articleId}`);
+    console.log(`Text source: ${textToRead ? 'voiceoverText' : 'full article'}`);
+    console.log(`Text length: ${textToRead.length} characters`);
 
-    // Helper to escape XML characters for SSML
-    const escapeXml = (unsafe) => {
-      return unsafe.replace(/[<>&'"]/g, c => {
-        switch (c) {
-          case '<': return '&lt;';
-          case '>': return '&gt;';
-          case '&': return '&amp;';
-          case '\'': return '&apos;';
-          case '"': return '&quot;';
-        }
-      });
-    };
-
-    // Construct SSML with explicit breaks between paragraphs to prevent glitches
-    // Normalize newlines and split by double newlines to identify paragraphs
-    const paragraphs = textToRead.split(/\n\s*\n/);
-    const escapedParagraphs = paragraphs.map(p => escapeXml(p.trim())).filter(p => p.length > 0);
-
-    // Join with 500ms breaks
-    const ssml = `<speak>
-      ${escapedParagraphs.join('<break time="500ms"/>')}
-    </speak>`;
-
-    console.log(`Generated SSML with ${escapedParagraphs.length} paragraphs`);
-
-    // Use Google Cloud Text-to-Speech API instead of Gemini
+    // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 
     const ttsResponse = await fetch(textToSpeechUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Goog-Api-Key': process.env.GEMINI_API_KEY // Using same API key
+        'X-Goog-Api-Key': process.env.GEMINI_API_KEY
       },
       body: JSON.stringify({
-        input: { ssml: ssml },
+        input: { text: textToRead },
         voice: {
           languageCode: 'en-US',
-          name: 'en-US-Journey-D', // Premium Journey voice - much more natural than Neural2
-          ssmlGender: 'MALE'
+          name: 'en-US-Neural2-J' // Reliable Neural2 voice
         },
         audioConfig: {
           audioEncoding: 'MP3',
@@ -993,14 +979,17 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 
     if (!ttsResponse.ok) {
       const errorData = await ttsResponse.json().catch(() => ({}));
-      console.error('TTS API error:', errorData);
+      console.error('TTS API error response:', JSON.stringify(errorData, null, 2));
+      console.error('TTS API status:', ttsResponse.status, ttsResponse.statusText);
 
       // Provide helpful error message
       if (errorData.error?.status === 'PERMISSION_DENIED') {
         throw new Error('Text-to-Speech API not enabled. Please enable it in Google Cloud Console and ensure your API key has access.');
       }
 
-      throw new Error(`Text-to-Speech API failed: ${errorData.error?.message || ttsResponse.statusText}`);
+      // Include full error details for debugging
+      const errorMessage = errorData.error?.message || errorData.error?.details?.[0]?.message || ttsResponse.statusText;
+      throw new Error(`Text-to-Speech API failed: ${errorMessage}`);
     }
 
     const ttsData = await ttsResponse.json();
