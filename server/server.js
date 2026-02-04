@@ -983,7 +983,8 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         audioConfig: {
           audioEncoding: 'MP3',
           speakingRate: 1.0,
-          pitch: 0.0
+          pitch: 0.0,
+          volumeGainDb: -4.0 // Reduce volume by 4dB to prevent clipping
         }
       })
     });
