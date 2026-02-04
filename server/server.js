@@ -954,8 +954,16 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     console.log(`Text length: ${textToRead.length} characters`);
 
 
-    // Use normal speaking rate - slower rate didn't fix glitches
-    const speakingRate = 1.0;
+    // Preprocess text to reduce glitches
+    // Clean up common issues that cause TTS glitches
+    const cleanText = textToRead
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
+      .replace(/\.{2,}/g, '.') // Replace multiple periods with single period
+      .replace(/\s+([.,!?])/g, '$1') // Remove space before punctuation
+      .replace(/([.,!?])([^\s])/g, '$1 $2') // Add space after punctuation if missing
+      .trim();
+
+    console.log('Preprocessed text for TTS');
 
     // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
@@ -967,14 +975,14 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         'X-Goog-Api-Key': process.env.GEMINI_API_KEY
       },
       body: JSON.stringify({
-        input: { text: textToRead },
+        input: { text: cleanText }, // Use cleaned text
         voice: {
           languageCode: 'en-US',
-          name: 'en-US-Journey-F' // Natural-sounding female Journey voice
+          name: 'en-US-Journey-D' // Back to male voice (user preferred)
         },
         audioConfig: {
           audioEncoding: 'MP3',
-          speakingRate: speakingRate,
+          speakingRate: 1.0,
           pitch: 0.0
         }
       })
