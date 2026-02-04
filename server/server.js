@@ -953,6 +953,23 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     console.log(`Text source: ${textToRead ? 'voiceoverText' : 'full article'}`);
     console.log(`Text length: ${textToRead.length} characters`);
 
+    // Prepare SSML with sentence breaks to prevent glitches
+    // Escape XML special characters
+    const escapeXml = (text) => {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    };
+
+    // Add small breaks after sentences to prevent voice glitches
+    const textWithBreaks = escapeXml(textToRead)
+      .replace(/([.!?])\s+/g, '$1<break time="300ms"/> '); // 300ms pause after sentences
+
+    const ssml = `<speak>${textWithBreaks}</speak>`;
+
     // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 
@@ -963,7 +980,7 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         'X-Goog-Api-Key': process.env.GEMINI_API_KEY
       },
       body: JSON.stringify({
-        input: { text: textToRead },
+        input: { ssml: ssml }, // Using SSML with sentence breaks
         voice: {
           languageCode: 'en-US',
           name: 'en-US-Journey-D' // Natural-sounding Journey voice
@@ -1009,7 +1026,9 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         {
           resource_type: 'video', // Cloudinary treats audio as 'video'
           format: 'mp3',
-          folder: 'planetary_brief_audio'
+          folder: 'planetary_brief_audio',
+          quality: 'auto:best', // Preserve maximum quality, don't re-encode
+          audio_codec: 'mp3' // Keep original MP3 codec
         },
         (error, result) => {
           if (error) reject(error);
