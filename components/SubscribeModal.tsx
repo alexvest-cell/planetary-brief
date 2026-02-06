@@ -172,23 +172,18 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
 
                             <button
                                 type="submit"
-                                disabled={isSubmitting || !email || selectedTopics.length === 0}
+                                disabled={true}
                                 className="w-full bg-news-accent hover:bg-emerald-400 text-black py-3 rounded-lg font-bold uppercase tracking-widest text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-news-accent/20"
                             >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 size={16} className="animate-spin" />
-                                        Processing...
-                                    </>
-                                ) : (
-                                    <>
-                                        Subscribe
-                                        <Bell size={16} />
-                                    </>
-                                )}
+                                Subscribe
+                                <Bell size={16} />
                             </button>
 
-                            <p className="text-[10px] text-center text-zinc-600">
+                            <p className="text-xs text-center text-news-accent font-bold uppercase tracking-widest mt-2">
+                                Feature Coming Soon
+                            </p>
+
+                            <p className="text-[10px] text-center text-zinc-600 mt-4">
                                 Zero spam. One email per week. Unsubscribe anytime.
                             </p>
                         </form>

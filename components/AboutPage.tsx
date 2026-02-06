@@ -15,7 +15,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     }, []);
 
     return (
-        <div className="bg-zinc-950 min-h-screen text-white pt-32 pb-24 relative overflow-hidden">
+        <div className="bg-zinc-950 min-h-screen text-white pt-44 pb-24 relative overflow-hidden">
             {/* Background Ambience */}
             <div className="fixed inset-0 pointer-events-none">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
@@ -26,16 +26,13 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
             <div className="container mx-auto px-4 md:px-6 relative z-10 max-w-5xl">
 
                 {/* Hero Section */}
-                <header className="mb-24 md:mb-32">
+                <header className="mb-12 md:mb-16">
 
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight text-white mb-8 leading-[0.9]">
                         Intelligence for a <br className="hidden md:block" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">Changing Planet.</span>
+                        <sup className="ml-4 align-top text-xs md:text-sm font-sans font-bold tracking-widest text-emerald-500 uppercase border border-emerald-500/30 px-2 py-0.5 rounded-full bg-emerald-500/10">Beta</sup>
                     </h1>
-
-                    <p className="text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed font-light border-l border-white/10 pl-6">
-                        Planetary Brief is an experimental news engine blending <span className="text-white font-medium">NASA-grade data</span> with <span className="text-white font-medium">AI synthesis</span> to track the vital signs of Earth in real-time.
-                    </p>
                 </header>
 
                 {/* The Mission - Manifesto Style */}

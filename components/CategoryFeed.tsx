@@ -52,8 +52,6 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
 
     const catData = CATEGORIES.find(c => c.id === category);
     const description = catData?.description || "Latest intelligence, verified data, and policy updates.";
-    const headerImage = catData?.imageUrl || "https://placehold.co/1200x800?text=Default+Category";
-
     // Featured Logic:
     // User wants the "Latest Posted" article to be featured, even if it has an older display date.
     // 1. Get all articles marked 'isFeaturedCategory'
@@ -66,6 +64,9 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
 
     // 3. Pick the winner, or fallback to the first article in the date-sorted feed
     const heroArticle = featuredCandidates[0] || filteredArticles[0];
+
+    // Priority: Hero Image > Category Image > Default Placeholder
+    const headerImage = heroArticle?.imageUrl || catData?.imageUrl || "https://placehold.co/1200x800?text=Default+Category";
 
     // Remove hero from grid
     let gridArticles = filteredArticles.filter(a => a.id !== heroArticle?.id);

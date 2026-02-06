@@ -10,22 +10,23 @@ interface PortfolioProps {
     articles: Article[];
     onArticleClick: (article: Article) => void;
     searchQuery?: string;
+    excludedArticleIds?: string[];
 }
 
 const Portfolio: React.FC<PortfolioProps> = ({
     articles,
     onArticleClick,
     searchQuery = '',
+    excludedArticleIds = [],
 }) => {
     const { playArticle, isLoading, currentArticle } = useAudio();
 
-    // Discover Mode: Show mixed content, prioritized by date/relevance (simulated by array order)
-    // Filter only by search query
     // Discover Mode: Show mixed content
     // Sort logic: We want recently UPLOADED items (createdAt) to appear first in the feed,
     // so users see new content immediately, even if it is backdated (editorial date).
     const displayedArticles = (articles || [])
         .slice() // Create a shallow copy to avoid mutating props
+        .filter(article => !excludedArticleIds.includes(article.id)) // Exclude featured hero + sidebar articles
         .sort((a, b) => {
             // Sort by CreatedAt (Newest Upload First)
             const createdA = new Date(a.createdAt || a.date).getTime();
@@ -38,6 +39,10 @@ const Portfolio: React.FC<PortfolioProps> = ({
                 article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
         }).slice(0, 100); // Increased limit to show more articles
+
+
+    // Filter helper for subsequent sections to also exclude the Hero article
+    const getFilteredList = (list: Article[]) => list.filter(a => !excludedArticleIds.includes(a.id));
 
     return (
         <section id={Section.NEWS} className="pt-0 pb-12 md:pt-4 md:pb-20 bg-black">
@@ -187,17 +192,17 @@ const Portfolio: React.FC<PortfolioProps> = ({
                 )}
 
                 {/* Ad Placement 2: Divider between Grid and Upcoming Events */}
+                {/* Ad Placement 2: Divider between Grid and Upcoming Events */}
                 {!searchQuery && (
-                    <div className="w-full my-12 border-y border-white/5 bg-zinc-900/30 py-8">
-                        <div className="container mx-auto max-w-6xl">
-                            <div className="text-[9px] text-center text-gray-600 mb-4 uppercase tracking-widest">Sponsored</div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
-                                <div className="flex flex-col items-center">
-                                    <AdUnit format="rectangle" className="w-full h-64 md:h-72" slotId={ADS_CONFIG.SLOTS.HOME_DIVIDER_LEFT} />
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <AdUnit format="rectangle" className="w-full h-64 md:h-72" slotId={ADS_CONFIG.SLOTS.HOME_DIVIDER_RIGHT} />
-                                </div>
+                    <div className="w-full my-12 py-8">
+                        <div className="container mx-auto px-4 md:px-0">
+                            <div className="flex flex-col items-center">
+                                <AdUnit
+                                    format="auto"
+                                    variant="transparent"
+                                    className="w-full h-64 md:h-80 bg-transparent"
+                                    slotId={ADS_CONFIG.SLOTS.HOME_DIVIDER_LEFT}
+                                />
                             </div>
                         </div>
                     </div>
@@ -205,7 +210,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
 
                 {/* Latest Guides Section */}
                 {!searchQuery && (() => {
-                    const guideArticles = (articles || []).filter(a => {
+                    const guideArticles = getFilteredList(articles || []).filter(a => {
                         const categories = Array.isArray(a.category) ? a.category : [a.category];
                         return categories.includes('Guides') || categories.includes('Action') || categories.includes('Act');
                     }).slice(0, 4);
@@ -281,7 +286,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
 
                         {/* Featured Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {articles.filter(a => a.isFeaturedDiscover).slice(0, 4).map((article) => (
+                            {getFilteredList(articles || []).filter(a => a.isFeaturedDiscover).slice(0, 4).map((article) => (
                                 <div
                                     key={`feat-${article.id}`}
                                     onClick={() => onArticleClick(article)}
@@ -318,18 +323,16 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                         </div>
                                     </div>
                                     <div className="p-4 flex flex-col flex-grow">
-                                        <div className="text-[9px] font-bold uppercase tracking-widest text-news-accent mb-2 truncate">{article.topic}</div>
-                                        <h3 className="text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-news-accent transition-colors line-clamp-3">
+                                        <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
                                             {article.title}
                                         </h3>
-                                        <p className="text-xs text-gray-400 line-clamp-2 md:line-clamp-3 mb-4 leading-relaxed">
+                                        <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
                                             {article.excerpt}
                                         </p>
-                                        <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between text-[9px] text-gray-500 uppercase font-bold">
-                                            <span className="truncate mr-1">{article.source}</span>
-                                            <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform text-white">
-                                                Read <ChevronRight size={10} />
-                                            </span>
+                                        <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
+                                            <span>{article.date}</span>
+                                            <span>•</span>
+                                            <span>{article.originalReadTime || article.readTime || '5 min read'}</span>
                                         </div>
                                     </div>
                                 </div>

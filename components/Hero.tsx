@@ -8,6 +8,7 @@ interface HeroProps {
     onReadFeatured: () => void;
     onArticleClick: (article: Article) => void;
     featuredArticleOverride?: Article;
+    sidebarArticlesOverride?: Article[]; // New prop
     articles?: Article[]; // New prop
 }
 
@@ -32,7 +33,7 @@ const getRelativeTime = (dateString: string) => {
     return `${diffDays} days ago`;
 };
 
-const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArticleOverride, articles = [] }) => {
+const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArticleOverride, articles = [], ...props }) => {
     const { playArticle, isLoading, currentArticle } = useAudio();
 
     // Priority: Override (from DB) > Static heroContent
@@ -67,13 +68,13 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
         return timeB - timeA; // Descending (Newest Upload First)
     });
 
-    // Get 4 recent stories for the sidebar (skipping the featured one)
-    const latestArticles = sortedArticles
+    // Get 4 recent stories for the sidebar (use override or fallback)
+    const latestArticles = props.sidebarArticlesOverride || sortedArticles
         .filter(a => a.id !== featuredArticleOverride?.id)
         .slice(0, 4);
 
     return (
-        <section id={Section.HERO} className="relative w-full bg-black text-white pt-32 md:pt-40 pb-12 md:pb-2">
+        <section id={Section.HERO} className="relative w-full bg-black text-white pt-36 md:pt-40 pb-12 md:pb-2">
             <div className="container mx-auto px-4 md:px-8">
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
@@ -89,15 +90,13 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                             {displayHeadline}
                         </h1>
 
-                        <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-6 font-light line-clamp-4">
-                            {displaySubheadline}
-                        </p>
+                        {/* Description removed per user request */}
 
                         <div className="mt-auto flex flex-col gap-4">
-                            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-gray-500">
+                            <div className="flex items-center gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-500">
                                 <span>{displayDate}</span>
                                 <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-                                <span>
+                                <span className="text-news-accent">
                                     {featuredArticleOverride ? (() => {
                                         const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
                                         const categories = Array.isArray(featuredArticleOverride.category)

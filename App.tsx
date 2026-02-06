@@ -5,6 +5,8 @@ import Portfolio from './components/Portfolio'; // Acts as Home/Discover Feed
 import CategoryFeed from './components/CategoryFeed'; // New Category Page
 import PlanetaryStatus from './components/PlanetaryStatus';
 import About from './components/About';
+import AdUnit from './components/AdUnit';
+import { ADS_CONFIG } from './data/adsConfig';
 import Action from './components/Action';
 import Contact from './components/Contact';
 import ArticleView from './components/ArticleView';
@@ -361,6 +363,33 @@ function App() {
     }} />;
   }
 
+  const getHeroArticle = () => {
+    // Feature Logic:
+    // 1. Find all 'isFeaturedDiscover' articles
+    const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
+    // 2. Sort by 'createdAt' (newest upload first)
+    featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
+
+    // 3. Pick winner, or fallback to fixed ID, or fallback to static default
+    return featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
+  };
+
+  const getSidebarArticles = (heroId: string) => {
+    // Sort articles by newness (Upload Date preferred)
+    const sorted = [...articles].sort((a, b) => {
+      const timeA = new Date(a.createdAt || a.date).getTime();
+      const timeB = new Date(b.createdAt || b.date).getTime();
+      return timeB - timeA;
+    });
+
+    // Get 4 recent stories, excluding the hero
+    return sorted.filter(a => a.id !== heroId).slice(0, 4);
+  };
+
+  const heroArticle = getHeroArticle();
+  const sidebarArticles = getSidebarArticles(heroArticle?.id);
+  const excludedIds = [heroArticle?.id, ...sidebarArticles.map(a => a.id)].filter(Boolean) as string[];
+
   return (
     <AudioProvider>
       <div className="min-h-screen bg-news-bg text-news-text font-sans">
@@ -384,24 +413,12 @@ function App() {
           {view === 'home' && (
             <>
               <Hero
-                onReadFeatured={() => {
-                  // Feature Logic:
-                  // 1. Find all 'isFeaturedDiscover' articles
-                  const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
-                  // 2. Sort by 'createdAt' (newest upload first)
-                  featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
-
-                  // 3. Pick winner, or fallback to fixed ID, or fallback to static default
-                  const featured = featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
-                  handleArticleClick(featured);
-                }}
+                onReadFeatured={() => handleArticleClick(heroArticle)}
                 onArticleClick={handleArticleClick}
                 // Pass the featured discover article
-                featuredArticleOverride={(() => {
-                  const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
-                  featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
-                  return featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026');
-                })()}
+                featuredArticleOverride={heroArticle}
+                // Pass the sidebar articles
+                sidebarArticlesOverride={sidebarArticles}
                 articles={articles}
               />
               {/* Pass DYNAMIC articles to Portfolio */}
@@ -409,10 +426,21 @@ function App() {
                 articles={articles}
                 onArticleClick={handleArticleClick}
                 searchQuery={searchQuery}
+                excludedArticleIds={excludedIds} // Prevent duplication of Hero + Sidebar
               />
-              <About
-                onShowAbout={handleShowAbout}
-              />
+
+              <div className="w-full bg-black py-12 border-t border-white/5">
+                <div className="container mx-auto px-4">
+                  <div className="flex justify-center">
+                    <AdUnit
+                      format="horizontal"
+                      variant="transparent"
+                      className="w-full h-32 md:h-48 bg-transparent"
+                      slotId={ADS_CONFIG.SLOTS.HOME_FOOTER}
+                    />
+                  </div>
+                </div>
+              </div>
 
             </>
           )}

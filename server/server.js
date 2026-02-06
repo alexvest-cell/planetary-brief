@@ -74,16 +74,30 @@ if (CLOUDINARY_CLOUD_NAME) {
   console.warn('⚠️ CLOUDINARY credentials not set. Image uploads will fail. Please add to .env.local');
 }
 
+// Slugify Helper
+function generateSlug(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, '-')     // Replace spaces and underscores with hyphens
+    .replace(/[^\w-]+/g, '')     // Remove all non-word chars
+    .replace(/--+/g, '-')        // Replace multiple - with single -
+    .replace(/^-+/, '')          // Trim - from start of text
+    .replace(/-+$/, '');         // Trim - from end of text
+}
+
 // Seeding Logic
 async function seedDatabase() {
   try {
     const count = await Article.countDocuments();
     if (count === 0) {
       console.log('Seeding database with initial articles...');
-      // Ensure seed data format matches schema
+      // Ensure seed data format matches schema and has slugs
       const formattedSeed = seedArticles.map(a => ({
         ...a,
-        content: Array.isArray(a.content) ? a.content : [a.content] // Ensure content is array
+        content: Array.isArray(a.content) ? a.content : [a.content], // Ensure content is array
+        slug: a.slug || generateSlug(a.title) // Generate slug if missing
       }));
       await Article.insertMany(formattedSeed);
       console.log('Seeding complete.');
@@ -93,271 +107,7 @@ async function seedDatabase() {
   }
 }
 
-// Upload Helper (supports images, audio, video)
-const streamUpload = (buffer, resourceType = 'image') => {
-  return new Promise((resolve, reject) => {
-    let stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "planetary_brief_uploads",
-        resource_type: resourceType, // 'image', 'video', or 'auto'
-        quality: "auto:best",
-        fetch_format: "auto",
-        invalidate: true
-      },
-      (error, result) => {
-        if (result) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      }
-    );
-    streamifier.createReadStream(buffer).pipe(stream);
-  });
-};
-
-// Multer (Memory Storage)
-const upload = multer({ storage: multer.memoryStorage() });
-
-// --- LOCAL FILE STORAGE FALLBACK ---
-// When MongoDB is not connected, store articles in a local JSON file
-const LOCAL_STORAGE_PATH = path.join(__dirname, 'local_articles.json');
-
-function readLocalArticles() {
-  try {
-    if (fs.existsSync(LOCAL_STORAGE_PATH)) {
-      const data = fs.readFileSync(LOCAL_STORAGE_PATH, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (err) {
-    console.error('Error reading local storage:', err);
-  }
-  return [];
-}
-
-function writeLocalArticles(articles) {
-  try {
-    fs.writeFileSync(LOCAL_STORAGE_PATH, JSON.stringify(articles, null, 2), 'utf8');
-    return true;
-  } catch (err) {
-    console.error('Error writing local storage:', err);
-    return false;
-  }
-}
-
-// --- AUTHENTICATION ---
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123'; // Set in .env.local
-const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || 'your-secret-key-change-this'; // Set in .env.local
-
-// Simple token generation (in production, use JWT)
-function generateToken() {
-  return Buffer.from(`${Date.now()}-${Math.random()}`).toString('base64');
-}
-
-// Store valid tokens (in-memory, resets on server restart)
-const validTokens = new Set();
-
-// Global request logger to debug routing issues
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
-
-// Middleware to verify admin token
-function requireAuth(req, res, next) {
-  const token = req.headers['authorization']?.replace('Bearer ', '');
-
-  if (!token || !validTokens.has(token)) {
-    return res.status(401).json({ error: 'Unauthorized - Invalid or missing token' });
-  }
-
-  next();
-}
-
-// Login endpoint
-app.post('/api/auth/login', (req, res) => {
-  const { password } = req.body;
-
-  // Debug logging (remove after fixing)
-  console.log('Login attempt:');
-  console.log('Received password length:', password?.length);
-  console.log('Expected password length:', ADMIN_PASSWORD?.length);
-  console.log('ADMIN_PASSWORD is set:', !!ADMIN_PASSWORD);
-  console.log('Passwords match:', password === ADMIN_PASSWORD);
-
-  if (password === ADMIN_PASSWORD) {
-    const token = generateToken();
-    validTokens.add(token);
-
-    // Token expires in 24 hours
-    setTimeout(() => validTokens.delete(token), 24 * 60 * 60 * 1000);
-
-    res.json({ token, message: 'Login successful' });
-  } else {
-    res.status(401).json({ error: 'Invalid password' });
-  }
-});
-
-// Logout endpoint
-app.post('/api/auth/logout', (req, res) => {
-  const token = req.headers['authorization']?.replace('Bearer ', '');
-  if (token) {
-    validTokens.delete(token);
-  }
-  res.json({ message: 'Logged out successfully' });
-});
-
-// Verify token endpoint (check if still logged in)
-app.get('/api/auth/verify', (req, res) => {
-  const token = req.headers['authorization']?.replace('Bearer ', '');
-
-  if (token && validTokens.has(token)) {
-    res.json({ valid: true });
-  } else {
-    res.status(401).json({ valid: false });
-  }
-});
-
-// --- ROUTES ---
-
-// GET Articles (public - no auth required)
-app.get('/api/articles', async (req, res) => {
-  try {
-    const { includeUnpublished } = req.query;
-    const token = req.headers['authorization']?.replace('Bearer ', '');
-    const isAdmin = token && validTokens.has(token);
-
-    // If no DB, return local file storage or seed data
-    if (mongoose.connection.readyState !== 1) {
-      console.log('No DB connection - checking local storage');
-      const localArticles = readLocalArticles();
-      if (localArticles.length > 0) {
-        console.log(`Returning ${localArticles.length} articles from local storage`);
-        return res.json(localArticles);
-      }
-      console.log('Returning seed data (no local storage yet)');
-      return res.json(seedArticles);
-    }
-
-    let query = {};
-
-    // Only show all articles (including drafts) if admin AND requested unpublished
-    if (!(isAdmin && includeUnpublished === 'true')) {
-      const now = new Date();
-      query = {
-        $or: [
-          { status: 'published' },
-          { status: 'scheduled', scheduledPublishDate: { $lte: now } },
-          { status: { $exists: false } } // Backward compatibility for old articles
-        ]
-      };
-    }
-
-    const articles = await Article.find(query).sort({ createdAt: -1 });
-    res.json(articles);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch articles' });
-  }
-});
-
-// GET Articles Backup/Export (protected - requires auth)
-app.get('/api/articles/export', requireAuth, async (req, res) => {
-  try {
-    let articles;
-
-    // If no DB, get from local storage or seed data
-    if (mongoose.connection.readyState !== 1) {
-      const localArticles = readLocalArticles();
-      articles = localArticles.length > 0 ? localArticles : seedArticles;
-    } else {
-      articles = await Article.find().sort({ createdAt: -1 });
-    }
-
-    // Set headers for file download
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="greenshift-backup-${timestamp}.json"`);
-
-    res.json({
-      exportDate: new Date().toISOString(),
-      totalArticles: articles.length,
-      articles: articles
-    });
-  } catch (error) {
-    console.error('Export error:', error);
-    res.status(500).json({ error: 'Failed to export articles' });
-  }
-});
-
-// GET Image URLs Backup/Export (protected - requires auth)
-app.get('/api/articles/export-images', requireAuth, async (req, res) => {
-  try {
-    let articles;
-
-    // If no DB, get from local storage or seed data
-    if (mongoose.connection.readyState !== 1) {
-      const localArticles = readLocalArticles();
-      articles = localArticles.length > 0 ? localArticles : seedArticles;
-    } else {
-      articles = await Article.find().sort({ createdAt: -1 });
-    }
-
-    // Collect all unique image URLs
-    const imageData = [];
-    const uniqueUrls = new Set();
-
-    articles.forEach(article => {
-      const images = [];
-
-      // Main image
-      if (article.imageUrl && !uniqueUrls.has(article.imageUrl)) {
-        images.push({ type: 'main', url: article.imageUrl });
-        uniqueUrls.add(article.imageUrl);
-      }
-
-      // Original image
-      if (article.originalImageUrl && !uniqueUrls.has(article.originalImageUrl)) {
-        images.push({ type: 'original', url: article.originalImageUrl });
-        uniqueUrls.add(article.originalImageUrl);
-      }
-
-      // Secondary image
-      if (article.secondaryImageUrl && !uniqueUrls.has(article.secondaryImageUrl)) {
-        images.push({ type: 'secondary', url: article.secondaryImageUrl });
-        uniqueUrls.add(article.secondaryImageUrl);
-      }
-
-      // Diagram
-      if (article.diagramUrl && !uniqueUrls.has(article.diagramUrl)) {
-        images.push({ type: 'diagram', url: article.diagramUrl });
-        uniqueUrls.add(article.diagramUrl);
-      }
-
-      if (images.length > 0) {
-        imageData.push({
-          articleId: article.id,
-          articleTitle: article.title,
-          images: images
-        });
-      }
-    });
-
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="greenshift-images-backup-${timestamp}.json"`);
-
-    res.json({
-      exportDate: new Date().toISOString(),
-      totalArticles: articles.length,
-      totalUniqueImages: uniqueUrls.size,
-      imageData: imageData
-    });
-  } catch (error) {
-    console.error('Image export error:', error);
-    res.status(500).json({ error: 'Failed to export image URLs' });
-  }
-});
+// ... (existing code)
 
 // POST Article (protected - requires auth)
 app.post('/api/articles', requireAuth, async (req, res) => {
@@ -372,6 +122,11 @@ app.post('/api/articles', requireAuth, async (req, res) => {
       newArticle.createdAt = new Date().toISOString();
     }
     newArticle.updatedAt = new Date().toISOString();
+
+    // Ensure Slug
+    if (!newArticle.slug && newArticle.title) {
+      newArticle.slug = generateSlug(newArticle.title);
+    }
 
     // Normalize content to array if string
     if (typeof newArticle.content === 'string') {
@@ -394,6 +149,10 @@ app.post('/api/articles', requireAuth, async (req, res) => {
     res.status(201).json(created);
   } catch (error) {
     console.error(error);
+    // Handle duplicate key error (likely slug collision)
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'Duplicate article ID or Slug. Please change the title.' });
+    }
     res.status(500).json({ error: 'Failed to create article. Error: ' + error.message });
   }
 });
@@ -809,13 +568,30 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
     </html>
   `;
 
-  const testAccount = await nodemailer.createTestAccount();
-  const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false,
-    auth: { user: testAccount.user, pass: testAccount.pass },
-  });
+  let transporter;
+
+  // 1. Try to use Real SMTP if configured (e.g. Gmail App Password)
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail', // Built-in support for Gmail
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+    console.log(`Using Real SMTP (${process.env.SMTP_USER})`);
+  }
+  // 2. Fallback to Ethereal (Test Mode)
+  else {
+    const testAccount = await nodemailer.createTestAccount();
+    transporter = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false,
+      auth: { user: testAccount.user, pass: testAccount.pass },
+    });
+    console.log("Using Ethereal Fake SMTP (Test Mode)");
+  }
 
   const info = await transporter.sendMail({
     from: '"Planetary Brief Intelligence" <briefing@planetarybrief.com>',
@@ -965,6 +741,27 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 
     console.log('Preprocessed text for TTS');
 
+
+    // Add pauses between sentences by inserting ellipses
+    // This is simpler and more reliable than SSML for Journey voices
+    const sentences = cleanText
+      .split(/([.!?]+\s+)/) // Split on sentence-ending punctuation, keep delimiters
+      .filter(s => s.trim().length > 0) // Remove empty strings
+      .reduce((acc, curr, idx, arr) => {
+        // Combine sentence text with its punctuation
+        if (idx % 2 === 0 && arr[idx + 1]) {
+          acc.push(curr + arr[idx + 1]);
+        } else if (idx % 2 === 0) {
+          acc.push(curr);
+        }
+        return acc;
+      }, []);
+
+    // Join sentences with ellipses to create natural pauses
+    const textWithPauses = sentences.join('... ');
+
+    console.log(`Processed ${sentences.length} sentences with pause markers`);
+
     // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 
@@ -975,14 +772,14 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         'X-Goog-Api-Key': process.env.GEMINI_API_KEY
       },
       body: JSON.stringify({
-        input: { text: cleanText }, // Use cleaned text
+        input: { text: textWithPauses }, // Use plain text with ellipses for pauses
         voice: {
           languageCode: 'en-US',
           name: 'en-US-Journey-D' // Back to male voice (user preferred)
         },
         audioConfig: {
           audioEncoding: 'MP3',
-          speakingRate: 1.0,
+          speakingRate: 0.95, // Increased from 0.92 per user feedback
           pitch: 0.0,
           volumeGainDb: -4.0 // Reduce volume by 4dB to prevent clipping
         }
@@ -1061,13 +858,13 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 });
 
 
-// Serve static files from the React app (root)
-app.use(express.static(path.join(__dirname, '../')));
+// Serve static files from the React app (build directory)
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // SPA fallback: serve index.html for any request that doesn't match API routes or static files
 // Express 5 doesn't support wildcard routes, so we use middleware instead
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../index.html'));
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // Start Server
