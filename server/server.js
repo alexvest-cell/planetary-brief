@@ -107,6 +107,27 @@ async function seedDatabase() {
   }
 }
 
+// Multer setup for memory storage (for Cloudinary)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Helper: Stream Upload to Cloudinary
+const streamUpload = (buffer, resourceType = 'image') => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: resourceType },
+      (error, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
+
 // --- AUTHENTICATION ---
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123'; // Set in .env.local
 const ADMIN_TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || 'your-secret-key-change-this'; // Set in .env.local
