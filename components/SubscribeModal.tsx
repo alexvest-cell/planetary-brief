@@ -164,7 +164,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="name@example.com"
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-news-accent transition-colors"
+                                        className="w-full bg-black/50 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-base text-white placeholder:text-gray-600 focus:outline-none focus:border-news-accent transition-colors"
                                     />
                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                                 </div>

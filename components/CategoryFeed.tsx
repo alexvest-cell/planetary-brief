@@ -53,13 +53,13 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
     const catData = CATEGORIES.find(c => c.id === category);
     const description = catData?.description || "Latest intelligence, verified data, and policy updates.";
     // Featured Logic:
-    // User wants the "Latest Posted" article to be featured, even if it has an older display date.
+    // When multiple articles are marked as featured, show the one with the newest display date.
     // 1. Get all articles marked 'isFeaturedCategory'
     const featuredCandidates = filteredArticles.filter(a => a.isFeaturedCategory);
 
-    // 2. Sort them by 'createdAt' (newest upload first) or fallback to 'date'
+    // 2. Sort them by display 'date' (newest display date first) or fallback to 'createdAt'
     featuredCandidates.sort((a, b) => {
-        return new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime();
+        return new Date(b.date || b.createdAt).getTime() - new Date(a.date || a.createdAt).getTime();
     });
 
     // 3. Pick the winner, or fallback to the first article in the date-sorted feed

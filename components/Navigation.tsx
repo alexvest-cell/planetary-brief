@@ -11,12 +11,14 @@ interface NavigationProps {
   onArticleSelect: (article: Article) => void;
   onDashboardClick: () => void;
   onActionGuideClick: () => void;
+  onSupportClick: () => void;
   onSubscribeClick: () => void;
   onShowAbout: () => void;
   activeCategory: string;
   onCategorySelect: (category: string) => void;
   newsArticles: Article[];
   currentView: string;
+  lastSyncTime?: string;
 }
 
 import { CATEGORY_IDS } from '../data/categories';
@@ -31,12 +33,14 @@ const Navigation: React.FC<NavigationProps> = ({
   onArticleSelect,
   onDashboardClick,
   onActionGuideClick,
+  onSupportClick,
   onSubscribeClick,
   onShowAbout,
   activeCategory,
   onCategorySelect,
   newsArticles,
-  currentView
+  currentView,
+  lastSyncTime
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -167,21 +171,21 @@ const Navigation: React.FC<NavigationProps> = ({
           <div className="flex items-center gap-2 w-full md:w-auto md:ml-12">
             <button
               onClick={() => { onCategorySelect('All'); }}
-              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${currentView !== 'action-guide' && activeCategory === 'All' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${['home', 'category', 'article', 'sources'].includes(currentView) ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               Articles
             </button>
             <button
               onClick={onActionGuideClick}
-              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${currentView === 'action-guide' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${(currentView === 'action-guide' || currentView === 'support') ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
-              Guides
+              Action
             </button>
             <button
               onClick={onDashboardClick}
-              className="flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider text-news-accent hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${['dashboard', 'explanation'].includes(currentView) ? 'bg-news-accent/10 text-news-accent' : 'text-news-accent hover:bg-white/10'}`}
             >
-              <Activity size={14} className="animate-pulse" />
+              <Activity size={14} className={['dashboard', 'explanation'].includes(currentView) ? 'animate-pulse' : ''} />
               <span>PlanetDash</span>
             </button>
           </div>
@@ -197,7 +201,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   value={searchValue}
                   onChange={handleSearchChange}
                   placeholder="Search..."
-                  className="bg-transparent border-none focus:outline-none text-white text-xs w-full placeholder:text-gray-500"
+                  className="bg-transparent border-none focus:outline-none text-white text-base w-full placeholder:text-gray-500"
                   onKeyDown={(e) => e.key === 'Enter' && onSearch(searchValue)}
                 />
                 <button onClick={toggleSearch} className="text-news-accent hover:text-white">
@@ -230,7 +234,7 @@ const Navigation: React.FC<NavigationProps> = ({
             value={searchValue}
             onChange={handleSearchChange}
             placeholder="Search..."
-            className="bg-transparent border-none focus:outline-none text-white text-sm w-full"
+            className="bg-transparent border-none focus:outline-none text-white text-base w-full"
             autoFocus
             onKeyDown={(e) => e.key === 'Enter' && onSearch(searchValue)}
           />
@@ -240,23 +244,72 @@ const Navigation: React.FC<NavigationProps> = ({
         </div>
       </div>
 
-      {/* Secondary Bar (Categories) */}
+      {/* Secondary Bar (Categories or Action Menu) */}
       <div className={`w-full bg-black/80 backdrop-blur border-b border-white/10 transition-all duration-300 ${isScrolled ? 'h-10' : 'h-12'}`}>
         <div className="container mx-auto px-4 md:px-8 h-full flex items-center overflow-x-auto hide-scrollbar">
-          <div className="flex items-center gap-6 md:gap-8 min-w-max mx-auto md:mx-0">
-            {navCategories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => onCategorySelect(cat)}
-                className={`text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
-                  }`}
-              >
-                {cat}
-                {activeCategory === cat && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full"></span>
+          <div className="flex items-center gap-6 md:gap-8 min-w-max">
+            {/* PlanetDash Submenu */}
+            {['dashboard', 'explanation'].includes(currentView) ? (
+              <div className="flex items-center gap-4 w-full animate-fade-in">
+                <span className="px-2 py-0.5 rounded border border-news-accent/30 bg-news-accent/5 text-news-accent text-[10px] font-mono uppercase tracking-wider shadow-[0_0_10px_rgba(0,255,157,0.1)]">
+                  Beta Version
+                </span>
+                {lastSyncTime && (
+                  <span className="text-[10px] uppercase tracking-wider text-news-accent font-mono ml-auto md:ml-4 animate-pulse-slow">
+                    Last sync: <span className="font-bold">{lastSyncTime.replace(' (Local time)', '')}</span>
+                  </span>
                 )}
-              </button>
-            ))}
+              </div>
+            ) : (
+              currentView !== 'action-guide' && currentView !== 'support' && navCategories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => onCategorySelect(cat)}
+                  className={`text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
+                    }`}
+                >
+                  {cat}
+                  {activeCategory === cat && (
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full"></span>
+                  )}
+                </button>
+              )))}
+
+            {/* Show action submenu when Action is active */}
+            {currentView === 'action-guide' && (
+              <>
+                <button
+                  onClick={onActionGuideClick}
+                  className="text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 text-news-accent"
+                >
+                  Guides
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full"></span>
+                </button>
+                <button
+                  onClick={onSupportClick}
+                  className="text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 text-gray-400 hover:text-white"
+                >
+                  Support
+                </button>
+              </>
+            )}
+            {currentView === 'support' && (
+              <>
+                <button
+                  onClick={onActionGuideClick}
+                  className="text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 text-gray-400 hover:text-white"
+                >
+                  Guides
+                </button>
+                <button
+                  onClick={onSupportClick}
+                  className="text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 text-news-accent"
+                >
+                  Support
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full"></span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

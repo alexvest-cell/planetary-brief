@@ -4,13 +4,26 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Planetary Brief | Global Environmental Intelligence</title>
 
   <style>
     /* Force vertical scrollbar to prevent layout shift between long/short pages */
     html {
       overflow-y: scroll;
+    }
+
+    /* Hide scrollbar while allowing scroll */
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+      /* Chrome, Safari and Opera */
     }
   </style>
 

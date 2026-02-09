@@ -37,7 +37,13 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+// Gemini Config
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.API_KEY;
+if (GEMINI_API_KEY) {
+  console.log('✓ Gemini API Key found');
+} else {
+  console.error('❌ Gemini API Key NOT found. AI features will fail.');
+}
 
 // Middleware
 app.use(cors());
@@ -533,22 +539,43 @@ app.post('/api/generate', async (req, res) => {
   try {
     const { prompt, type, model: selectedModel, category, topic, minMinutes, maxMinutes } = req.body;
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: 'Server missing GEMINI_API_KEY' });
-    }
 
-    // Use Gemini 2.0 Flash
-    const model = "gemini-2.0-flash";
-    const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+
+    console.log(`[AI Request] Type: ${type}, Model: ${selectedModel}`);
+
 
     const context = (category || topic) ? `Category: ${category || 'N/A'}, Topic: ${topic || 'N/A'}. ` : "";
     let systemPrompt = "";
 
+
     if (type === 'title') {
-      systemPrompt = `You are an expert editor. ${context}Write a single, punchy, click-worthy but factual headline for an environmental news article based on this topic. Do not use quotes.`;
+      systemPrompt = `You are a senior editor at a prestigious global news organization. ${context}
+      Goal: Provide a high-level investigative summary as a headline.
+      
+      FORBIDDEN PATTERNS:
+      - NO short tags or generic titles (e.g., FORBIDDEN: "Reefs in Peril", "Arctic Melting").
+      - Absolutely NO exclamation marks (!).
+      - Absolutely NO calls to action ("Save", "Protect", "Act", "Join", "Discover why", "Let's").
+      - NO promotional hype or "clickbait" tags (Alert, Crisis, Urgent).
+      
+      IDEAL PATTERN (8-10 Word Investigative Finding):
+      - "The unseen thermal anomalies disrupting deep-water currents in the North Atlantic"
+      - "Systemic failures in tropical forest monitoring projects across the Amazon"
+      
+      STRUCTURAL RULES:
+      - LENGTH: Must be between 8 and 10 words.
+      - TONE: Serious, investigative, factual.
+      - Use an intellectual "Curiosity Gap"—describe a hidden discovery.`;
     } else if (type === 'body') {
-      systemPrompt = `You are an expert environmental journalist. ${context}Write a concise, engaging article body (4-5 paragraphs) based on this prompt. Use markdown formatting. Focus on facts and impact.`;
+      systemPrompt = `You are an expert environmental journalist. ${context}
+      Write a concise, engaging article body (4-5 paragraphs).
+      
+      STRICT JOURNALISTIC RULES:
+      - ABSOLUTELY NO CALLS TO ACTION: No "Join us", "Save the planet", "Protect our future", or "Let's come together".
+      - NO EXCLAMATION MARKS: Use zero "!".
+      - CONCLUSION RULE: The article MUST end with a factual, objective summary of the future implications or systemic trends. NO community appeals.
+      - TONE: Serious, descriptive, data-focused.`;
     } else if (type === 'image_prompt') {
       systemPrompt = `You are an expert photo editor for a top-tier news agency (like Reuters or National Geographic). 
       Based on the article title and content provided, write a highly detailed image generation prompt suitable for Midjourney v6 or DALL-E 3.
@@ -565,16 +592,38 @@ app.post('/api/generate', async (req, res) => {
       systemPrompt = `You are a social media expert for a premium environmental news platform.
       Based on the article content provided, generate optimized social media posts.
 
-      REQUIREMENTS:
-      1. Twitter/X: Concise, punchy, under 280 chars, with 2-3 relevant hashtags.
-      2. LinkedIn: Professional tone, slightly longer (3-4 sentences), engaging question or insight, with 3-5 hashtags.
-      3. Instagram: Engaging caption, use emojis, focus on the visual/impact aspect, block of hashtags at bottom.
+      REQUIREMENTS (JOURNALISTIC TONE):
+      - Write as an investigative journalist uncovering a discovery.
+      - ABSOLUTELY NO CALLS TO ACTION (e.g., "Learn more", "Check our link", "Read now").
+      - ABSOLUTELY NO EXCLAMATION MARKS. Use zero hype.
+      - The text should be a fascinating, factual summary that draws the reader in purely based on the intrigue of the fact.
+      1. Twitter/X: Concise, punchy, under 280 chars, informative.
+      2. Facebook/Instagram: Sophisticated, storytelling tone, zero promotion.
+      
+      FOR EACH PLATFORM, ALSO PROVIDE A "VISUAL HEADLINE" (HOOK):
+      - A punchy investigative finding (8-10 words). 
+      - RULES: No "!", no calls-to-action, no promotional verbs (Save, Help, Join, Discover).
+      - Must create an immediate, intellectual Curiosity Gap by describing a specific hidden systemic truth.
+      - TONE: Serious reporter sharing a discovery.
       
       Generate a JSON object (NO markdown):
       {
-        "twitter": "Text for X...",
-        "linkedin": "Text for LinkedIn...",
-        "instagram": "Text for Instagram..."
+        "twitter": { 
+          "text": "Text for X...", 
+          "headline": "Short Visual Headline" 
+        },
+        "facebook": { 
+          "text": "Text for FB...", 
+          "headline": "Short Visual Headline" 
+        },
+        "instagram": { 
+          "text": "Text for Insta...", 
+          "headline": "Short Visual Headline" 
+        },
+        "tiktok": { 
+          "text": "Text for TikTok...", 
+          "headline": "Short Visual Headline" 
+        }
       }`;
     } else if (type === 'full') {
       const targetLength = minMinutes && maxMinutes ? `${minMinutes}-${maxMinutes}` : '5-7';
@@ -591,8 +640,8 @@ app.post('/api/generate', async (req, res) => {
       Generate a JSON object with the following structure (DO NOT include markdown code blocks, just raw JSON):
 
       {
-        "title": "A compelling, factual headline (10-15 words max)",
-        "excerpt": "A 2-3 sentence teaser that hooks the reader and summarizes the key point",
+        "title": "Serious 8-10 word investigative finding. FORBIDDEN: Short tags like 'Reefs in Peril'. NO '!', NO CTA.",
+        "excerpt": "Sophisticated 1-sentence teaser summarizing the investigative core.",
         "content": ["Array of 6-10 substantial paragraphs, each 3-5 sentences. Focus on facts, data, and impact. Include specific numbers and sources where relevant."],
         "contextBox": {
           "title": "A short title for additional context (e.g., 'The Science Behind It', 'Key Policy Details')",
@@ -604,73 +653,28 @@ app.post('/api/generate', async (req, res) => {
       }
 
       IMPORTANT: 
-      - Be factual and cite realistic sources
-      - Use current environmental issues and trends
-      - Make the content substantial and informative
-      - Ensure keywords are diverse and relevant`;
+      - Be factual and cite realistic sources.
+      - ABSOLUTELY NO CALLS TO ACTION OR EXCLAMATIONS.
+      - NO COMMUNITY APPEALS (e.g., "Let's protect this").
+      - The article must end with a cold, factual finding about future systemic risk or scientific progress.
+      - Ensure keywords are diverse and relevant.`;
     }
 
-    const payload = {
-      contents: [{
-        parts: [{ text: `${systemPrompt}\n\nUser Request: ${prompt}` }]
-      }]
-    };
+    // --- ROUTE TO PROVIDER ---
+    const modelLower = (selectedModel || "").toLowerCase().trim();
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gemini API Error: ${errText}`);
+    if (modelLower.startsWith('gpt-') || modelLower.includes('openai')) {
+      console.log(`[AI Route] Routing to OpenAI handler for model: ${selectedModel}`);
+      return handleOpenAI(req, res, systemPrompt, prompt, selectedModel || "gpt-4o");
+    } else {
+      const geminiModel = selectedModel || "gemini-1.5-flash-latest";
+      console.log(`[AI Route] Routing to Gemini handler for model: ${geminiModel}`);
+      return handleGemini(req, res, systemPrompt, prompt, geminiModel, apiKey, context, type);
     }
 
-    const data = await response.json();
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-    if (type === 'full' || type === 'social') {
-      try {
-        let cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const firstBrace = cleanedText.indexOf('{');
-        const lastBrace = cleanedText.lastIndexOf('}');
-        if (firstBrace !== -1 && lastBrace !== -1) {
-          cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
-        }
-        const result = JSON.parse(cleanedText);
-
-        if (type === 'full') {
-          const totalWords = result.content && Array.isArray(result.content) ? result.content.join(' ').split(/\s+/).length : 500;
-          const readTimeMinutes = Math.ceil(totalWords / 200);
-          result.readTime = `${readTimeMinutes} min read`;
-        }
-
-        if (type === 'social') {
-          // Normalize Social Data
-          const normalized = {};
-          for (const key in result) {
-            const lower = key.toLowerCase();
-            if (lower.includes('twitter') || lower === 'x') normalized.twitter = result[key];
-            else if (lower.includes('linkedin')) normalized.linkedin = result[key];
-            else if (lower.includes('instagram')) normalized.instagram = result[key];
-            else normalized[lower] = result[key];
-          }
-          return res.json(normalized);
-        }
-
-        return res.json(result);
-      } catch (jsonErr) {
-        console.error("JSON Parse Error:", text);
-        return res.status(500).json({ error: `AI produced invalid JSON`, rawText: text });
-      }
-    }
-
-    res.json({ text });
-
-  } catch (e) {
-    console.error("AI Generation Failed:", e);
-    res.status(500).json({ error: e.message });
+  } catch (err) {
+    console.error(`[/api/generate Critical Error]`, err);
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -983,10 +987,11 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         return acc;
       }, []);
 
-    // Join sentences with ellipses to create natural pauses
-    const textWithPauses = sentences.join('... ');
+    // Join sentences with longer ellipses to create more pronounced pauses
+    // Triple ellipses create ~600-800ms pauses vs single ellipsis ~200ms
+    const textWithPauses = sentences.join('... ... ... ');
 
-    console.log(`Processed ${sentences.length} sentences with pause markers`);
+    console.log(`Processed ${sentences.length} sentences with extended pause markers`);
 
     // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
@@ -998,14 +1003,14 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
         'X-Goog-Api-Key': process.env.GEMINI_API_KEY
       },
       body: JSON.stringify({
-        input: { text: textWithPauses }, // Use plain text with ellipses for pauses
+        input: { text: textWithPauses }, // Use plain text with extended ellipses for pauses
         voice: {
           languageCode: 'en-US',
           name: 'en-US-Journey-D' // Back to male voice (user preferred)
         },
         audioConfig: {
           audioEncoding: 'MP3',
-          speakingRate: 0.95, // Increased from 0.92 per user feedback
+          speakingRate: 0.95, // Natural pace with extended pauses between sentences
           pitch: 0.0,
           volumeGainDb: -4.0 // Reduce volume by 4dB to prevent clipping
         }
@@ -1097,3 +1102,153 @@ app.use((req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
+// --- AI PROVIDER ROUTING ---
+
+// --- GOOGLE GEMINI HANDLER ---
+async function handleGemini(req, res, systemPrompt, prompt, model, apiKey, context, type) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  console.log(`\n--- [AI] GEMINI SYSTEM PROMPT (Type: ${type}) ---`);
+  console.log(systemPrompt);
+  console.log(`-----------------------------------------------\n`);
+
+  try {
+    const payload = {
+      system_instruction: {
+        parts: [{ text: systemPrompt }]
+      },
+      contents: [{
+        parts: [{ text: `Generate ${type} content based on: ${prompt}` }]
+      }]
+    };
+
+    console.log(`[AI] Calling Gemini [${model}] with system_instruction...`);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      console.error(`[AI] Gemini API Error Status: ${response.status}`);
+      console.error(`[AI] Gemini API Error Body:`, JSON.stringify(errorBody, null, 2));
+
+      if (response.status === 403) {
+        return res.status(403).json({
+          error: 'Gemini API Permission Denied (403)',
+          details: errorBody.error?.message || 'Access blocked. Check your API key or service enablement.',
+          reason: errorBody.error?.status || 'API_KEY_SERVICE_BLOCKED'
+        });
+      }
+
+      throw new Error(`Gemini API Error: ${errorBody.error?.message || response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    return processAIResponse(res, text, type);
+  } catch (err) {
+    console.error(`[Gemini Error]`, err);
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+// --- OPENAI HANDLER ---
+async function handleOpenAI(req, res, systemPrompt, prompt, model) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Missing OPENAI_API_KEY in .env.local' });
+  }
+
+  console.log(`\n--- [AI] OPENAI SYSTEM PROMPT (Type: ${req.body.type}) ---`);
+  console.log(systemPrompt);
+  console.log(`------------------------------------------------\n`);
+
+  try {
+    console.log(`[AI] Calling OpenAI [${model}]...`);
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      console.error(`[AI] OpenAI Error:`, errData);
+      throw new Error(errData.error?.message || `OpenAI Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content || "";
+    return processAIResponse(res, text, req.body.type);
+  } catch (err) {
+    console.error(`[OpenAI Error]`, err);
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+// --- SHARED RESPONSE PROCESSOR ---
+function processAIResponse(res, text, type) {
+  if (!text) {
+    console.warn("[AI] Empty response from AI");
+    return res.status(500).json({ error: 'Empty response from AI' });
+  }
+
+  if (type === 'full' || type === 'social') {
+    try {
+      let cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const firstBrace = cleanedText.indexOf('{');
+      const lastBrace = cleanedText.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
+      }
+      const result = JSON.parse(cleanedText);
+
+      if (type === 'full') {
+        const totalWords = result.content && Array.isArray(result.content) ? result.content.join(' ').split(/\s+/).length : 500;
+        const readTimeMinutes = Math.ceil(totalWords / 200);
+        result.readTime = `${readTimeMinutes} min read`;
+      }
+
+      if (type === 'social') {
+        const normalized = {};
+        const normalizeEntry = (entry) => {
+          if (typeof entry === 'string') return { text: entry, headline: "PLANETARY BRIEF" };
+          return {
+            text: entry.text || entry.content || "",
+            headline: entry.headline || entry.title || "PLANETARY BRIEF"
+          };
+        };
+
+        for (const key in result) {
+          const lower = key.toLowerCase();
+          if (lower.includes('twitter') || lower === 'x') normalized.twitter = normalizeEntry(result[key]);
+          else if (lower.includes('facebook')) normalized.facebook = normalizeEntry(result[key]);
+          else if (lower.includes('instagram')) normalized.instagram = normalizeEntry(result[key]);
+          else if (lower.includes('tiktok')) normalized.tiktok = normalizeEntry(result[key]);
+        }
+        return res.json(normalized);
+      }
+
+      return res.json(result);
+    } catch (e) {
+      console.error("JSON Parse Error on text:", text);
+      return res.status(500).json({ error: 'AI output was not valid JSON', raw: text });
+    }
+  }
+
+  return res.json({ text });
+}
+

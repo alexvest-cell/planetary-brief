@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Thermometer, CloudFog, MountainSnow, Droplets, Waves, Bird, Leaf, Flame, Wind, AlertTriangle } from 'lucide-react';
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import Portfolio from './components/Portfolio'; // Acts as Home/Discover Feed
@@ -15,12 +16,33 @@ import EarthDashboard from './components/EarthDashboard';
 import DataExplanationView from './components/DataExplanationView';
 import ActionDetailsView from './components/ActionDetailsView';
 import AboutPage from './components/AboutPage';
+import Support from './components/Support';
 import SubscribeModal from './components/SubscribeModal';
 import AdminDashboard from './components/AdminDashboard';
 import AudioPlayer from './components/AudioPlayer';
 import { AudioProvider } from './contexts/AudioContext';
 import { Section, Article, ExplanationData } from './types';
 import { featuredArticle, newsArticles as staticNewsArticles } from './data/content';
+
+
+// Helper to restore icon component lost in JSON serialization
+const restoreIcon = (data: any): ExplanationData => {
+  const title = data.title || data.label; // Handle potential variations
+  let IconComponent = Thermometer; // Default
+
+  if (title === "Global Mean Temp" || title === "Permafrost Thaw") IconComponent = Thermometer;
+  else if (title.includes("CO₂") || title.includes("Carbon")) IconComponent = CloudFog;
+  else if (title.includes("Ice Sheet") || title.includes("West Antarctic")) IconComponent = MountainSnow;
+  else if (title === "Sea Level Rise") IconComponent = Droplets;
+  else if (title === "Ocean Acidity") IconComponent = Waves;
+  else if (title === "Biodiversity") IconComponent = Bird;
+  else if (title === "Forest Loss" || title.includes("Rainforest")) IconComponent = Leaf;
+  else if (title.includes("Methane")) IconComponent = Flame;
+  else if (title.includes("Atlantic Circulation") || title.includes("AMOC")) IconComponent = Wind;
+  else if (title.includes("Limit") || title.includes("Warning")) IconComponent = AlertTriangle;
+
+  return { ...data, icon: IconComponent };
+};
 
 // Helper functions for clean URLs
 const categoryToSlug = (category: string): string => {
@@ -51,11 +73,40 @@ function App() {
   // Browser History Management: All view changes push state to history API,
   // allowing the browser back/forward buttons to work correctly across the entire site
   const [activeSection, setActiveSection] = useState<Section>(Section.HERO);
-  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'action-guide' | 'about' | 'subscribe' | 'admin'>('home');
+  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'action-guide' | 'about' | 'subscribe' | 'admin'>(() => {
+    // Initialize view from URL
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+
+    if (hash === '#explain') return 'explanation';
+    if (path === '/dashboard') return 'dashboard';
+    if (path === '/about') return 'about';
+    if (path === '/guides') return 'action-guide';
+    if (path === '/support') return 'support';
+    // Admin, subscribe, etc could be added
+    return 'home';
+  });
+
+  // Hydrate history state on mount to ensure back button works for initial entry
+  useEffect(() => {
+    if (!window.history.state) {
+      const path = window.location.pathname;
+      let initialState: any = { view: 'home' };
+
+      if (path === '/dashboard') initialState = { view: 'dashboard' };
+      else if (path === '/about') initialState = { view: 'about' };
+      else if (path === '/guides') initialState = { view: 'action-guide' };
+      else if (path === '/support') initialState = { view: 'support' };
+
+      window.history.replaceState(initialState, '', path);
+    }
+  }, []);
+
   const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
   const [explanationData, setExplanationData] = useState<ExplanationData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [lastSyncTime, setLastSyncTime] = useState<string>('');
 
   // Dynamic Articles State
   const [articles, setArticles] = useState<Article[]>(staticNewsArticles);
@@ -188,11 +239,17 @@ function App() {
     }
   }, [articles]);
 
+  // Ref to store dashboard scroll position
+  const dashboardScrollRef = React.useRef(0);
+
   // Handle Browser Back Button
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      // ... existing popstate logic ...
+    // Disable automatic browser scroll restoration to handle it manually
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
 
+    const handlePopState = (event: PopStateEvent) => {
       if (event.state && event.state.view) {
         const viewState = event.state.view;
 
@@ -213,9 +270,17 @@ function App() {
             break;
           case 'dashboard':
             setView('dashboard');
+            // Restore scroll position from session storage
+            setTimeout(() => {
+              const savedScroll = sessionStorage.getItem('dashboardScroll');
+              if (savedScroll) {
+                window.scrollTo(0, parseInt(savedScroll));
+              }
+            }, 100);
             break;
           case 'explanation':
             setView('explanation');
+            window.scrollTo(0, 0);
             if (event.state.explanationData) {
               setExplanationData(event.state.explanationData);
             }
@@ -237,10 +302,40 @@ function App() {
             break;
         }
       } else {
-        // No state means we're at the initial page (home)
-        setView('home');
-        setCurrentArticle(null);
-        setSearchQuery('');
+        // No state (often initial entry). Check URL to determine view.
+        const path = window.location.pathname;
+        const hash = window.location.hash;
+
+        if (hash === '#explain') {
+          setView('explanation');
+          // Restore data from session if possible
+          const savedData = sessionStorage.getItem('explanationData');
+          if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            // Restore icon component based on title
+            setExplanationData(restoreIcon(parsedData));
+          }
+        } else if (path === '/dashboard') {
+          setView('dashboard');
+          // Try to restore scroll even on null state if session has it
+          setTimeout(() => {
+            const savedScroll = sessionStorage.getItem('dashboardScroll');
+            if (savedScroll) {
+              window.scrollTo(0, parseInt(savedScroll));
+            }
+          }, 100);
+        } else if (path === '/about') {
+          setView('about');
+        } else if (path === '/guides') {
+          setView('action-guide');
+        } else if (path === '/support') {
+          setView('support');
+        } else {
+          // Default to home
+          setView('home');
+          setCurrentArticle(null);
+          setSearchQuery('');
+        }
       }
     };
 
@@ -302,10 +397,65 @@ function App() {
     window.history.pushState({ view: 'action-guide' }, '', '/guides');
   };
 
+  const handleShowSupport = () => {
+    setView('support');
+    window.scrollTo(0, 0);
+    window.history.pushState({ view: 'support' }, '', '/support');
+  };
+
+  // Helper to restore icon component lost in JSON serialization
+  // Renamed to avoid conflict - should be removed later
+  const restoreIcon_OLD = (data: any): ExplanationData => {
+    const title = data.title || data.label; // Handle potential variations
+    let IconComponent = Thermometer; // Default
+
+    if (title === "Global Mean Temp" || title === "Permafrost Thaw") IconComponent = Thermometer;
+    else if (title.includes("CO₂") || title.includes("Carbon")) IconComponent = CloudFog;
+    else if (title.includes("Ice Sheet") || title.includes("West Antarctic")) IconComponent = MountainSnow;
+    else if (title === "Sea Level Rise") IconComponent = Droplets;
+    else if (title === "Ocean Acidity") IconComponent = Waves;
+    else if (title === "Biodiversity") IconComponent = Bird;
+    else if (title === "Forest Loss" || title.includes("Rainforest")) IconComponent = Leaf;
+    else if (title.includes("Methane")) IconComponent = Flame;
+    else if (title.includes("Atlantic Circulation") || title.includes("AMOC")) IconComponent = Wind;
+    else if (title.includes("Limit") || title.includes("Warning")) IconComponent = AlertTriangle;
+
+    return { ...data, icon: IconComponent };
+  };
+
   const handleExplainData = (data: ExplanationData) => {
+    // Explicitly update the CURRENT history entry to be a valid Dashboard checkpoint
+    // This ensures that when the user clicks "Back", they return to this exact state
+    if (view === 'dashboard') {
+      window.history.replaceState({ view: 'dashboard' }, '', '/dashboard');
+    }
+
+    // Save scroll position
+    sessionStorage.setItem('dashboardScroll', window.scrollY.toString());
+
+    // Save explanation data to session so it persists across reloads/nav
+    sessionStorage.setItem('explanationData', JSON.stringify(data));
+
     setExplanationData(data);
     setView('explanation');
-    window.history.pushState({ view: 'explanation', explanationData: data }, '', '');
+    window.scrollTo(0, 0);
+    // Use hash for navigation - explicit pushstate with hash
+    window.location.hash = 'explain';
+  };
+
+  const handleCloseExplanation = () => {
+    // Explicitly go to dashboard view
+    setView('dashboard');
+    // Replace URL to point to dashboard, effectively "closing" the modal in history
+    window.history.replaceState({ view: 'dashboard' }, '', '/dashboard');
+
+    // Restore scroll from session storage
+    setTimeout(() => {
+      const savedScroll = sessionStorage.getItem('dashboardScroll');
+      if (savedScroll) {
+        window.scrollTo(0, parseInt(savedScroll));
+      }
+    }, 100);
   };
 
   const handleBackToDashboard = () => {
@@ -401,12 +551,14 @@ function App() {
           onArticleSelect={handleArticleClick}
           onDashboardClick={handleShowDashboard}
           onActionGuideClick={handleShowActionGuide}
+          onSupportClick={handleShowSupport}
           onSubscribeClick={handleShowSubscribe}
           onShowAbout={handleShowAbout}
           activeCategory={activeCategory}
           onCategorySelect={handleCategorySelect}
           newsArticles={articles}
           currentView={view} // Pass the current view state
+          lastSyncTime={lastSyncTime}
         />
 
         <main>
@@ -473,22 +625,29 @@ function App() {
               onBack={handleBackToFeed}
               onExplain={handleExplainData}
               onSearch={handleSearch}
+              onDataSync={setLastSyncTime}
             />
           )}
 
           {view === 'explanation' && explanationData && (
             <DataExplanationView
               data={explanationData}
-              onBack={handleBackToDashboard}
+              onBack={handleCloseExplanation}
             />
           )}
 
           {view === 'action-guide' && (
-            <ActionDetailsView
-              onBack={handleBackToFeed}
-              onSearch={handleSearch}
+            <CategoryFeed
+              category="Guides"
               articles={articles}
               onArticleClick={handleArticleClick}
+              onBack={() => handleCategorySelect('All')}
+            />
+          )}
+
+          {view === 'support' && (
+            <Support
+              onBack={() => handleCategorySelect('All')}
             />
           )}
 

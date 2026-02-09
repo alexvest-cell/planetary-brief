@@ -8,6 +8,7 @@ interface EarthDashboardProps {
     onBack: () => void;
     onExplain: (data: ExplanationData) => void;
     onSearch: (query: string) => void;
+    onDataSync?: (time: string) => void;
 }
 
 // --- DATA CALCULATION ENGINE ---
@@ -39,10 +40,10 @@ const getRemainingBudget = (baseBudget: number, annualBurnRate: number): { remai
     };
 };
 
-const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSearch }) => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSearch, onDataSync }) => {
+    // useEffect(() => {
+    //     window.scrollTo(0, 0);
+    // }, []);
 
     // Real-time Data State
     const [realData, setRealData] = useState<any>(null);
@@ -54,7 +55,9 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
                 const data = await fetchClimateData();
                 setRealData(data);
                 const now = new Date();
-                setSyncTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (Local time)');
+                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (Local time)';
+                setSyncTime(timeStr);
+                if (onDataSync) onDataSync(timeStr);
             } catch (err) {
                 console.error("Biosphere sync failed", err);
                 setSyncTime("Offline (Using Projections)");
@@ -444,10 +447,11 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
                 style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
             </div>
 
-            <div className="container mx-auto px-5 md:px-12 relative z-10">
+            <div className="container mx-auto px-5 md:px-12 relative z-10 pt-4 pb-12 md:pt-6 md:pb-24">
+
 
                 {/* Data Integrity Note - Moved to Top */}
-                <div className="mt-8 md:mt-12 mb-6 md:mb-8 bg-news-accent/5 border border-news-accent/10 p-5 md:p-6 rounded-xl">
+                <div className="mb-6 md:mb-8 bg-news-accent/5 border border-news-accent/10 p-5 md:p-6 rounded-xl">
                     <div className="flex items-start gap-3">
                         <Info size={18} className="text-news-accent mt-0.5" />
                         <div>
@@ -747,78 +751,6 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
                             </div>
                         </div>
                     ))}
-                </div>
-
-                {/* AI Chatbot Section (Replaces Planetary Intelligence AI) */}
-                <div className="bg-zinc-900/40 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md mt-12">
-                    <div className="p-4 md:p-6 border-b border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-black/20">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-emerald-500/20 rounded-md text-emerald-500 border border-emerald-500/30">
-                                <Bot size={20} />
-                            </div>
-                            <div>
-                                <h3 className="text-base md:text-lg font-bold text-white flex items-center gap-2">
-                                    GreenShift AI Assistant
-                                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                </h3>
-                                <p className="text-xs text-gray-400">Powered by Gemini 3 Pro • Ask me anything about our planet</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-gray-500">
-                            <Sparkles size={12} className="text-emerald-500" />
-                            System Online
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col h-[400px] md:h-[500px]">
-                        {/* Chat History */}
-                        <div className="flex-grow overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 bg-black/40" ref={scrollRef}>
-                            {messages.map((msg, idx) => (
-                                <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border ${msg.role === 'model' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' : 'bg-zinc-800 border-white/10 text-white'}`}>
-                                        {msg.role === 'model' ? <Bot size={16} /> : <div className="text-[10px] font-bold">You</div>}
-                                    </div>
-                                    <div className={`max-w-[85%] md:max-w-[80%] rounded-lg p-3 md:p-4 text-xs md:text-sm leading-relaxed font-mono ${msg.role === 'user'
-                                        ? 'bg-zinc-800 border border-white/10 text-white'
-                                        : 'bg-emerald-500/5 border border-emerald-500/20 text-gray-200'
-                                        }`}>
-                                        {msg.text}
-                                    </div>
-                                </div>
-                            ))}
-                            {isLoading && (
-                                <div className="flex gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500 text-emerald-500 flex items-center justify-center">
-                                        <Bot size={16} />
-                                    </div>
-                                    <div className="bg-black/40 border border-white/10 p-3 rounded-lg text-xs text-emerald-500 font-mono animate-pulse">
-                                        Analyzing environmental data...
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Input Area */}
-                        <div className="p-4 bg-zinc-900/50 border-t border-white/10">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onKeyDown={handleKeyPress}
-                                    placeholder="Ask about climate, nature, or policy..."
-                                    className="w-full bg-black/50 border border-white/10 rounded-lg py-3 md:py-4 pl-4 pr-12 text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500 transition-colors font-mono text-xs md:text-sm"
-                                />
-                                <button
-                                    onClick={handleSend}
-                                    disabled={isLoading}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-500 p-2 transition-colors disabled:opacity-30"
-                                >
-                                    <Send size={18} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
             </div>

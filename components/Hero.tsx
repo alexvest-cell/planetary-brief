@@ -90,7 +90,9 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                             {displayHeadline}
                         </h1>
 
-                        {/* Description removed per user request */}
+                        <p className="text-base md:text-lg text-gray-400 leading-relaxed mb-6">
+                            {displaySubheadline}
+                        </p>
 
                         <div className="mt-auto flex flex-col gap-4">
                             <div className="flex items-center gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-500">

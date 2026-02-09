@@ -14,21 +14,26 @@ const DataExplanationView: React.FC<DataExplanationViewProps> = ({ data, onBack 
     }, [data]);
 
     return (
-        <div className="bg-black min-h-screen text-white font-sans pt-36 md:pt-32 pb-24 animate-fade-in relative">
+        <div className="bg-black min-h-screen text-white font-sans animate-fade-in relative">
 
             {/* Background Grid */}
             <div className="fixed inset-0 pointer-events-none opacity-10"
                 style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
             </div>
 
-            <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-4xl">
+            {/* Background Grid */}
+            <div className="fixed inset-0 pointer-events-none opacity-10"
+                style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+            </div>
+
+            <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-4xl pt-32 pb-24">
 
                 {/* Navigation */}
 
 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row gap-8 items-start mb-12 border-b border-white/10 pb-12">
-                    <div className={`p-6 rounded-2xl ${data.color.replace('text-', 'bg-').replace('500', '500/20')} border ${data.color.replace('text-', 'border-').replace('500', '500/30')}`}>
+                    <div className={`p-6 rounded-2xl ${data.color.replace('text-', 'bg-')}/20 border ${data.color.replace('text-', 'border-')}/30`}>
                         <data.icon size={48} className={data.color} />
                     </div>
                     <div>
@@ -112,3 +117,13 @@ const DataExplanationView: React.FC<DataExplanationViewProps> = ({ data, onBack 
 };
 
 export default DataExplanationView;
+
+// Safelist for dynamic classes used in this component:
+// bg-red-500/20 border-red-500/30
+// bg-gray-400/20 border-gray-400/30
+// bg-cyan-300/20 border-cyan-300/30
+// bg-blue-500/20 border-blue-500/30
+// bg-indigo-400/20 border-indigo-400/30
+// bg-yellow-500/20 border-yellow-500/30
+// bg-emerald-500/20 border-emerald-500/30
+// bg-orange-500/20 border-orange-500/30

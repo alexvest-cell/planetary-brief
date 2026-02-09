@@ -348,7 +348,9 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                     />
                   </div>
                   <div className="p-4 md:p-5 flex flex-col flex-grow">
-                    <span className="text-[9px] md:text-[10px] text-news-accent font-bold uppercase tracking-widest mb-2 truncate">{related.category}</span>
+                    <span className="text-[9px] md:text-[10px] text-news-accent font-bold uppercase tracking-widest mb-2 truncate">
+                      {Array.isArray(related.category) ? related.category.join(', ') : related.category}
+                    </span>
                     <h4 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-3 group-hover:text-news-accent transition-colors line-clamp-3">
                       {related.title}
                     </h4>

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Trash2, Edit, Save, Plus, Download, Upload, Calendar, Eye, EyeOff, Sparkles, Image as ImageIcon, Clock, Copy, FileImage, Volume2, Loader2, ArrowLeft, LogOut, Search, Headphones } from 'lucide-react';
+import { Trash2, Edit, Save, Plus, Download, Upload, Calendar, Eye, EyeOff, Sparkles, Image as ImageIcon, Clock, Copy, FileImage, Volume2, Loader2, ArrowLeft, LogOut, Search, Headphones, ExternalLink, ArrowRight } from 'lucide-react';
 import { generateSlug } from '../utils/slugify';
 import { Article } from '../types';
 import { newsArticles as staticArticles } from '../data/content';
@@ -38,7 +38,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
     // AI Orchestrator State
     const [aiPrompt, setAiPrompt] = useState('');
-    const [aiModel, setAiModel] = useState('gemini-2.0-flash');
+    const [aiModel, setAiModel] = useState('gemini-1.5-flash-latest');
     const [minMinutes, setMinMinutes] = useState(5);
     const [maxMinutes, setMaxMinutes] = useState(10);
 
@@ -47,8 +47,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     const [importText, setImportText] = useState('');
 
     // Social Media State
-    const [socialPosts, setSocialPosts] = useState<{ twitter?: string, linkedin?: string, instagram?: string } | null>(null);
+    const [socialPosts, setSocialPosts] = useState<{
+        twitter?: { text: string, headline: string },
+        facebook?: { text: string, headline: string },
+        instagram?: { text: string, headline: string },
+        tiktok?: { text: string, headline: string }
+    } | null>(null);
     const [socialLoading, setSocialLoading] = useState(false);
+    const [activeSocialTab, setActiveSocialTab] = useState<'twitter' | 'facebook' | 'instagram' | 'tiktok'>('instagram');
     const [imagePrompt, setImagePrompt] = useState('');
     const [imagePromptLoading, setImagePromptLoading] = useState(false);
 
@@ -490,18 +496,54 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                     model: aiModel
                 })
             });
-
-            if (!res.ok) throw new Error('Generation failed');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                console.error('Generation failed:', errorData);
+                throw new Error(errorData.error || 'Generation failed');
+            }
             const data = await res.json();
             setSocialPosts(data);
-        } catch (err) {
-            alert('Failed to generate social posts');
+        } catch (err: any) {
+            console.error('Social post generation error:', err);
+            alert(`Failed to generate social posts: ${err.message}`);
         } finally {
             setSocialLoading(false);
         }
     };
 
-    const generateSocialImage = async () => {
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        alert('Copied to clipboard!');
+    };
+
+    const handlePostIntent = (platform: 'twitter' | 'facebook' | 'instagram' | 'tiktok', text: string) => {
+        let url = '';
+        const encodedText = encodeURIComponent(text);
+        const encodedUrl = encodeURIComponent(`https://planetarybrief.com/article/${formData.id || ''}`);
+
+        switch (platform) {
+            case 'twitter':
+                url = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+                break;
+            case 'facebook':
+                url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+                break;
+            case 'instagram':
+                alert('Instagram does not support direct posting via web. Text copied! Please open Instagram to post.');
+                copyToClipboard(text);
+                return;
+            case 'tiktok':
+                alert('TikTok does not support direct posting via web. Text copied! Please open TikTok to post.');
+                copyToClipboard(text);
+                return;
+        }
+
+        if (url) {
+            window.open(url, '_blank', 'width=600,height=400');
+        }
+    };
+
+    const generateSocialImage = async (platform: 'instagram' | 'twitter' | 'facebook' | 'tiktok') => {
         if (!formData.imageUrl || !formData.title) {
             alert("No image or title available to generate graphic.");
             return;
@@ -511,9 +553,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Instagram Portrait aspect ratio 4:5 (1080x1350)
-        canvas.width = 1080;
-        canvas.height = 1350;
+        // Dimensions based on Platform
+        let width = 1080;
+        let height = 1350; // Default Insta Portrait 4:5
+
+        if (platform === 'twitter' || platform === 'facebook') {
+            width = 1200;
+            height = 630; // Landscape 1.91:1
+        } else if (platform === 'tiktok') {
+            width = 1080;
+            height = 1920; // Vertical 9:16
+        }
+
+        canvas.width = width;
+        canvas.height = height;
 
         const img = new Image();
         img.crossOrigin = "anonymous";
@@ -540,90 +593,91 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 3. Branding (Top Left)
-        ctx.save();
-        ctx.shadowColor = "rgba(0,0,0,0.8)";
-        ctx.shadowBlur = 10;
-        ctx.font = "bold 50px 'Playfair Display', serif";
 
-        ctx.fillStyle = "#10b981"; // news-accent green
-        ctx.fillText("PLANETARY", 60, 90);
 
-        const metrics = ctx.measureText("PLANETARY");
-        const greenWidth = metrics.width;
 
-        ctx.fillStyle = "#ffffff"; // White
-        ctx.fillText("BRIEF", 60 + greenWidth, 90);
-        ctx.restore();
+
 
         // 4. Content Block (Calculated from Bottom)
-        const margin = 80;
-        let pY = canvas.height - margin;
+        const padding = Math.floor(canvas.width * 0.06);
+        const margin = padding;
 
-        // Date (Bottom)
-        ctx.font = "bold 24px 'Inter', sans-serif";
-        ctx.fillStyle = "#6b7280"; // Zinc-500
-        const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-        ctx.fillText(dateStr, margin, pY);
-        pY -= 50;
+        // --- Adjustments for Platform ---
+        let titleScale = 0.08;
+        let subScaleFactor = 0.028;
+        let brandScale = 0.035; // Default logo scale
+        let verticalLift = canvas.height * 0.03; // Lower: clearing logo but tighter
+
+        if (platform === 'twitter' || platform === 'facebook') {
+            titleScale = 0.045; // Aggressive reduction
+            subScaleFactor = 0.018;
+            brandScale = 0.025; // Smaller logo for landscape
+            verticalLift = canvas.height * 0.05; // Lower for landscape too
+        }
+
+        let pY = canvas.height - margin - verticalLift;
 
         // Divider Line
         ctx.beginPath();
         ctx.moveTo(margin, pY);
         ctx.lineTo(margin + 100, pY);
         ctx.strokeStyle = "#10b981";
-        ctx.lineWidth = 6;
+        ctx.lineWidth = Math.max(6, canvas.width * 0.008);
         ctx.stroke();
-        pY -= 40;
 
-        // Excerpt (Optional)
-        if (formData.excerpt) {
-            ctx.font = "300 32px 'Inter', sans-serif";
-            ctx.fillStyle = "#e4e4e7"; // Zinc-200
+        // --- ADDED: Subtitle / Explaining Text ---
+        const subSize = Math.floor(canvas.width * subScaleFactor);
+        ctx.font = `500 ${subSize}px 'Inter', sans-serif`;
+        ctx.fillStyle = "#e5e7eb"; // Zinc-200
+        ctx.shadowBlur = 10;
 
-            // Use only the first complete sentence for punchiness
-            const firstSentence = formData.excerpt.split(/[.!?]\s/)[0] + (formData.excerpt.match(/[.!?]/) ? formData.excerpt.match(/[.!?]/)[0] : '');
-            const excerptWords = firstSentence.split(' ');
-            let excerptLine = '';
-            const excerptLines = [];
-            const maxExcerptWidth = canvas.width - (margin * 2);
+        // Pull excerpt or content lead
+        const subText = formData.excerpt || (Array.isArray(formData.content) ? formData.content[0] : "") || "";
+        const subWords = subText.split(' ');
+        let subLine = '';
+        const subLines = [];
+        const maxSubWidth = canvas.width - (margin * 2.5);
 
-            for (let n = 0; n < excerptWords.length; n++) {
-                const testLine = excerptLine + excerptWords[n] + ' ';
-                const metrics = ctx.measureText(testLine);
-                if (metrics.width > maxExcerptWidth && n > 0) {
-                    excerptLines.push(excerptLine);
-                    excerptLine = excerptWords[n] + ' ';
-                } else {
-                    excerptLine = testLine;
-                }
+        for (let n = 0; n < subWords.length; n++) {
+            const testLine = subLine + subWords[n] + ' ';
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxSubWidth && n > 0) {
+                subLines.push(subLine);
+                subLine = subWords[n] + ' ';
+            } else {
+                subLine = testLine;
             }
-            excerptLines.push(excerptLine);
+        }
+        subLines.push(subLine);
 
-            // Limit excerpt to 2 lines
-            let linesToShow = excerptLines;
-            if (excerptLines.length > 2) {
-                linesToShow = excerptLines.slice(0, 2);
-                // Add ellipsis to the last visible line
-                linesToShow[1] = linesToShow[1].substring(0, linesToShow[1].length - 3) + "...";
-            }
+        // Draw subtext (full text, no truncation)
+        pY -= (subSize * 1.2);
+        const displaySubLines = subLines.slice(0, 4); // Show up to 4 lines if necessary, but AI prompt should keep it short
 
-            // Draw from bottom up
-            for (let i = linesToShow.length - 1; i >= 0; i--) {
-                ctx.fillText(linesToShow[i], margin, pY);
-                pY -= 45; // Line height
-            }
-            pY -= 30; // Spacing before title
+        for (let i = displaySubLines.length - 1; i >= 0; i--) {
+            ctx.fillText(displaySubLines[i], margin, pY);
+            pY -= (subSize * 1.3);
         }
 
+        pY -= (canvas.width * 0.02); // Buffer before title
+
+
         // Title (Big Serif)
-        ctx.font = "bold 90px 'Playfair Display', serif";
+        // Scaled size
+        const titleSize = Math.floor(canvas.width * titleScale);
+        ctx.font = `bold ${titleSize}px 'Playfair Display', serif`;
         ctx.fillStyle = "#ffffff";
         ctx.shadowColor = "rgba(0,0,0,0.5)";
         ctx.shadowBlur = 20;
 
-        // Use AI Headline if available, else Title
-        const headlineText = formData.title;
+        // Use AI Visual Headline if available for this platform, else Title
+        let headlineText = formData.title;
+        // @ts-ignore
+        if (socialPosts && socialPosts[platform] && socialPosts[platform].headline) {
+            // @ts-ignore
+            headlineText = socialPosts[platform].headline;
+        }
+
         const titleWords = headlineText.toUpperCase().split(' ');
         let titleLine = '';
         const titleLines = [];
@@ -644,13 +698,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         // Draw Title from bottom up
         for (let i = titleLines.length - 1; i >= 0; i--) {
             ctx.fillText(titleLines[i], margin, pY);
-            pY -= 100; // Title Line Height
+            pY -= (titleSize * 1.2); // Title Line Height
         }
+
+        // --- NEW Branding Position: Bottom Right (Subtle) ---
+        ctx.save();
+        const brandSize = Math.floor(canvas.width * brandScale); // Dynamic scale
+        ctx.font = `bold ${brandSize}px 'Playfair Display', serif`;
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.shadowBlur = 5;
+
+        const briefMetrics = ctx.measureText("BRIEF");
+        const planetaryMetrics = ctx.measureText("PLANETARY");
+        const totalBrandWidth = planetaryMetrics.width + (brandSize / 4) + briefMetrics.width;
+
+        // Position at bottom right with some margin
+        const bx = canvas.width - totalBrandWidth - margin;
+        const by = canvas.height - margin;
+
+        ctx.fillStyle = "#10b981";
+        ctx.fillText("PLANETARY", bx, by);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("BRIEF", bx + planetaryMetrics.width + (brandSize / 4), by);
+        ctx.restore();
+
 
         // Trigger Download
         const dataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        link.download = `planetary-brief-social-${Date.now()}.png`;
+        link.download = `planetary-brief-${platform}-${Date.now()}.png`;
         link.href = dataUrl;
         link.click();
     };
@@ -972,6 +1048,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                     <h2 className="text-sm font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
                                         <Sparkles size={14} /> AI Assistant
                                         <span className="text-zinc-600">|</span>
+                                        <select
+                                            value={aiModel}
+                                            onChange={(e) => setAiModel(e.target.value)}
+                                            className="bg-black/40 border border-emerald-500/20 rounded px-2 py-0.5 text-[10px] text-emerald-400 focus:outline-none focus:border-emerald-500/50"
+                                        >
+                                            <optgroup label="Google Gemini" className="bg-zinc-900">
+                                                <option value="gemini-1.5-flash-latest">1.5 Flash (Fast)</option>
+                                                <option value="gemini-1.5-pro-latest">1.5 Pro (Precision)</option>
+                                                <option value="gemini-2.0-flash-exp">2.0 Flash (Next-Gen)</option>
+                                            </optgroup>
+                                            <optgroup label="OpenAI (Fallback)" className="bg-zinc-900">
+                                                <option value="gpt-4o">GPT-4o (Reliable)</option>
+                                                <option value="gpt-4o-mini">GPT-4o-mini (Speed)</option>
+                                            </optgroup>
+                                        </select>
+                                        <span className="text-zinc-600">|</span>
                                         <button
                                             onClick={() => setShowImport(!showImport)}
                                             className="text-white/50 hover:text-white transition-colors text-xs flex items-center gap-1"
@@ -1014,8 +1106,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                             value={aiModel}
                                             onChange={e => setAiModel(e.target.value)}
                                         >
-                                            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fast)</option>
-                                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Powerful)</option>
+                                            <optgroup label="Google Gemini" className="bg-zinc-900">
+                                                <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash</option>
+                                                <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro</option>
+                                                <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash</option>
+                                            </optgroup>
+                                            <optgroup label="OpenAI" className="bg-zinc-900">
+                                                <option value="gpt-4o">GPT-4o</option>
+                                                <option value="gpt-4o-mini">GPT-4o-mini</option>
+                                            </optgroup>
                                         </select>
 
                                         {/* Length Selectors */}
@@ -1415,96 +1514,131 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                     {/* SOCIAL MEDIA TRANSFORMER */}
                                     <div className="pt-6 border-t border-white/5 space-y-4">
                                         <div className="flex justify-between items-center">
-                                            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                                <Sparkles size={12} className="text-blue-400" /> Social Media Transformer
-                                            </h3>
+                                            <div className="flex items-center gap-4">
+                                                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                                    <Sparkles size={12} className="text-blue-400" /> Social Transformer
+                                                </h3>
+                                                <select
+                                                    value={aiModel}
+                                                    onChange={(e) => setAiModel(e.target.value)}
+                                                    className="bg-black/40 border border-blue-500/20 rounded px-2 py-1 text-[9px] text-blue-400 focus:outline-none focus:border-blue-500/50 uppercase tracking-tighter"
+                                                >
+                                                    <optgroup label="Google Gemini" className="bg-zinc-900">
+                                                        <option value="gemini-1.5-flash-latest">1.5 Flash</option>
+                                                        <option value="gemini-1.5-pro-latest">1.5 Pro</option>
+                                                        <option value="gemini-2.0-flash-exp">2.0 Flash</option>
+                                                    </optgroup>
+                                                    <optgroup label="OpenAI" className="bg-zinc-900">
+                                                        <option value="gpt-4o">GPT-4o</option>
+                                                        <option value="gpt-4o-mini">GPT-4o-mini</option>
+                                                    </optgroup>
+                                                </select>
+                                            </div>
                                             <button
                                                 type="button"
-                                                onClick={handleSocialGenerate}
+                                                onClick={() => handleSocialGenerate()}
                                                 disabled={socialLoading}
-                                                className="text-[10px] bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg transition-all"
+                                                className="text-[10px] bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg border border-blue-500/30 flex items-center gap-2 transition-all"
                                             >
-                                                {socialLoading ? 'Generating...' : 'Generate Posts'}
+                                                {socialLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                                {socialLoading ? 'Generating...' : 'Generate New Posts'}
                                             </button>
                                         </div>
 
                                         {socialPosts && (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                                                {/* X / Twitter */}
-                                                <div className="bg-black/40 border border-white/5 p-4 rounded-xl space-y-2">
-                                                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase">X / Twitter</span>
-                                                        <a
-                                                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(socialPosts.twitter || '')}`}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                            className="text-[10px] bg-white text-black px-2 py-1 rounded font-bold hover:bg-gray-200"
-                                                        >
-                                                            Post Now
-                                                        </a>
-                                                    </div>
-                                                    <p className="text-xs text-zinc-300 font-mono whitespace-pre-wrap">
-                                                        {(socialPosts.twitter || (socialPosts as any).x) || <span className="text-zinc-600 italic">No content generated.</span>}
-                                                    </p>
-                                                </div>
-
-                                                {/* LinkedIn */}
-                                                <div className="bg-black/40 border border-white/5 p-4 rounded-xl space-y-2">
-                                                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase">LinkedIn</span>
+                                            <div className="space-y-3">
+                                                {/* Tabs */}
+                                                <div className="flex border-b border-white/5">
+                                                    {(['instagram', 'facebook', 'twitter', 'tiktok'] as const).map(platform => (
                                                         <button
                                                             type="button"
-                                                            onClick={() => navigator.clipboard.writeText(socialPosts.linkedin || '')}
-                                                            className="text-[10px] bg-blue-700 text-white px-2 py-1 rounded font-bold hover:bg-blue-600"
+                                                            key={platform}
+                                                            onClick={() => setActiveSocialTab(platform)}
+                                                            className={`flex-1 py-1.5 text-[10px] font-bold uppercase transition-colors border-b-2
+                                                            ${activeSocialTab === platform
+                                                                    ? 'border-blue-500 text-blue-400'
+                                                                    : 'border-transparent text-zinc-600 hover:text-white'
+                                                                }`}
                                                         >
-                                                            Copy
+                                                            {platform}
+                                                        </button>
+                                                    ))}
+                                                </div>
+
+                                                {/* Active Tab Content */}
+                                                <div className="bg-black/20 rounded-lg p-3 border border-white/5">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase">
+                                                            {activeSocialTab} Copy
+                                                        </span>
+                                                        <div className="flex gap-1">
+                                                            <button
+                                                                type="button"
+                                                                // @ts-ignore
+                                                                onClick={() => copyToClipboard(socialPosts[activeSocialTab]?.text || '')}
+                                                                className="p-1 hover:bg-white/10 rounded text-zinc-400 hover:text-white transition-colors"
+                                                                title="Copy Text"
+                                                            >
+                                                                <Copy size={12} />
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                // @ts-ignore
+                                                                onClick={() => handlePostIntent(activeSocialTab, socialPosts[activeSocialTab]?.text || '')}
+                                                                className="p-1 hover:bg-white/10 rounded text-blue-400 hover:text-blue-300 transition-colors"
+                                                                title="Post Now"
+                                                            >
+                                                                <ExternalLink size={12} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <p className="text-xs text-zinc-300 whitespace-pre-wrap font-mono leading-relaxed max-h-32 overflow-y-auto bg-black/30 p-2 rounded mb-3">
+                                                        {/* @ts-ignore */}
+                                                        {socialPosts[activeSocialTab]?.text || "No content generated."}
+                                                    </p>
+
+                                                    {/* Graphic Generator for this platform */}
+                                                    <div className="pt-3 border-t border-white/5 flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`border border-white/10 bg-white/5 flex items-center justify-center rounded-sm transition-all duration-300
+                                                            ${activeSocialTab === 'instagram' ? 'w-6 h-8' : // 4:5
+                                                                    activeSocialTab === 'tiktok' ? 'w-6 h-10' : // 9:16
+                                                                        'w-10 h-5' // 1.91:1
+                                                                }`}>
+                                                                <ImageIcon size={10} className="text-zinc-600" />
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[10px] font-bold text-zinc-400">Targeted Graphic</span>
+                                                                <span className="text-[9px] text-zinc-600">
+                                                                    Replaces current main image
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => generateSocialImage(activeSocialTab)}
+                                                            className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-white text-[10px] rounded flex items-center gap-1 transition-colors border border-white/10"
+                                                        >
+                                                            <Download size={10} /> Generate
                                                         </button>
                                                     </div>
-                                                    <p className="text-xs text-zinc-300 font-sans whitespace-pre-wrap leading-relaxed">{socialPosts.linkedin}</p>
-                                                </div>
-
-
-                                                {/* Instagram + Image Generation */}
-                                                <div className="bg-black/40 border border-white/5 p-4 rounded-xl space-y-2 col-span-1 md:col-span-2">
-                                                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase">Instagram / Visuals</span>
-                                                        <div className="flex gap-2">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => navigator.clipboard.writeText(socialPosts.instagram || '')}
-                                                                className="text-[10px] bg-pink-700 text-white px-2 py-1 rounded font-bold hover:bg-pink-600"
-                                                            >
-                                                                Copy Text
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={generateSocialImage}
-                                                                className="text-[10px] bg-news-accent text-black px-2 py-1 rounded font-bold hover:bg-emerald-400 flex items-center gap-1"
-                                                            >
-                                                                <Upload size={10} /> Download Image
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                        <div className="md:col-span-2">
-                                                            <p className="text-xs text-zinc-300 font-sans whitespace-pre-wrap leading-relaxed">
-                                                                {socialPosts.instagram || <span className="text-zinc-600 italic">No content generated.</span>}
-                                                            </p>
-                                                        </div>
-                                                        <div className="aspect-[4/5] bg-zinc-900 rounded-lg overflow-hidden relative group cursor-pointer" onClick={generateSocialImage}>
-                                                            {formData.imageUrl ? (
-                                                                <>
-                                                                    <img src={formData.imageUrl} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
-                                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                                        <p className="text-white text-xs font-bold uppercase tracking-wider bg-black/50 px-2 py-1 rounded backdrop-blur">Preview Graphic</p>
-                                                                    </div>
-                                                                </>
-                                                            ) : (
-                                                                <div className="flex items-center justify-center h-full text-zinc-600 text-[10px]">No Article Image</div>
-                                                            )}
-                                                        </div>
+                                                    <div className="mt-2 text-[9px] text-zinc-600 font-mono truncate">
+                                                        Headline: <span className="text-zinc-500">
+                                                            {/* @ts-ignore */}
+                                                            {socialPosts[activeSocialTab]?.headline || formData.title}
+                                                        </span>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        )}
+
+                                        {!socialPosts && (
+                                            <div className="text-center py-8 border border-dashed border-white/10 rounded-lg bg-white/[0.02]">
+                                                <Sparkles size={16} className="text-zinc-700 mx-auto mb-2" />
+                                                <p className="text-[10px] text-zinc-600">
+                                                    Select an article and click "Generate New Posts" to create optimized content for 4 platforms.
+                                                </p>
                                             </div>
                                         )}
                                     </div>
@@ -1665,10 +1799,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                             </div>
                         </div>
                     </div>
-
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 

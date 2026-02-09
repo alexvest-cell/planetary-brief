@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Section, Article } from '../types';
 
-import { ChevronRight, Filter, Sparkles, Headphones } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Filter, Sparkles, Headphones } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 import { useAudio } from '../contexts/AudioContext';
@@ -210,10 +210,10 @@ const Portfolio: React.FC<PortfolioProps> = ({
 
                 {/* Latest Guides Section */}
                 {!searchQuery && (() => {
-                    const guideArticles = getFilteredList(articles || []).filter(a => {
+                    const guideArticles = (articles || []).filter(a => {
                         const categories = Array.isArray(a.category) ? a.category : [a.category];
                         return categories.includes('Guides') || categories.includes('Action') || categories.includes('Act');
-                    }).slice(0, 4);
+                    }).slice(0, 10);
 
                     if (guideArticles.length === 0) return null;
 
@@ -223,30 +223,30 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                 <h2 className="text-xl md:text-2xl font-serif font-bold text-white">Latest Guides</h2>
                             </div>
 
-                            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {guideArticles.map((article, index) => (
-                                    <div
-                                        key={article.id}
-                                        onClick={() => onArticleClick(article)}
-                                        className="group cursor-pointer bg-zinc-900/30 border border-white/5 hover:bg-zinc-900 hover:border-news-accent/30 transition-all duration-300 rounded-lg overflow-hidden flex flex-col h-full"
-                                    >
-                                        <div className="aspect-[3/2] overflow-hidden relative">
-                                            <img
-                                                src={article.imageUrl}
-                                                alt={article.title}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
-                                            />
-                                            <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
-                                                <div className="bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
-                                                    Guides
-                                                </div>
+                            <div className="relative group/scroll">
+                                <div
+                                    ref={(el) => { if (el) el.id = 'guides-scroll'; }}
+                                    className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar scroll-smooth"
+                                >
+                                    {guideArticles.map((article, index) => (
+                                        <div
+                                            key={article.id}
+                                            onClick={() => onArticleClick(article)}
+                                            className="group cursor-pointer bg-zinc-900/30 border border-white/5 hover:bg-zinc-900 hover:border-news-accent/30 transition-all duration-300 rounded-lg overflow-hidden flex flex-col flex-shrink-0 w-[280px] md:w-[320px] snap-start"
+                                        >
+                                            <div className="aspect-[3/2] overflow-hidden relative">
+                                                <img
+                                                    src={article.imageUrl}
+                                                    alt={article.title}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                                                />
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         playArticle(article);
                                                     }}
                                                     disabled={isLoading && currentArticle?.id === article.id}
-                                                    className="w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                                    className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
                                                     title="Listen to guide"
                                                 >
                                                     {isLoading && currentArticle?.id === article.id ? (
@@ -256,22 +256,41 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                     )}
                                                 </button>
                                             </div>
-                                        </div>
-                                        <div className="p-4 flex flex-col flex-grow">
-                                            <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
-                                                {article.title}
-                                            </h3>
-                                            <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
-                                                {article.excerpt}
-                                            </p>
-                                            <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
-                                                <span>{article.date}</span>
-                                                <span>•</span>
-                                                <span>{article.originalReadTime}</span>
+                                            <div className="p-4 flex flex-col flex-grow">
+                                                <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
+                                                    {article.title}
+                                                </h3>
+                                                <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
+                                                    {article.excerpt}
+                                                </p>
+                                                <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
+                                                    <span>{article.date}</span>
+                                                    <span>•</span>
+                                                    <span>{article.originalReadTime}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                                {/* Navigation Arrows - Desktop Only */}
+                                <button
+                                    onClick={() => {
+                                        const container = document.getElementById('guides-scroll');
+                                        if (container) container.scrollBy({ left: -340, behavior: 'smooth' });
+                                    }}
+                                    className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/80 backdrop-blur border border-white/20 rounded-full items-center justify-center hover:bg-news-accent hover:border-news-accent transition-all opacity-0 group-hover/scroll:opacity-100 z-10 shadow-lg"
+                                >
+                                    <ChevronLeft size={20} className="text-white" />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const container = document.getElementById('guides-scroll');
+                                        if (container) container.scrollBy({ left: 340, behavior: 'smooth' });
+                                    }}
+                                    className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/80 backdrop-blur border border-white/20 rounded-full items-center justify-center hover:bg-news-accent hover:border-news-accent transition-all opacity-0 group-hover/scroll:opacity-100 z-10 shadow-lg"
+                                >
+                                    <ChevronRight size={20} className="text-white" />
+                                </button>
                             </div>
                         </div>
                     );
@@ -284,34 +303,35 @@ const Portfolio: React.FC<PortfolioProps> = ({
                             <h2 className="text-xl md:text-2xl font-serif font-bold text-white">Featured Stories</h2>
                         </div>
 
-                        {/* Featured Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {getFilteredList(articles || []).filter(a => a.isFeaturedDiscover).slice(0, 4).map((article) => (
-                                <div
-                                    key={`feat-${article.id}`}
-                                    onClick={() => onArticleClick(article)}
-                                    className="group cursor-pointer bg-zinc-900/30 border border-white/5 hover:bg-zinc-900 hover:border-news-accent/30 transition-all duration-300 rounded-lg overflow-hidden flex flex-col h-full"
-                                >
-                                    <div className="aspect-[3/2] overflow-hidden relative">
-                                        <img
-                                            src={article.imageUrl}
-                                            alt={article.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
-                                        />
-                                        <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
-                                            <div className="bg-black/60 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-widest text-white border border-white/10">
-                                                {(() => {
-                                                    const cat = Array.isArray(article.category) ? article.category[0] : article.category;
-                                                    return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
-                                                })()}
-                                            </div>
+                        {/* Featured Scroll */}
+                        <div className="relative group/scroll">
+                            <div
+                                ref={(el) => { if (el) el.id = 'featured-scroll'; }}
+                                className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar scroll-smooth"
+                            >
+                                {(articles || []).filter(a => {
+                                    const categories = Array.isArray(a.category) ? a.category : [a.category];
+                                    const isGuide = categories.includes('Guides') || categories.includes('Action') || categories.includes('Act');
+                                    return (a.isFeaturedDiscover || a.isFeaturedCategory) && !isGuide;
+                                }).slice(0, 10).map((article) => (
+                                    <div
+                                        key={`feat-${article.id}`}
+                                        onClick={() => onArticleClick(article)}
+                                        className="group cursor-pointer bg-zinc-900/30 border border-white/5 hover:bg-zinc-900 hover:border-news-accent/30 transition-all duration-300 rounded-lg overflow-hidden flex flex-col flex-shrink-0 w-[280px] md:w-[320px] snap-start"
+                                    >
+                                        <div className="aspect-[3/2] overflow-hidden relative">
+                                            <img
+                                                src={article.imageUrl}
+                                                alt={article.title}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                                            />
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     playArticle(article);
                                                 }}
                                                 disabled={isLoading && currentArticle?.id === article.id}
-                                                className="w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                                                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
                                                 title="Listen to story"
                                             >
                                                 {isLoading && currentArticle?.id === article.id ? (
@@ -321,25 +341,44 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 )}
                                             </button>
                                         </div>
-                                    </div>
-                                    <div className="p-4 flex flex-col flex-grow">
-                                        <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
-                                            {article.title}
-                                        </h3>
-                                        <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
-                                            {article.excerpt}
-                                        </p>
-                                        <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
-                                            <span>{article.date}</span>
-                                            <span>•</span>
-                                            <span>{article.originalReadTime || article.readTime || '5 min read'}</span>
+                                        <div className="p-4 flex flex-col flex-grow">
+                                            <h3 className="text-sm md:text-base font-serif font-bold text-white leading-tight mb-2 group-hover:text-gray-200 transition-colors">
+                                                {article.title}
+                                            </h3>
+                                            <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2 flex-grow">
+                                                {article.excerpt}
+                                            </p>
+                                            <div className="flex items-center gap-2 text-[10px] text-gray-500 pt-2 border-t border-white/5">
+                                                <span>{article.date}</span>
+                                                <span>•</span>
+                                                <span>{article.originalReadTime || '5 min read'}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                            {/* Navigation Arrows - Desktop Only */}
+                            <button
+                                onClick={() => {
+                                    const container = document.getElementById('featured-scroll');
+                                    if (container) container.scrollBy({ left: -340, behavior: 'smooth' });
+                                }}
+                                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/80 backdrop-blur border border-white/20 rounded-full items-center justify-center hover:bg-news-accent hover:border-news-accent transition-all opacity-0 group-hover/scroll:opacity-100 z-10 shadow-lg"
+                            >
+                                <ChevronLeft size={20} className="text-white" />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const container = document.getElementById('featured-scroll');
+                                    if (container) container.scrollBy({ left: 340, behavior: 'smooth' });
+                                }}
+                                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/80 backdrop-blur border border-white/20 rounded-full items-center justify-center hover:bg-news-accent hover:border-news-accent transition-all opacity-0 group-hover/scroll:opacity-100 z-10 shadow-lg"
+                            >
+                                <ChevronRight size={20} className="text-white" />
+                            </button>
                             {/* Fallback if no featured articles */}
                             {articles.filter(a => a.isFeaturedDiscover).length === 0 && (
-                                <div className="col-span-full py-12 text-center text-gray-500 text-sm border border-dashed border-white/5 rounded-lg">
+                                <div className="py-12 text-center text-gray-500 text-sm border border-dashed border-white/5 rounded-lg">
                                     No featured stories selected yet. Use the CMS to feature articles.
                                 </div>
                             )}

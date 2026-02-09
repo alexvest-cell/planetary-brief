@@ -29,36 +29,38 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                 <header className="mb-12 md:mb-16">
 
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold tracking-tight text-white mb-8 leading-[0.9]">
-                        Intelligence for a <br className="hidden md:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">Changing Planet.</span>
-                        <sup className="ml-4 align-top text-xs md:text-sm font-sans font-bold tracking-widest text-emerald-500 uppercase border border-emerald-500/30 px-2 py-0.5 rounded-full bg-emerald-500/10">Beta</sup>
+                        Environmental Intelligence <br className="hidden md:block" />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">Made Clear.</span>
                     </h1>
                 </header>
 
-                {/* The Mission - Manifesto Style */}
+                {/* The Mission - New Content */}
                 <section className="mb-32 grid md:grid-cols-12 gap-8 items-start">
                     <div className="md:col-span-4">
                         <div className="sticky top-24">
                             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Our Mission</span>
-                            <h2 className="text-2xl font-bold text-white mb-4">Signal in the Noise</h2>
+                            <h2 className="text-2xl font-bold text-white mb-4">Trusted Intelligence for Everyone</h2>
                             <p className="text-sm text-zinc-400 leading-relaxed">
-                                We live in the age of data overload. Our goal is to filter the flood of information into clarity, focusing only on the structural shifts that define our future.
+                                We bring environmental journalism to life with clarity, credibility, and relevance—making the complex understandable and the urgent accessible.
                             </p>
                         </div>
                     </div>
-                    <div className="md:col-span-8 space-y-8">
-                        <div className="p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                            <h3 className="text-xl font-serif font-bold text-white mb-4">No Hype. No Doomstreaming.</h3>
-                            <p className="text-zinc-300 leading-relaxed">
-                                Environmental news often swings between apocalyptic panic and greenwashed optimism. We reject both.
-                                We believe that clear, data-grounded reality—however stark—is the only foundation for meaningful action.
+                    <div className="md:col-span-8 space-y-6">
+                        <div className="prose prose-invert max-w-none">
+                            <p className="text-zinc-300 leading-relaxed mb-6">
+                                Planetary Brief brings trusted environmental intelligence to life. We deliver clear, engaging journalism that explains how climate, energy, nature, and policy intersect in the world around us. Our mission is to make the complex understandable, the urgent relevant, and the science meaningful—so readers feel informed rather than overwhelmed.
                             </p>
-                        </div>
-                        <div className="p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                            <h3 className="text-xl font-serif font-bold text-white mb-4">Rigorous Sourcing</h3>
+                            <p className="text-zinc-300 leading-relaxed mb-6">
+                                We believe environmental reporting should be grounded in evidence and shaped by the best available science, but told in a way that people actually want to read. Through daily briefs, in-depth explainers, and narrative-driven reporting, we focus on what is happening, why it matters, and what it means for the future.
+                            </p>
+                            <p className="text-zinc-300 leading-relaxed mb-6">
+                                Planetary Brief prioritises clarity, credibility, and relevance over hype. Our reporting is based on established research and trusted scientific and journalistic sources, with careful attention to accuracy, context, and plain language. Every article is written to reflect current knowledge while remaining engaging and accessible to a broad audience.
+                            </p>
+                            <p className="text-zinc-300 leading-relaxed mb-6">
+                                We are especially focused on reaching readers who find traditional environmental reporting too dense, too technical, or too detached from everyday life. Climate change, biodiversity loss, and energy transitions affect everyone, and understanding them should not require a scientific background.
+                            </p>
                             <p className="text-zinc-300 leading-relaxed">
-                                We do not scrape social media. We do not aggregate opinion pieces.
-                                Our inputs are strictly limited to peer-reviewed journals, government monitoring agencies (NOAA, NASA, ESA), and established scientific reporting.
+                                Planetary Brief is an independent platform for learning, perspective, and insight into a rapidly changing planet. We invite readers to explore, question, and better understand the forces shaping the environment—and the choices that will define what comes next.
                             </p>
                         </div>
                     </div>
