@@ -713,7 +713,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         const totalBrandWidth = planetaryMetrics.width + (brandSize / 4) + briefMetrics.width;
 
         // Position at bottom right with some margin
-        const bx = canvas.width - totalBrandWidth - margin;
+        const bx = margin;
         const by = canvas.height - margin;
 
         ctx.fillStyle = "#10b981";

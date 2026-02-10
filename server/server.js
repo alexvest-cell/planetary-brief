@@ -597,9 +597,9 @@ app.post('/api/generate', async (req, res) => {
       - ABSOLUTELY NO CALLS TO ACTION (e.g., "Learn more", "Check our link", "Read now").
       - ABSOLUTELY NO EXCLAMATION MARKS. Use zero hype.
       - The text should be a fascinating, factual summary that draws the reader in purely based on the intrigue of the fact.
-      - INCLUDE HASHTAGS: Append 3-5 highly relevant, trending environmental hashtags (e.g., #ClimateAction, #Sustainability) to the end of each post's text.
-      1. Twitter/X: Concise, punchy, under 280 chars, informative.
-      2. Facebook/Instagram: Sophisticated, storytelling tone, zero promotion.
+      - INCLUDE HASHTAGS: Append 3-5 highly relevant, trending environmental hashtags (e.g., #ClimateAction, #Sustainability) to the end of each post's text. THIS IS MANDATORY for all platforms.
+      1. Twitter/X: Concise, punchy, under 280 chars, informative. MUST include hashtags at the end.
+      2. Facebook/Instagram: Sophisticated, storytelling tone, zero promotion. MUST include hashtags at the end.
       
       FOR EACH PLATFORM, ALSO PROVIDE A "VISUAL HEADLINE" (HOOK):
       - A punchy investigative finding (8-10 words). 
