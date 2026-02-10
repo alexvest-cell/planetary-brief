@@ -613,13 +613,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         let titleScale = 0.08;
         let subScaleFactor = 0.028;
         let brandScale = 0.028; // Default logo scale (reduced from 0.035)
-        let verticalLift = canvas.height * 0.12; // Lifted from 0.03 for more space
+        let verticalLift = canvas.height * 0.075; // Sweet spot (was 0.12, orig 0.03)
 
         if (platform === 'twitter' || platform === 'facebook') {
             titleScale = 0.045; // Aggressive reduction
             subScaleFactor = 0.018;
             brandScale = 0.018; // Smaller logo for landscape (reduced from 0.025)
-            verticalLift = canvas.height * 0.15; // Higher for landscape too
+            verticalLift = canvas.height * 0.10; // Sweet spot (was 0.15, orig 0.05)
         }
 
         let pY = canvas.height - margin - verticalLift;
