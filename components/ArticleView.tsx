@@ -261,7 +261,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         </header>
 
         <figure className="mb-12 md:mb-16 -mx-4 md:-mx-12 lg:mx-0">
-          <div className="relative aspect-square md:rounded-sm overflow-hidden">
+          <div className="relative aspect-[4/3] md:rounded-sm overflow-hidden">
             <img
               src={article.originalImageUrl || article.imageUrl}
               alt={article.title}

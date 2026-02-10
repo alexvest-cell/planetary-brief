@@ -581,6 +581,7 @@ app.post('/api/generate', async (req, res) => {
       Based on the article title and content provided, write a highly detailed image generation prompt suitable for Midjourney v6 or DALL-E 3.
       
       STYLE GUIDE:
+      - **CRITICAL: Generate the image with a 4:3 ASPECT RATIO (Landscape).**
       - ULTRA-REALISTIC PHOTOGRAPHY, 8k resolution, raw photo style, shot on Sony A7R IV or similar
       - Journalistic, documentary style, "on the ground" perspective (eye level)
       - True to life colors and lighting (natural light, realistic depth of field)

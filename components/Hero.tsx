@@ -117,7 +117,7 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                     {/* Column 2: Main Story Image (5 cols) */}
                     <div className="lg:col-span-5 order-1 lg:order-2">
                         <div
-                            className="relative w-full aspect-[4/3] md:aspect-square lg:aspect-[4/3] bg-zinc-900 overflow-hidden cursor-pointer group"
+                            className="relative w-full aspect-[4/3] md:aspect-[4/3] lg:aspect-[4/3] bg-zinc-900 overflow-hidden cursor-pointer group"
                             onClick={onReadFeatured}
                         >
                             <img
