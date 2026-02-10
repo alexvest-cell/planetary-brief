@@ -149,7 +149,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         },
         sources: [],
         status: 'draft', // Default to draft for new articles
-        scheduledPublishDate: undefined
+        scheduledPublishDate: undefined,
+        imageOffsetX: 0,
+        imageOffsetY: 0
     });
 
     // SEO State
@@ -580,8 +582,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
         // 1. Draw Image (Cover)
         const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-        const x = (canvas.width / 2) - (img.width / 2) * scale;
-        const y = (canvas.height / 2) - (img.height / 2) * scale;
+
+        // --- ADDED: Manual Offsets ---
+        const offsetX = (formData.imageOffsetX || 0) * (canvas.width / 100);
+        const offsetY = (formData.imageOffsetY || 0) * (canvas.height / 100);
+
+        const x = (canvas.width / 2) - (img.width / 2) * scale + offsetX;
+        const y = (canvas.height / 2) - (img.height / 2) * scale + offsetY;
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 
         // 2. Dark Overlay Gradient for Text Readability (Stronger at bottom)
@@ -606,13 +613,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         let titleScale = 0.08;
         let subScaleFactor = 0.028;
         let brandScale = 0.028; // Default logo scale (reduced from 0.035)
-        let verticalLift = canvas.height * 0.03; // Lower: clearing logo but tighter
+        let verticalLift = canvas.height * 0.12; // Lifted from 0.03 for more space
 
         if (platform === 'twitter' || platform === 'facebook') {
             titleScale = 0.045; // Aggressive reduction
             subScaleFactor = 0.018;
             brandScale = 0.018; // Smaller logo for landscape (reduced from 0.025)
-            verticalLift = canvas.height * 0.05; // Lower for landscape too
+            verticalLift = canvas.height * 0.15; // Higher for landscape too
         }
 
         let pY = canvas.height - margin - verticalLift;
@@ -1543,6 +1550,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                 {socialLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
                                                 {socialLoading ? 'Generating...' : 'Generate New Posts'}
                                             </button>
+                                        </div>
+
+                                        {/* Image Offset Controls */}
+                                        <div className="flex gap-4 items-center bg-black/40 border border-blue-500/10 p-3 rounded-lg transition-all hover:border-blue-500/30">
+                                            <div className="flex-1 space-y-1">
+                                                <label className="text-[9px] font-bold text-blue-500/60 uppercase flex justify-between items-center">
+                                                    <span>Position Horizontal</span>
+                                                    <span className="font-mono bg-blue-500/20 px-1 rounded text-blue-400">{formData.imageOffsetX || 0}%</span>
+                                                </label>
+                                                <input
+                                                    type="range" min="-50" max="50"
+                                                    value={formData.imageOffsetX || 0}
+                                                    onChange={e => setFormData({ ...formData, imageOffsetX: parseInt(e.target.value) })}
+                                                    className="w-full accent-blue-500 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                                                />
+                                            </div>
+                                            <div className="w-px h-8 bg-white/5 mx-2" />
+                                            <div className="flex-1 space-y-1">
+                                                <label className="text-[9px] font-bold text-blue-500/60 uppercase flex justify-between items-center">
+                                                    <span>Position Vertical</span>
+                                                    <span className="font-mono bg-blue-500/20 px-1 rounded text-blue-400">{formData.imageOffsetY || 0}%</span>
+                                                </label>
+                                                <input
+                                                    type="range" min="-50" max="50"
+                                                    value={formData.imageOffsetY || 0}
+                                                    onChange={e => setFormData({ ...formData, imageOffsetY: parseInt(e.target.value) })}
+                                                    className="w-full accent-blue-500 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                                                />
+                                            </div>
                                         </div>
 
                                         {socialPosts && (

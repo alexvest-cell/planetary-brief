@@ -29,6 +29,8 @@ export interface Article {
     content: string;
     source: string;
   };
+  imageOffsetX?: number; // X offset percentage (-50 to 50)
+  imageOffsetY?: number; // Y offset percentage (-50 to 50)
 }
 
 export interface ChatMessage {
