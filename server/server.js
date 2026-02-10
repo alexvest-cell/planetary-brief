@@ -592,11 +592,12 @@ app.post('/api/generate', async (req, res) => {
       systemPrompt = `You are a social media expert for a premium environmental news platform.
       Based on the article content provided, generate optimized social media posts.
 
-      REQUIREMENTS (JOURNALISTIC TONE):
+      REQUIREMENTS (JOURNALISTIC TONE & SEO):
       - Write as an investigative journalist uncovering a discovery.
       - ABSOLUTELY NO CALLS TO ACTION (e.g., "Learn more", "Check our link", "Read now").
       - ABSOLUTELY NO EXCLAMATION MARKS. Use zero hype.
       - The text should be a fascinating, factual summary that draws the reader in purely based on the intrigue of the fact.
+      - INCLUDE HASHTAGS: Append 3-5 highly relevant, trending environmental hashtags (e.g., #ClimateAction, #Sustainability) to the end of each post's text.
       1. Twitter/X: Concise, punchy, under 280 chars, informative.
       2. Facebook/Instagram: Sophisticated, storytelling tone, zero promotion.
       
