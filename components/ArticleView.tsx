@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Article } from '../types';
 import { useAudio } from '../contexts/AudioContext';
-import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck, Headphones, Pause, Play } from 'lucide-react';
+import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck, Headphones, Pause, Play, Share2 } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 
@@ -152,6 +152,34 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
       playArticle(article);
     }
   };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: article.title,
+      text: article.excerpt || article.seoDescription || article.title,
+      url: window.location.href
+    };
+
+    // Try Web Share API first (mobile/modern browsers)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or error - silent fail
+        console.log('Share cancelled or failed:', err);
+      }
+    } else {
+      // Fallback: Copy URL to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Article link copied to clipboard!');
+      } catch (err) {
+        console.error('Failed to copy:', err);
+        alert('Unable to share. Please copy the URL from your browser.');
+      }
+    }
+  };
+
   // independent of the generated content length.
   const readTime = article.originalReadTime || "5 min read";
 
@@ -198,27 +226,37 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
               <span className="flex items-center gap-1 text-gray-400"><FileText size={12} /> {readTime}</span>
             </div>
 
-            <button
-              onClick={handleToggleAudio}
-              disabled={isThisArticleLoading}
-              className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 group relative
-                    ${isThisArticlePlaying
-                  ? 'border-news-live text-news-live bg-news-live/10'
-                  : 'border-white/10 hover:border-news-accent text-white hover:text-news-accent'
-                }`}
-              title="Listen to Article"
-            >
-              {isThisArticleLoading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : isThisArticlePlaying ? (
-                <>
-                  <Pause size={16} className="fill-current" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-news-live rounded-full animate-pulse"></span>
-                </>
-              ) : (
-                <Play size={16} />
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleToggleAudio}
+                disabled={isThisArticleLoading}
+                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 group relative
+                      ${isThisArticlePlaying
+                    ? 'border-news-live text-news-live bg-news-live/10'
+                    : 'border-white/10 hover:border-news-accent text-white hover:text-news-accent'
+                  }`}
+                title="Listen to Article"
+              >
+                {isThisArticleLoading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : isThisArticlePlaying ? (
+                  <>
+                    <Pause size={16} className="fill-current" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-news-live rounded-full animate-pulse"></span>
+                  </>
+                ) : (
+                  <Play size={16} />
+                )}
+              </button>
+
+              <button
+                onClick={handleShare}
+                className="w-10 h-10 rounded-full border border-white/10 hover:border-news-accent text-white hover:text-news-accent flex items-center justify-center transition-all duration-300 group"
+                title="Share Article"
+              >
+                <Share2 size={16} className="group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
           </div>
         </header>
 
