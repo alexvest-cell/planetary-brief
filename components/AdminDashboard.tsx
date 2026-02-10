@@ -514,14 +514,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     };
 
     const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
+        const suffix = "Read on planetarybrief.com";
+        let finalText = text.trim();
+        if (!finalText.includes(suffix)) {
+            finalText = finalText + "\n\n" + suffix;
+        }
+        navigator.clipboard.writeText(finalText);
         alert('Copied to clipboard!');
     };
 
     const handlePostIntent = (platform: 'twitter' | 'facebook' | 'instagram' | 'tiktok', text: string) => {
+        const suffix = "Read on planetarybrief.com";
+        let finalText = text.trim();
+        if (!finalText.includes(suffix)) {
+            finalText = finalText + "\n\n" + suffix;
+        }
+
+        const encodedText = encodeURIComponent(finalText);
+        const articleUrl = `https://planetarybrief.com/article/${formData.id || ''}`;
+        const encodedUrl = encodeURIComponent(articleUrl);
         let url = '';
-        const encodedText = encodeURIComponent(text);
-        const encodedUrl = encodeURIComponent(`https://planetarybrief.com/article/${formData.id || ''}`);
 
         switch (platform) {
             case 'twitter':
@@ -532,11 +544,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 break;
             case 'instagram':
                 alert('Instagram does not support direct posting via web. Text copied! Please open Instagram to post.');
-                copyToClipboard(text);
+                copyToClipboard(finalText);
                 return;
             case 'tiktok':
                 alert('TikTok does not support direct posting via web. Text copied! Please open TikTok to post.');
-                copyToClipboard(text);
+                copyToClipboard(finalText);
                 return;
         }
 
@@ -613,13 +625,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         let titleScale = 0.08;
         let subScaleFactor = 0.028;
         let brandScale = 0.028; // Default logo scale (reduced from 0.035)
-        let verticalLift = canvas.height * 0.075; // Sweet spot (was 0.12, orig 0.03)
+        let verticalLift = canvas.height * 0.055; // Lowering again (was 0.075, orig 0.03)
 
         if (platform === 'twitter' || platform === 'facebook') {
             titleScale = 0.045; // Aggressive reduction
             subScaleFactor = 0.018;
             brandScale = 0.018; // Smaller logo for landscape (reduced from 0.025)
-            verticalLift = canvas.height * 0.10; // Sweet spot (was 0.15, orig 0.05)
+            verticalLift = canvas.height * 0.08; // Lowering again (was 0.10, orig 0.05)
         }
 
         let pY = canvas.height - margin - verticalLift;
@@ -638,32 +650,51 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         ctx.fillStyle = "#e5e7eb"; // Zinc-200
         ctx.shadowBlur = 10;
 
-        // Pull excerpt or content lead
         const subText = formData.excerpt || (Array.isArray(formData.content) ? formData.content[0] : "") || "";
+
+        // --- AUTO-SCALE SUBTEXT IF TOO LONG ---
+        let finalSubSize = subSize;
         const subWords = subText.split(' ');
-        let subLine = '';
-        const subLines = [];
+        let subLines = [];
         const maxSubWidth = canvas.width - (margin * 2.5);
 
-        for (let n = 0; n < subWords.length; n++) {
-            const testLine = subLine + subWords[n] + ' ';
-            const metrics = ctx.measureText(testLine);
-            if (metrics.width > maxSubWidth && n > 0) {
-                subLines.push(subLine);
-                subLine = subWords[n] + ' ';
-            } else {
-                subLine = testLine;
+        const calculateLines = (fontSize: number) => {
+            ctx.font = `500 ${fontSize}px 'Inter', sans-serif`;
+            const lines = [];
+            let currentLine = '';
+            for (let n = 0; n < subWords.length; n++) {
+                const testLine = currentLine + subWords[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxSubWidth && n > 0) {
+                    lines.push(currentLine);
+                    currentLine = subWords[n] + ' ';
+                } else {
+                    currentLine = testLine;
+                }
             }
+            lines.push(currentLine);
+            return lines;
+        };
+
+        subLines = calculateLines(finalSubSize);
+        // If more than 4 lines, shrink font size to fit
+        if (subLines.length > 4) {
+            finalSubSize = Math.floor(subSize * 0.85); // Shrink 15%
+            subLines = calculateLines(finalSubSize);
         }
-        subLines.push(subLine);
+        // If still more than 5 lines, shrink more
+        if (subLines.length > 5) {
+            finalSubSize = Math.floor(subSize * 0.7); // Shrink to 70% total
+            subLines = calculateLines(finalSubSize);
+        }
 
-        // Draw subtext (full text, no truncation)
-        pY -= (subSize * 1.2);
-        const displaySubLines = subLines.slice(0, 4); // Show up to 4 lines if necessary, but AI prompt should keep it short
+        // Draw subtext
+        ctx.font = `500 ${finalSubSize}px 'Inter', sans-serif`;
+        pY -= (finalSubSize * 1.2);
 
-        for (let i = displaySubLines.length - 1; i >= 0; i--) {
-            ctx.fillText(displaySubLines[i], margin, pY);
-            pY -= (subSize * 1.3);
+        for (let i = subLines.length - 1; i >= 0; i--) {
+            ctx.fillText(subLines[i], margin, pY);
+            pY -= (finalSubSize * 1.3);
         }
 
         pY -= (canvas.width * 0.02); // Buffer before title
@@ -715,18 +746,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         ctx.shadowColor = "rgba(0,0,0,0.5)";
         ctx.shadowBlur = 5;
 
-        const briefMetrics = ctx.measureText("BRIEF");
+        const briefMetrics = ctx.measureText("BRIEF.COM");
         const planetaryMetrics = ctx.measureText("PLANETARY");
-        const totalBrandWidth = planetaryMetrics.width + (brandSize / 4) + briefMetrics.width;
+        const totalBrandWidth = planetaryMetrics.width + briefMetrics.width;
 
-        // Position at bottom right with some margin
+        // Position at bottom left with some margin
         const bx = margin;
         const by = canvas.height - margin;
 
         ctx.fillStyle = "#10b981";
         ctx.fillText("PLANETARY", bx, by);
         ctx.fillStyle = "#ffffff";
-        ctx.fillText("BRIEF", bx + planetaryMetrics.width + (brandSize / 4), by);
+        ctx.fillText("BRIEF.COM", bx + planetaryMetrics.width, by);
         ctx.restore();
 
 
