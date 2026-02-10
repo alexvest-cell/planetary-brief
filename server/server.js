@@ -1159,7 +1159,7 @@ async function handleGemini(req, res, systemPrompt, prompt, model, apiKey, conte
 async function handleOpenAI(req, res, systemPrompt, prompt, model) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Missing OPENAI_API_KEY in .env.local' });
+    return res.status(500).json({ error: 'Missing OPENAI_API_KEY. Please ensure it is set in your environment variables or .env.local file.' });
   }
 
   console.log(`\n--- [AI] OPENAI SYSTEM PROMPT (Type: ${req.body.type}) ---`);
