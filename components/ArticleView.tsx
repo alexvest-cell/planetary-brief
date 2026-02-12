@@ -4,6 +4,7 @@ import { useAudio } from '../contexts/AudioContext';
 import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck, Headphones, Pause, Play, Share2 } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
+import { generateArticleSchema, updateMetaTags, injectStructuredData } from '../utils/seoUtils';
 
 interface ArticleViewProps {
   article: Article;
@@ -107,21 +108,24 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
     window.scrollTo(0, 0);
   }, [article.id]);
 
-
+  // SEO: Update meta tags, canonical URL, and inject structured data
   useEffect(() => {
     if (article) {
-      document.title = `${article.title} | GreenShift`;
+      const canonicalUrl = `https://planetarybrief.com/article/${article.slug || article.id}`;
+      const description = article.seoDescription || article.excerpt || article.title;
 
-      // Update Meta Description
-      let metaDesc = document.querySelector('meta[name="description"]');
-      if (!metaDesc) {
-        metaDesc = document.createElement('meta');
-        metaDesc.setAttribute('name', 'description');
-        document.head.appendChild(metaDesc);
-      }
-      metaDesc.setAttribute('content', article.seoDescription || article.excerpt || article.title);
+      // Update all meta tags including OpenGraph and Twitter Cards
+      updateMetaTags({
+        title: `${article.title} | Planetary Brief`,
+        description: description,
+        canonicalUrl: canonicalUrl,
+        ogTitle: article.title,
+        ogDescription: description,
+        ogImage: article.imageUrl,
+        twitterCard: 'summary_large_image'
+      });
 
-      // Update Keywords
+      // Update keywords meta tag
       let metaKeywords = document.querySelector('meta[name="keywords"]');
       if (!metaKeywords) {
         metaKeywords = document.createElement('meta');
@@ -131,10 +135,16 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
       if (article.keywords && article.keywords.length > 0) {
         metaKeywords.setAttribute('content', article.keywords.join(', '));
       } else {
-        // Fallback to category/topic
         const cats = Array.isArray(article.category) ? article.category.join(', ') : article.category;
-        metaKeywords.setAttribute('content', `${cats}, ${article.topic}, environment, greenshift`);
+        metaKeywords.setAttribute('content', `${cats}, ${article.topic}, environment, sustainability`);
       }
+
+      // Inject Article structured data (JSON-LD)
+      const schema = generateArticleSchema(article);
+      const cleanup = injectStructuredData(schema);
+
+      // Cleanup on unmount
+      return cleanup;
     }
   }, [article]);
 

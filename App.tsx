@@ -23,6 +23,7 @@ import AudioPlayer from './components/AudioPlayer';
 import { AudioProvider } from './contexts/AudioContext';
 import { Section, Article, ExplanationData } from './types';
 import { featuredArticle, newsArticles as staticNewsArticles } from './data/content';
+import { updateMetaTags } from './utils/seoUtils';
 
 
 // Helper to restore icon component lost in JSON serialization
@@ -342,6 +343,55 @@ function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [articles]);
+
+  // SEO: Update page title and canonical URL based on current view
+  useEffect(() => {
+    const baseUrl = 'https://planetarybrief.com';
+
+    switch (view) {
+      case 'home':
+        updateMetaTags({
+          title: 'Planetary Brief | Global Environmental Intelligence',
+          description: 'Stay informed with expert environmental news, climate analysis, and sustainability insights from trusted sources.',
+          canonicalUrl: baseUrl
+        });
+        break;
+      case 'category':
+        const categorySlug = categoryToSlug(activeCategory);
+        updateMetaTags({
+          title: `${activeCategory} News | Planetary Brief`,
+          description: `Latest ${activeCategory.toLowerCase()} news and analysis from Planetary Brief.`,
+          canonicalUrl: `${baseUrl}/category/${categorySlug}`
+        });
+        break;
+      case 'dashboard':
+        updateMetaTags({
+          title: 'Earth Dashboard | Planetary Brief',
+          description: 'Real-time planetary health metrics and environmental data visualization.',
+          canonicalUrl: `${baseUrl}/dashboard`
+        });
+        break;
+      case 'about':
+        updateMetaTags({
+          title: 'About | Planetary Brief',
+          description: 'Learn about Planetary Brief\'s mission to translate complex scientific data into actionable intelligence.',
+          canonicalUrl: `${baseUrl}/about`
+        });
+        break;
+      case 'action-guide':
+        updateMetaTags({
+          title: 'Guides | Planetary Brief',
+          description: 'Expert guides for environmental action and sustainability.',
+          canonicalUrl: `${baseUrl}/guides`
+        });
+        break;
+      case 'admin':
+        // No SEO needed for admin pages
+        document.title = 'Admin Dashboard | Planetary Brief';
+        break;
+      // Article view is handled in ArticleView component
+    }
+  }, [view, activeCategory]);
 
   const scrollToSection = (sectionId: Section) => {
     if (view !== 'home') {

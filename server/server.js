@@ -27,6 +27,9 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 import Article from './models/Article.js';
 import Subscriber from './models/Subscriber.js';
 
+// Routes
+import sitemapRouter from './routes/sitemap.js';
+
 const app = express();
 const port = 3000;
 
@@ -49,6 +52,9 @@ if (GEMINI_API_KEY) {
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+
+// Serve static files from public directory (for robots.txt, etc.)
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Database Connection
 if (MONGODB_URI) {
@@ -201,6 +207,9 @@ app.get('/api/auth/verify', (req, res) => {
 });
 
 // --- ROUTES ---
+
+// Mount sitemap route (must be before other routes to avoid conflicts)
+app.use('/', sitemapRouter);
 
 // GET Articles (public - no auth required)
 app.get('/api/articles', async (req, res) => {
