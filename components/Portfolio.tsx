@@ -129,6 +129,8 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                     src={article.imageUrl}
                                                     alt={article.title}
                                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                                                    loading={index === 0 ? 'eager' : 'lazy'}
+                                                    decoding="async"
                                                 />
                                                 {index === 0 && (
                                                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
@@ -239,6 +241,8 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                     src={article.imageUrl}
                                                     alt={article.title}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 />
                                                 <button
                                                     onClick={(e) => {

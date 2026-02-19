@@ -103,7 +103,7 @@ export const upcomingEvents: Article[] = [
     {
         id: 'evt-cop30',
         title: 'UN Climate Change Conference (COP30)',
-        category: 'Global Summit', topic: 'Global Summit',
+        category: 'Policy, Governance & Finance', topic: 'Global Summit',
         source: 'UNFCCC',
         imageUrl: 'https://placehold.co/1200x800?text=evt-cop30', // Conference/UN
         excerpt: 'World leaders convene in Belém, Brazil, to finalize the new collective quantified goal on climate finance and adaptation strategies.',
@@ -130,7 +130,7 @@ export const upcomingEvents: Article[] = [
     {
         id: 'evt-plastics',
         title: 'Final Ratification: Global Plastics Treaty',
-        category: 'Legislation', topic: 'Legislation',
+        category: 'Planetary Health & Society', topic: 'Legislation',
         source: 'UN Environment Assembly',
         imageUrl: 'https://placehold.co/1200x800?text=evt-plastics', // Plastic bottle beach
         excerpt: 'Delegates meet in Paris to sign the finalized text of the international legally binding instrument on plastic pollution.',
@@ -157,7 +157,7 @@ export const upcomingEvents: Article[] = [
     {
         id: 'evt-imo',
         title: 'IMO Marine Environment Protection Committee (MEPC 85)',
-        category: 'Maritime Law', topic: 'Maritime Law',
+        category: 'Policy, Governance & Finance', topic: 'Maritime Law',
         source: 'International Maritime Organization',
         imageUrl: 'https://placehold.co/1200x800?text=evt-imo', // Ship container
         excerpt: 'The shipping industry faces a deadline to adopt market-based measures for decarbonization, including a potential carbon levy on fuel.',
@@ -184,7 +184,7 @@ export const upcomingEvents: Article[] = [
     {
         id: 'evt-cbd',
         title: 'Convention on Biological Diversity (COP17)',
-        category: 'Biodiversity', topic: 'Biodiversity',
+        category: 'Biodiversity & Oceans', topic: 'Biodiversity',
         source: 'CBD Secretariat',
         imageUrl: 'https://placehold.co/1200x800?text=evt-cbd', // Jungle forest
         excerpt: 'Evaluating the implementation of the Kunming-Montreal Global Biodiversity Framework two years in.',

@@ -7,6 +7,9 @@ interface SubscribeModalProps {
     onClose: () => void;
 }
 
+import { subscribeToNewsletter } from '../utils/newsletterApi';
+import { getKitTagId } from '../data/kitConfig';
+
 const topics = CATEGORIES.map(cat => ({ id: cat.id, label: cat.label }));
 
 const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
@@ -45,26 +48,24 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
         if (!email || selectedTopics.length === 0) return;
 
         setIsSubmitting(true);
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        // Map internal Hub IDs to Kit Tag IDs
+        const kitTagIds = selectedTopics
+            .map(topic => getKitTagId(topic))
+            .filter((id): id is string => id !== null);
+
+        // Fallback: If no tags mapped (e.g. local dev without config), send raw topic names
+        // The backend might handle them or we might just want to capture the email.
+        const finalTags = kitTagIds.length > 0 ? kitTagIds : selectedTopics;
 
         try {
-            const response = await fetch('/api/subscribe', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, topics: selectedTopics, timezone }),
-            });
-
-            if (response.ok) {
-                setIsSuccess(true);
-            } else {
-                alert('Failed to subscribe. Please try again.');
-                setIsSubmitting(false);
-            }
-        } catch (error) {
+            await subscribeToNewsletter(email, finalTags);
+            setIsSuccess(true);
+        } catch (error: any) {
             console.error('Subscription error:', error);
-            alert('Could not connect to the subscription server.');
+            // Show actual error message for debugging
+            alert(`Subscription failed: ${error.message || 'Unknown error'}`);
+        } finally {
             setIsSubmitting(false);
         }
     };
@@ -86,7 +87,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                 <div className="flex items-center justify-between p-4 border-b border-white/5 bg-zinc-900/50">
                     <h2 className="text-lg font-serif font-bold text-white flex items-center gap-2">
                         <Bell size={18} className="text-news-accent" />
-                        Weekly Digest
+                        Weekly Intelligence Briefing
                     </h2>
                     <button
                         onClick={onClose}
@@ -119,17 +120,17 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
                                 <p className="text-sm text-gray-400 mb-4">
-                                    Stay ahead with our concise weekly intelligence briefing. Select the topics you care about most.
+                                    Receive a structured weekly briefing on the most consequential developments across climate systems, biodiversity, governance, and planetary risk.
                                 </p>
 
                                 <div className="flex justify-between items-end mb-3">
-                                    <label className="text-xs font-bold uppercase tracking-widest text-zinc-500">Topics</label>
+                                    <label className="text-xs font-bold uppercase tracking-widest text-zinc-500">Select Focus Areas</label>
                                     <button
                                         type="button"
                                         onClick={handleSelectAll}
                                         className="text-[10px] font-bold uppercase tracking-widest text-news-accent hover:text-white transition-colors"
                                     >
-                                        {selectedTopics.length === topics.length ? 'Deselect All' : 'Select All'}
+                                        {selectedTopics.length === topics.length ? 'Deselect All' : 'Select All Areas'}
                                     </button>
                                 </div>
 
@@ -163,7 +164,7 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="name@example.com"
+                                        placeholder="Enter your email address"
                                         className="w-full bg-black/50 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-base text-white placeholder:text-gray-600 focus:outline-none focus:border-news-accent transition-colors"
                                     />
                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
@@ -172,19 +173,26 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
 
                             <button
                                 type="submit"
-                                disabled={true}
+                                disabled={isSubmitting}
                                 className="w-full bg-news-accent hover:bg-emerald-400 text-black py-3 rounded-lg font-bold uppercase tracking-widest text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-news-accent/20"
                             >
-                                Subscribe
-                                <Bell size={16} />
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 size={16} className="animate-spin" />
+                                        Subscribing...
+                                    </>
+                                ) : (
+                                    <>
+                                        Activate Subscription
+                                        <Bell size={16} />
+                                    </>
+                                )}
                             </button>
 
-                            <p className="text-xs text-center text-news-accent font-bold uppercase tracking-widest mt-2">
-                                Feature Coming Soon
-                            </p>
+
 
                             <p className="text-[10px] text-center text-zinc-600 mt-4">
-                                Zero spam. One email per week. Unsubscribe anytime.
+                                One structured briefing every Tuesday. No promotional content. Unsubscribe at any time.
                             </p>
                         </form>
                     )}

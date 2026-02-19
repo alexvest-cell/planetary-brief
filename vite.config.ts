@@ -22,6 +22,28 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': path.resolve(__dirname, '.'),
       }
+    },
+    build: {
+      // Target modern browsers for better optimization
+      target: 'es2020',
+      // Minification
+      minify: 'esbuild',
+      terserOptions: {
+        compress: {
+          drop_console: mode === 'production',
+          drop_debugger: mode === 'production'
+        }
+      },
+      // CSS code splitting
+      cssCodeSplit: true,
+      // Source maps only for development
+      sourcemap: mode !== 'production',
+      // Chunk size warnings
+      chunkSizeWarningLimit: 500
+    },
+    // Performance optimizations
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'lucide-react']
     }
   };
 });

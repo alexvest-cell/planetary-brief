@@ -3,15 +3,28 @@ import { Article } from '../types';
 /**
  * Generate Article structured data (JSON-LD) for SEO
  * Follows schema.org NewsArticle specification
+ * Enhanced with semantic fields for better topic clustering and entity recognition
  */
 export function generateArticleSchema(article: Article): object {
     const baseUrl = 'https://planetarybrief.com';
+
+    // Use primaryTopic or fall back to category
+    const articleSection = article.primaryTopic ||
+        (Array.isArray(article.category) ? article.category[0] : article.category);
+
+    // Combine keywords with entities and secondaryTopics for richer semantic tags
+    const allKeywords = [
+        ...(article.keywords || []),
+        ...(article.entities || []),
+        ...(article.secondaryTopics || [])
+    ].filter((v, i, a) => a.indexOf(v) === i); // Remove duplicates
 
     return {
         '@context': 'https://schema.org',
         '@type': 'NewsArticle',
         headline: article.title,
         description: article.seoDescription || article.excerpt,
+        ...(article.whyItMatters && { abstract: article.whyItMatters }), // Why It Matters as abstract
         image: article.imageUrl ? [article.imageUrl] : [],
         datePublished: article.createdAt || article.date,
         dateModified: article.updatedAt || article.createdAt || article.date,
@@ -33,8 +46,34 @@ export function generateArticleSchema(article: Article): object {
             '@type': 'WebPage',
             '@id': `${baseUrl}/article/${article.slug || article.id}`
         },
-        articleSection: Array.isArray(article.category) ? article.category[0] : article.category,
-        keywords: article.keywords?.join(', ') || '',
+        articleSection: articleSection,
+        keywords: allKeywords.length > 0 ? allKeywords.join(', ') : '',
+
+        // Article Type as genre (Policy Brief, Data Signal, etc.)
+        ...(article.articleType && { genre: article.articleType }),
+
+        // Entities as schema.org mentions
+        ...(article.entities && article.entities.length > 0 && {
+            mentions: article.entities.map(entity => ({
+                '@type': 'Thing',
+                name: entity
+            }))
+        }),
+
+        // Topics as schema.org "about" for better topical clustering
+        ...(((article.primaryTopic || (article.secondaryTopics && article.secondaryTopics.length > 0))) && {
+            about: [
+                ...(article.primaryTopic ? [{
+                    '@type': 'Thing',
+                    name: article.primaryTopic
+                }] : []),
+                ...(article.secondaryTopics || []).map(topic => ({
+                    '@type': 'Thing',
+                    name: topic
+                }))
+            ]
+        }),
+
         ...(article.imageAttribution && {
             creditText: article.imageAttribution
         })

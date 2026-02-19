@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOp
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 import { generateArticleSchema, updateMetaTags, injectStructuredData } from '../utils/seoUtils';
+import { tagLabelToSlug } from '../data/tagDictionary';
 
 interface ArticleViewProps {
   article: Article;
@@ -12,6 +13,8 @@ interface ArticleViewProps {
   onArticleSelect: (article: Article) => void;
   allArticles: Article[];
   onShowAbout: () => void;
+  onCategoryClick?: (category: string) => void;
+  onTagClick?: (tagSlug: string) => void;
 }
 
 const ArticleDataVisual = ({ article }: { article: Article }) => {
@@ -41,9 +44,17 @@ const ArticleDataVisual = ({ article }: { article: Article }) => {
 
         {article.contextBox.source && (
           <div className="pt-4 border-t border-white/5 mt-6">
-            <div className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">
-              Verified Data: <span className="text-gray-400">{article.contextBox.source}</span>
+            <div className="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-3">
+              Verified Data
             </div>
+            <ul className="grid grid-cols-1 gap-y-1">
+              {article.contextBox.source.split(';').map(s => s.trim()).filter(s => s).map((source, i) => (
+                <li key={i} className="text-[10px] text-gray-400 leading-relaxed flex items-start gap-2">
+                  <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
+                  <span>{source}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
@@ -51,57 +62,132 @@ const ArticleDataVisual = ({ article }: { article: Article }) => {
   );
 };
 
+// Referenced Institutions Section (above integrity box)
+const ReferencedInstitutions = ({ article }: { article: Article }) => {
+  const rawEntities = Array.isArray(article.entities) && article.entities.length > 0
+    ? article.entities
+    : null;
+
+  if (!rawEntities) return null;
+
+  // Split entities that may be semicolon-separated strings into individual items
+  const entities = rawEntities.flatMap(e =>
+    e.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
+  );
+
+  if (entities.length === 0) return null;
+
+  return (
+    <div className="mb-4 md:mb-6">
+      <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
+        <Globe size={12} className="text-gray-500" />
+        <span>Referenced Institutions & Programs</span>
+      </div>
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+        {entities.map((entity, i) => (
+          <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
+            <span className="text-gray-600 mt-0.5 flex-shrink-0">•</span>
+            <span>{entity}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+
 // Combined Footer Component
 const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout: () => void }) => (
-  <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8 my-6 md:my-10 flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
-    {/* Brand Block */}
-    <div className="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
-      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-500/10 flex items-center justify-center font-serif font-bold text-emerald-500 text-base md:text-lg ring-1 ring-emerald-500/20 flex-shrink-0">
-        PB
-      </div>
-      <div className="flex flex-col">
-        <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
-        <button
-          onClick={onShowAbout}
-          className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
-        >
-          About Verification <Info size={12} className="group-hover:scale-110 transition-transform" />
-        </button>
-      </div>
-    </div>
+  <div className="my-6 md:my-10">
 
-    {/* Divider */}
-    <div className="hidden md:block w-px h-10 bg-white/10"></div>
+    {/* Editorial Integrity Box */}
+    <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8">
+      {/* Top Row: Brand + Methodology */}
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
+        {/* Brand Block */}
+        <div className="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-500/10 flex items-center justify-center font-serif font-bold text-emerald-500 text-base md:text-lg ring-1 ring-emerald-500/20 flex-shrink-0">
+            PB
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
+            <button
+              onClick={onShowAbout}
+              className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
+            >
+              About Verification <Info size={12} className="group-hover:scale-110 transition-transform" />
+            </button>
+          </div>
+        </div>
 
-    {/* Integrity Text */}
-    <div className="flex flex-col gap-1.5 flex-grow">
-      <div className="flex items-center gap-2 text-gray-400 font-bold uppercase tracking-wider text-[9px] md:text-[10px]">
-        <ShieldCheck size={12} className="text-emerald-500" />
-        <span>Editorial Integrity</span>
+        {/* Divider */}
+        <div className="hidden md:block w-px h-10 bg-white/10"></div>
+
+        {/* Methodology */}
+        <div className="flex flex-col gap-1.5 flex-grow">
+          <div className="flex items-center gap-2 text-gray-400 font-bold uppercase tracking-wider text-[9px] md:text-[10px]">
+            <ShieldCheck size={12} className="text-emerald-500" />
+            <span>Editorial Integrity</span>
+          </div>
+          <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
+            This article synthesizes publicly available datasets and institutional reports.
+            <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
+          </p>
+        </div>
       </div>
-      <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
-        {Array.isArray(article.sources) && article.sources.length > 0 ? (
-          <>
-            This article uses synthesized data from verified sources including{' '}
-            {article.sources.map((source, i) => (
-              <span key={i}>
-                {source}{i < article.sources.length - 1 ? ', ' : ''}
-              </span>
-            ))}.
-            <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
-          </>
-        ) : (
-          <>
-            This article uses synthesized data from verified sources including IPCC, NOAA, and legislative filings.
-            <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
-          </>
-        )}
-      </p>
+
+      {/* Sources Section */}
+      {Array.isArray(article.sources) && article.sources.length > 0 && (() => {
+        // Split sources that may be semicolon-separated strings into individual items
+        const splitSources = article.sources.flatMap(s =>
+          s.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
+        );
+        return (
+          <div className="mt-5 pt-5 border-t border-white/5">
+            <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
+              <Database size={12} className="text-gray-500" />
+              <span>Primary Data & Reports</span>
+            </div>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+              {splitSources.map((source, i) => (
+                <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
+                  <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
+                  <span>{source}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })()}
+
+      {/* Referenced Institutions & Programs */}
+      {Array.isArray(article.entities) && article.entities.length > 0 && (() => {
+        const entities = article.entities.flatMap(e =>
+          e.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
+        );
+        if (entities.length === 0) return null;
+        return (
+          <div className="mt-5 pt-5 border-t border-white/5">
+            <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
+              <Globe size={12} className="text-gray-500" />
+              <span>Referenced Institutions & Programs</span>
+            </div>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+              {entities.map((entity, i) => (
+                <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
+                  <span className="text-gray-600 mt-0.5 flex-shrink-0">•</span>
+                  <span>{entity}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })()}
     </div>
   </div>
 );
 
-const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSelect, allArticles, onShowAbout }) => {
+const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSelect, allArticles, onShowAbout, onCategoryClick, onTagClick }) => {
   const { playArticle, pauseAudio, resumeAudio, isPlaying, isLoading, currentArticle } = useAudio();
 
   useEffect(() => {
@@ -215,7 +301,15 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
 
         <header className="mb-8 md:mb-10 text-left">
-          <div className="text-news-accent font-bold uppercase tracking-widest text-xs mb-3">
+          <div
+            className="text-news-accent font-bold uppercase tracking-widest text-xs mb-3 cursor-pointer hover:text-emerald-400 transition-colors inline-block"
+            onClick={() => {
+              const categories = Array.isArray(article.category) ? article.category : [article.category];
+              if (categories.length > 0 && onCategoryClick) {
+                onCategoryClick(categories[0]); // Link to primary category
+              }
+            }}
+          >
             {(() => {
               const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
               const categories = Array.isArray(article.category) ? article.category : [article.category];
@@ -223,24 +317,29 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
             })()}
           </div>
 
-
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-white leading-[1.05] mb-6 md:mb-8">
             {article.title}
           </h1>
 
           {/* Compact Header Metadata */}
-          <div className="flex items-center justify-between border-y border-white/10 py-4 my-6">
-            <div className="flex items-center gap-4 text-xs uppercase tracking-wider font-bold text-gray-400">
+          <div className="flex items-center justify-between border-y border-white/10 py-3 md:py-4 my-6">
+            <div className="flex items-center gap-2 md:gap-4 text-[10px] md:text-xs uppercase tracking-wider font-bold text-gray-400">
               <span className="text-white">{article.date}</span>
               <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-              <span className="flex items-center gap-1 text-gray-400"><FileText size={12} /> {readTime}</span>
+              <span className="flex items-center gap-1 text-gray-400"><FileText size={10} className="md:w-3 md:h-3" /> {readTime}</span>
+              {article.articleType && (
+                <>
+                  <span className="w-1 h-1 rounded-full bg-gray-600"></span>
+                  <span className="text-emerald-400">{article.articleType}</span>
+                </>
+              )}
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={handleToggleAudio}
                 disabled={isThisArticleLoading}
-                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 group relative
+                className={`h-10 rounded-full border flex items-center justify-center transition-all duration-300 group relative px-0 w-10 md:w-auto md:px-4 gap-2
                       ${isThisArticlePlaying
                     ? 'border-news-live text-news-live bg-news-live/10'
                     : 'border-white/10 hover:border-news-accent text-white hover:text-news-accent'
@@ -252,10 +351,13 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                 ) : isThisArticlePlaying ? (
                   <>
                     <Pause size={16} className="fill-current" />
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-news-live rounded-full animate-pulse"></span>
+                    <span className="hidden md:inline text-[10px] font-bold uppercase tracking-widest">Pause Audio</span>
                   </>
                 ) : (
-                  <Play size={16} />
+                  <>
+                    <Play size={16} />
+                    <span className="hidden md:inline text-[10px] font-bold uppercase tracking-widest">Audio Summary</span>
+                  </>
                 )}
               </button>
 
@@ -271,6 +373,13 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         </header>
 
         <figure className="mb-12 md:mb-16 -mx-4 md:-mx-12 lg:mx-0">
+          {article.subheadline && (
+            <div className="mb-6 px-4 md:px-0">
+              <h2 className="text-xl md:text-2xl font-serif text-white/90 leading-relaxed italic border-l-4 border-news-accent pl-4">
+                {article.subheadline}
+              </h2>
+            </div>
+          )}
           <div className="relative aspect-[4/3] md:rounded-sm overflow-hidden">
             <img
               src={article.originalImageUrl || article.imageUrl}
@@ -366,9 +475,59 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
           })()}
         </div>
 
+        {/* Secondary Topics Tags */}
+        {article.secondaryTopics && (
+          (() => {
+            // Handle multiple formats:
+            // 1. Array of strings: ["Topic1", "Topic2"]
+            // 2. Array with single comma-separated string: ["Topic1, Topic2, Topic3"]
+            // 3. Plain string: "Topic1, Topic2"
+            let topicsArray: string[] = [];
+
+            if (Array.isArray(article.secondaryTopics)) {
+              // Check if it's an array with a single element containing commas/semicolons
+              if (article.secondaryTopics.length === 1 &&
+                typeof article.secondaryTopics[0] === 'string' &&
+                /[,;]/.test(article.secondaryTopics[0])) {
+                // Split the single element
+                topicsArray = article.secondaryTopics[0].split(/[,;]/).map(s => s.trim()).filter(s => s);
+              } else {
+                // Already a proper array
+                topicsArray = article.secondaryTopics.filter(s => s);
+              }
+            } else if (typeof article.secondaryTopics === 'string') {
+              topicsArray = article.secondaryTopics.split(/[,;]/).map(s => s.trim()).filter(s => s);
+            }
+
+            if (topicsArray.length === 0) return null;
+
+            return (
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-gray-500">Tags</span>
+                  <div className="h-px flex-grow bg-white/5"></div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {topicsArray.map((topic, index) => (
+                    <button
+                      key={index}
+                      onClick={() => onTagClick?.(tagLabelToSlug(topic))}
+                      className="px-3 py-1.5 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 rounded-full text-xs text-gray-300 hover:text-emerald-400 transition-all duration-200 cursor-pointer"
+                    >
+                      {topic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()
+        )}
+
         <div className="mt-16 mb-8">
           <AdUnit className="w-full h-32 md:h-48" format="horizontal" slotId={ADS_CONFIG.SLOTS.ARTICLE_FOOTER} />
         </div>
+
+
 
         {/* Combined Footer Component */}
         <ArticleFooter article={article} onShowAbout={onShowAbout} />

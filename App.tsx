@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Thermometer, CloudFog, MountainSnow, Droplets, Waves, Bird, Leaf, Flame, Wind, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { Thermometer, CloudFog, MountainSnow, Droplets, Waves, Bird, Leaf, Flame, Wind, AlertTriangle, Loader2 } from 'lucide-react';
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import Portfolio from './components/Portfolio'; // Acts as Home/Discover Feed
@@ -9,21 +9,29 @@ import About from './components/About';
 import AdUnit from './components/AdUnit';
 import { ADS_CONFIG } from './data/adsConfig';
 import Action from './components/Action';
-import Contact from './components/Contact';
-import ArticleView from './components/ArticleView';
-
-import EarthDashboard from './components/EarthDashboard';
-import DataExplanationView from './components/DataExplanationView';
-import ActionDetailsView from './components/ActionDetailsView';
-import AboutPage from './components/AboutPage';
-import Support from './components/Support';
-import SubscribeModal from './components/SubscribeModal';
-import AdminDashboard from './components/AdminDashboard';
+import Footer from './components/Footer';
 import AudioPlayer from './components/AudioPlayer';
 import { AudioProvider } from './contexts/AudioContext';
 import { Section, Article, ExplanationData } from './types';
 import { featuredArticle, newsArticles as staticNewsArticles } from './data/content';
+import LatestPolicySection from './components/LatestPolicySection';
+import DataSignalsSection from './components/DataSignalsSection';
+import InDepthAnalysisSection from './components/InDepthAnalysisSection';
+import TopicHubsSection from './components/TopicHubsSection';
+import { homepageConfig } from './data/homepageConfig';
 import { updateMetaTags } from './utils/seoUtils';
+
+// Code splitting: Lazy load heavy components
+const ArticleView = lazy(() => import('./components/ArticleView'));
+const EarthDashboard = lazy(() => import('./components/EarthDashboard'));
+const DataExplanationView = lazy(() => import('./components/DataExplanationView'));
+const AboutPage = lazy(() => import('./components/AboutPage'));
+const SubscribeModal = lazy(() => import('./components/SubscribeModal'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
+const TermsOfUse = lazy(() => import('./components/TermsOfUse'));
+const Archives = lazy(() => import('./components/Archives'));
+const TagArchive = lazy(() => import('./components/TagArchive'));
 
 
 // Helper to restore icon component lost in JSON serialization
@@ -56,17 +64,28 @@ const categoryToSlug = (category: string): string => {
 
 const slugToCategory = (slug: string): string => {
   const categoryMap: Record<string, string> = {
-    'climate-change': 'Climate Change',
-    'energy': 'Energy',
-    'pollution': 'Pollution',
-    'policy-and-economics': 'Policy & Economics',
-    'oceans': 'Oceans',
-    'biodiversity': 'Biodiversity',
-    'conservation': 'Conservation',
-    'solutions': 'Solutions',
-    'guides': 'Guides'
+    // Legacy Slugs -> New Categories
+    'climate-change': 'Climate & Energy Systems',
+    'energy': 'Climate & Energy Systems',
+    'pollution': 'Planetary Health & Society',
+    'policy-and-economics': 'Policy, Governance & Finance',
+    'oceans': 'Biodiversity & Oceans',
+    'biodiversity': 'Biodiversity & Oceans',
+    'conservation': 'Biodiversity & Oceans',
+    'solutions': 'Technology & Innovation',
+    // New 5-Pillar Slugs
+    'climate-and-energy-systems': 'Climate & Energy Systems',
+    'planetary-health-and-society': 'Planetary Health & Society',
+    'policy-governance-and-finance': 'Policy, Governance & Finance',
+    'biodiversity-and-oceans': 'Biodiversity & Oceans',
+    'technology-and-innovation': 'Technology & Innovation'
   };
   return categoryMap[slug] || slug;
+};
+
+// Helper to get multiple articles by ID
+const getArticlesByIds = (ids: string[], allArticles: Article[]) => {
+  return ids.map(id => allArticles.find(a => a.id === id)).filter(Boolean) as Article[];
 };
 
 function App() {
@@ -74,7 +93,7 @@ function App() {
   // Browser History Management: All view changes push state to history API,
   // allowing the browser back/forward buttons to work correctly across the entire site
   const [activeSection, setActiveSection] = useState<Section>(Section.HERO);
-  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'action-guide' | 'about' | 'subscribe' | 'admin'>(() => {
+  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'about' | 'subscribe' | 'admin' | 'privacy' | 'terms' | 'archives' | 'tag-archive'>(() => {
     // Initialize view from URL
     const path = window.location.pathname;
     const hash = window.location.hash;
@@ -82,8 +101,11 @@ function App() {
     if (hash === '#explain') return 'explanation';
     if (path === '/dashboard') return 'dashboard';
     if (path === '/about') return 'about';
-    if (path === '/guides') return 'action-guide';
-    if (path === '/support') return 'support';
+
+    if (path === '/privacy') return 'privacy';
+    if (path === '/terms') return 'terms';
+    if (path === '/archives') return 'archives';
+    if (path.startsWith('/tag/')) return 'tag-archive';
     // Admin, subscribe, etc could be added
     return 'home';
   });
@@ -96,8 +118,7 @@ function App() {
 
       if (path === '/dashboard') initialState = { view: 'dashboard' };
       else if (path === '/about') initialState = { view: 'about' };
-      else if (path === '/guides') initialState = { view: 'action-guide' };
-      else if (path === '/support') initialState = { view: 'support' };
+      else if (path === '/about') initialState = { view: 'about' };
 
       window.history.replaceState(initialState, '', path);
     }
@@ -107,6 +128,7 @@ function App() {
   const [explanationData, setExplanationData] = useState<ExplanationData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [activeTagSlug, setActiveTagSlug] = useState<string>('');
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
 
   // Dynamic Articles State
@@ -175,6 +197,11 @@ function App() {
       if (pathname !== '/admin') {
         window.history.replaceState({}, '', '/admin');
       }
+    } else if (pathname.startsWith('/tag/')) {
+      // Handle clean tag URLs like /tag/marine-heatwaves
+      const slug = pathname.replace('/tag/', '').replace(/\/$/, '');
+      setActiveTagSlug(slug);
+      setView('tag-archive');
     } else if (pathname.startsWith('/category/')) {
       // Handle clean category URLs like /category/policy-economics
       const slug = pathname.replace('/category/', '');
@@ -186,10 +213,8 @@ function App() {
       if (pathname !== '/dashboard') {
         window.history.replaceState({}, '', '/dashboard');
       }
-    } else if (pathname === '/guides' || viewParam === 'action') {
-      setView('action-guide');
-      if (pathname !== '/guides') {
-        window.history.replaceState({}, '', '/guides');
+      if (pathname !== '/dashboard') {
+        window.history.replaceState({}, '', '/dashboard');
       }
     } else if (viewParam === 'subscribe') {
       // Open modal instead of changing view
@@ -266,6 +291,12 @@ function App() {
             setActiveCategory(event.state.category || 'All');
             setView('category');
             break;
+          case 'tag-archive':
+            if (event.state.tagSlug) {
+              setActiveTagSlug(event.state.tagSlug);
+            }
+            setView('tag-archive');
+            break;
           case 'sources':
             setView('sources');
             break;
@@ -327,10 +358,18 @@ function App() {
           }, 100);
         } else if (path === '/about') {
           setView('about');
-        } else if (path === '/guides') {
-          setView('action-guide');
-        } else if (path === '/support') {
-          setView('support');
+        } else if (path === '/about') {
+          setView('about');
+        } else if (path === '/privacy') {
+          setView('privacy');
+        } else if (path === '/terms') {
+          setView('terms');
+        } else if (path === '/archives') {
+          setView('archives');
+        } else if (path.startsWith('/tag/')) {
+          const slug = path.replace('/tag/', '').replace(/\/$/, '');
+          setActiveTagSlug(slug);
+          setView('tag-archive');
         } else {
           // Default to home
           setView('home');
@@ -378,13 +417,7 @@ function App() {
           canonicalUrl: `${baseUrl}/about`
         });
         break;
-      case 'action-guide':
-        updateMetaTags({
-          title: 'Guides | Planetary Brief',
-          description: 'Expert guides for environmental action and sustainability.',
-          canonicalUrl: `${baseUrl}/guides`
-        });
-        break;
+
       case 'admin':
         // No SEO needed for admin pages
         document.title = 'Admin Dashboard | Planetary Brief';
@@ -417,7 +450,8 @@ function App() {
     setCurrentArticle(article);
     setView('article');
     window.scrollTo(0, 0);
-    window.history.pushState({ view: 'article', articleId: article.id }, '', `/article/${article.id}`);
+    const urlPath = `/article/${article.slug || article.id}`;
+    window.history.pushState({ view: 'article', articleId: article.id }, '', urlPath);
   };
 
 
@@ -441,17 +475,7 @@ function App() {
     window.history.pushState({ view: 'dashboard' }, '', '/dashboard');
   };
 
-  const handleShowActionGuide = () => {
-    setView('action-guide');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'action-guide' }, '', '/guides');
-  };
 
-  const handleShowSupport = () => {
-    setView('support');
-    window.scrollTo(0, 0);
-    window.history.pushState({ view: 'support' }, '', '/support');
-  };
 
   // Helper to restore icon component lost in JSON serialization
   // Renamed to avoid conflict - should be removed later
@@ -555,40 +579,71 @@ function App() {
     }
   };
 
-  if (view === 'admin') {
-    return <AdminDashboard onBack={() => {
-      setView('home');
-      fetchArticles(); // Refresh data on return
-      window.history.replaceState({}, '', window.location.pathname);
-    }} />;
-  }
-
-  const getHeroArticle = () => {
-    // Feature Logic:
-    // 1. Find all 'isFeaturedDiscover' articles
-    const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
-    // 2. Sort by 'createdAt' (newest upload first)
-    featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
-
-    // 3. Pick winner, or fallback to fixed ID, or fallback to static default
-    return featuredCandidates[0] || articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
+  const handleTagClick = (tagSlug: string) => {
+    setActiveTagSlug(tagSlug);
+    setView('tag-archive');
+    window.scrollTo(0, 0);
+    window.history.pushState({ view: 'tag-archive', tagSlug }, '', `/tag/${tagSlug}`);
   };
 
-  const getSidebarArticles = (heroId: string) => {
-    // Sort articles by newness (Upload Date preferred)
-    const sorted = [...articles].sort((a, b) => {
-      const timeA = new Date(a.createdAt || a.date).getTime();
-      const timeB = new Date(b.createdAt || b.date).getTime();
-      return timeB - timeA;
-    });
+  if (view === 'admin') {
+    return (
+      <Suspense fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <Loader2 size={48} className="animate-spin text-emerald-500" />
+        </div>
+      }>
+        <AdminDashboard onBack={() => {
+          setView('home');
+          fetchArticles(); // Refresh data on return
+          window.history.replaceState({}, '', window.location.pathname);
+        }} />
+      </Suspense>
+    );
+  }
 
-    // Get 4 recent stories, excluding the hero
-    return sorted.filter(a => a.id !== heroId).slice(0, 4);
+  // Helper to get multiple articles by ID
+  const getArticlesByIds = (ids: string[], allArticles: Article[]) => {
+    return ids.map(id => allArticles.find(a => a.id === id)).filter(Boolean) as Article[];
+  };
+
+  const getHeroArticle = () => {
+    // 1. Priority: Dynamic Global Hero (CMS)
+    const featuredCandidates = articles.filter(a => a.isFeaturedDiscover);
+    featuredCandidates.sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime());
+
+    if (featuredCandidates.length > 0) {
+      return featuredCandidates[0];
+    }
+
+    // 2. Fallback: Config Hardcoded Hero
+    const configHero = articles.find(a => a.id === homepageConfig.hero.articleId);
+    if (configHero) {
+      // Apply overrides if they exist
+      return {
+        ...configHero,
+        title: homepageConfig.hero.headlineOverride || configHero.title,
+        excerpt: homepageConfig.hero.subheadingOverride || configHero.excerpt
+      };
+    }
+
+    // 3. Fallback: Default
+    return articles.find(a => a.id === 'gs-policy-2026') || featuredArticle;
   };
 
   const heroArticle = getHeroArticle();
-  const sidebarArticles = getSidebarArticles(heroArticle?.id);
-  const excludedIds = [heroArticle?.id, ...sidebarArticles.map(a => a.id)].filter(Boolean) as string[];
+
+  // Get content for sections
+  // Get content for sections
+  const policyArticles = articles
+    .filter(a => a.articleType === 'Policy Brief' || a.articleType === 'Treaty Explainer')
+    .sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime())
+    .slice(0, 4);
+
+  const analysisArticles = articles
+    .filter(a => a.featuredInDepth || a.articleType === 'In-Depth Analysis' || a.articleType === 'Technology Assessment')
+    .sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime())
+    .slice(0, 4);
 
   return (
     <AudioProvider>
@@ -600,8 +655,6 @@ function App() {
           searchQuery={searchQuery}
           onArticleSelect={handleArticleClick}
           onDashboardClick={handleShowDashboard}
-          onActionGuideClick={handleShowActionGuide}
-          onSupportClick={handleShowSupport}
           onSubscribeClick={handleShowSubscribe}
           onShowAbout={handleShowAbout}
           activeCategory={activeCategory}
@@ -614,22 +667,55 @@ function App() {
         <main>
           {view === 'home' && (
             <>
+              <div className="container mx-auto px-4 flex flex-col items-center">
+                {/* Vertical Line */}
+                <div className="w-px h-16 md:h-20 bg-gradient-to-b from-transparent via-white/30 to-transparent mb-6 mt-24 md:mt-16"></div>
+
+                <div className="text-center max-w-4xl pb-4 md:pb-8">
+                  <p className="text-lg md:text-xl lg:text-2xl font-serif leading-relaxed text-zinc-300">
+                    <span className="text-news-accent font-semibold">Planetary Brief</span> delivers data-driven environmental intelligence across climate systems, biodiversity, governance, and innovation. We translate institutional research into structured analysis.
+                  </p>
+                </div>
+              </div>
+
               <Hero
                 onReadFeatured={() => handleArticleClick(heroArticle)}
                 onArticleClick={handleArticleClick}
-                // Pass the featured discover article
                 featuredArticleOverride={heroArticle}
-                // Pass the sidebar articles
-                sidebarArticlesOverride={sidebarArticles}
-                articles={articles}
               />
-              {/* Pass DYNAMIC articles to Portfolio */}
-              <Portfolio
-                articles={articles}
+
+              <LatestPolicySection
+                title={homepageConfig.policySection.title}
+                articles={policyArticles}
                 onArticleClick={handleArticleClick}
-                searchQuery={searchQuery}
-                excludedArticleIds={excludedIds} // Prevent duplication of Hero + Sidebar
               />
+
+              <DataSignalsSection
+                signals={homepageConfig.dataSignals}
+                onExplain={() => handleExplainData({
+                  title: 'Methodology',
+                  icon: null,
+                  color: 'green',
+                  detailedInfo: { definition: '', context: '', impact: '' }
+                })} // Placeholder handler for now
+                onTagClick={handleTagClick}
+                onViewDashboard={handleShowDashboard}
+              />
+
+              <InDepthAnalysisSection
+                title={homepageConfig.analysisSection.title}
+                articles={analysisArticles}
+                onArticleClick={handleArticleClick}
+              />
+
+              <TopicHubsSection
+                title={homepageConfig.topicHubs.title}
+                categories={homepageConfig.topicHubs.pillars}
+                onCategoryClick={handleCategorySelect}
+              />
+
+              {/* Portfolio removed per strategic redesign */}
+              {/* <Portfolio ... /> */}
 
               <div className="w-full bg-black py-12 border-t border-white/5">
                 <div className="container mx-auto px-4">
@@ -653,73 +739,147 @@ function App() {
               articles={articles} // Pass dynamic articles
               onArticleClick={handleArticleClick}
               onBack={() => handleCategorySelect('All')}
+              onViewDashboard={handleShowDashboard}
+              onCategorySelect={handleCategorySelect}
             />
           )}
 
           {view === 'article' && currentArticle && (
-            <ArticleView
-              article={currentArticle}
-              onBack={handleBackToFeed}
-              onArticleSelect={handleArticleClick}
-              allArticles={articles} // Pass dynamic articles
-              onShowAbout={handleShowAbout}
-            />
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <ArticleView
+                article={currentArticle}
+                onBack={handleBackToFeed}
+                onArticleSelect={handleArticleClick}
+                allArticles={articles}
+                onShowAbout={handleShowAbout}
+                onCategoryClick={handleCategorySelect}
+                onTagClick={handleTagClick}
+              />
+            </Suspense>
           )}
 
           {view === 'about' && (
-            <AboutPage onBack={handleBackToFeed} />
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <AboutPage onBack={handleBackToFeed} />
+            </Suspense>
           )}
 
           {view === 'dashboard' && (
-            <EarthDashboard
-              onBack={handleBackToFeed}
-              onExplain={handleExplainData}
-              onSearch={handleSearch}
-              onDataSync={setLastSyncTime}
-            />
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <EarthDashboard
+                onBack={handleBackToFeed}
+                onExplain={handleExplainData}
+                onSearch={handleSearch}
+                onDataSync={setLastSyncTime}
+                onTagClick={handleTagClick}
+              />
+            </Suspense>
           )}
 
           {view === 'explanation' && explanationData && (
-            <DataExplanationView
-              data={explanationData}
-              onBack={handleCloseExplanation}
-            />
-          )}
-
-          {view === 'action-guide' && (
-            <CategoryFeed
-              category="Guides"
-              articles={articles}
-              onArticleClick={handleArticleClick}
-              onBack={() => handleCategorySelect('All')}
-            />
-          )}
-
-          {view === 'support' && (
-            <Support
-              onBack={() => handleCategorySelect('All')}
-            />
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <DataExplanationView
+                data={explanationData}
+                onBack={handleCloseExplanation}
+              />
+            </Suspense>
           )}
 
 
+
+
+          {view === 'privacy' && (
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <PrivacyPolicy
+                onBack={() => handleCategorySelect('All')}
+              />
+            </Suspense>
+          )}
+
+          {view === 'terms' && (
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <TermsOfUse
+                onBack={() => handleCategorySelect('All')}
+              />
+            </Suspense>
+          )}
+
+          {view === 'archives' && (
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <Archives
+                articles={articles}
+                onArticleClick={handleArticleClick}
+                onBack={() => handleCategorySelect('All')}
+              />
+            </Suspense>
+          )}
+
+
+          {view === 'tag-archive' && activeTagSlug && (
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <TagArchive
+                tagSlug={activeTagSlug}
+                articles={articles}
+                onArticleClick={handleArticleClick}
+                onBack={handleBackToFeed}
+                onCategoryClick={handleCategorySelect}
+              />
+            </Suspense>
+          )}
 
           {/* Global Footer available on all pages */}
-          <Contact
+          <Footer
+            onCategoryClick={handleCategorySelect}
             onShowAbout={handleShowAbout}
+            onDashboardClick={handleShowDashboard}
             onSubscribeClick={handleShowSubscribe}
           />
         </main>
 
-        <SubscribeModal
-          isOpen={isSubscribeModalOpen}
-          onClose={() => {
-            setIsSubscribeModalOpen(false);
-            // If URL had ?view=subscribe, maybe revert it?
-            if (window.location.search.includes('view=subscribe')) {
-              window.history.replaceState({}, '', window.location.pathname);
-            }
-          }}
-        />
+        <Suspense fallback={null}>
+          <SubscribeModal
+            isOpen={isSubscribeModalOpen}
+            onClose={() => {
+              setIsSubscribeModalOpen(false);
+              // If URL had ?view=subscribe, maybe revert it?
+              if (window.location.search.includes('view=subscribe')) {
+                window.history.replaceState({}, '', window.location.pathname);
+              }
+            }}
+          />
+        </Suspense>
 
         <AudioPlayer />
       </div>

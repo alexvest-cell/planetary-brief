@@ -1,168 +1,2447 @@
-
-// Static Seed Data with Full Content Generation
-// Ported from data/content.ts to ensure rich content in the backend
-
-const extendContent = (base, category, topic) => {
-    if (base.length >= 8) return base;
-
-    return [
-        ...base,
-        `The ${topic} Context`,
-        `The latest data from the ${topic} sector indicates a rapid acceleration of trends previously thought to be decades away. Experts in ${category} are now calling for immediate, systemic intervention.`,
-        "This is not an isolated event but part of a global pattern. Regional analysis shows similar disruptions occurring across both the Northern and Southern hemispheres, suggesting a synchronized shift in planetary systems.",
-        "Systemic Impact Analysis",
-        "When we analyze the broader ecosystem effects, we see a complex web of interactions. When one variable shifts—be it temperature, acidity, or policy—it triggers a cascade of secondary effects. For instance, recent changes in local biodiversity have already begun to alter soil composition, which in turn affects water retention and agricultural yields.",
-        "We are attempting to repair a plane while flying it. The resilience of natural systems is being tested, and while some are showing surprising adaptability, others are nearing collapse. The data points we are seeing today are the early warning signals of this stress test.",
-        "Future Outlook",
-        "Looking forward, the implications of this development will ripple through the remainder of the decade. As we approach the 2030 milestones, the actions taken today will determine whether we meet our planetary boundaries or breach them irreversibly. GreenShift will continue to monitor this situation as new data becomes available."
-    ];
-};
-
-const generateBodyContent = (category, topic, excerpt) => {
-    return [
-        excerpt,
-
-        `Recent data indicates that ${topic} is becoming a central issue for ${category} experts. The trends observed over the last quarter suggest a significant acceleration, prompting calls for immediate regulatory and industrial responses. We are seeing a convergence of multiple factors: rising public awareness, stricter government mandates, and technological breakthroughs that are finally making sustainable alternatives cost-competitive.`,
-        "Historical Precedents",
-        `To understand the current trajectory of ${topic}, we must look back at similar shifts in the ${category} sector. Previous transitions—such as the move away from ozone-depleting substances or the initial adoption of renewable energy standards—followed a predictable S-curve of adoption. Early skepticism gave way to rapid institutional uptake once the economic case was proven. We are currently at the knee of that curve.`,
-        "Systemic Implications",
-        "Analysts warn that this is not an isolated phenomenon. The interplay between local environmental changes and global systems means that the impact of this event could ripple across borders. Verified sources from the IPCC and major monitoring agencies have flagged similar patterns in related sectors. For example, supply chain disruptions in one region are now causing price volatility in markets halfway across the globe, illustrating the fragility of our interconnected economy.",
-        "Economic Impact Assessment",
-        `The financial implications of ${topic} are staggering. Major insurance firms and investment banks are already adjusting their risk models to account for this new reality. Assets that were once considered safe bets are becoming stranded, while capital flows are increasingly redirected toward resilience and adaptation. This capital reallocation is driving innovation but also creating short-term market instability as incumbents struggle to pivot.`,
-        "Technological and Policy Response",
-        "In response to these developments, stakeholders are mobilizing resources to address the root causes. New frameworks are being proposed to mitigate risks, focusing on long-term sustainability rather than short-term fixes. The emphasis is shifting towards resilience and adaptation strategies. Governments are deploying subsidies and tax incentives to accelerate the transition, while the private sector is ramping up R&D spending to solve critical bottlenecks.",
-        "Expert Consensus",
-        `Leading voices in ${category} agree that the time for incrementalism has passed. The consensus emerging from recent summits is that structural reform is necessary to address the scale of the challenge presented by ${topic}. Disagreement remains on the speed of implementation, but the direction of travel is no longer in dispute.`,
-        "Future Outlook",
-        `As we look towards 2030, the trajectory of ${topic} will likely define the broader ${category} landscape. GreenShift will continue to monitor the data streams and provide updates as the situation evolves. The consensus among the scientific community remains clear: the window for effective action is narrowing, but the solutions are within reach. The decisions made in the next 18 months will likely determine the outcome for the next decade.`
-    ];
-};
-
 const seedArticles = [
-    // --- FEATURED ---
-    {
-        id: 'gs-policy-2026',
-        title: 'The End of Cheap Plastic: Why Your Grocery Bill is About to Change Forever',
-        category: 'Pollution', topic: 'Pollution',
-        source: 'GreenShift Original',
-        imageUrl: 'https://placehold.co/1200x800?text=gs-policy-2026-main',
-        secondaryImageUrl: 'https://placehold.co/1200x800?text=gs-policy-2026-secondary',
-        diagramUrl: 'https://placehold.co/1200x800?text=gs-policy-2026-diagram',
-        excerpt: 'The days of $1 water bottles are over. A new global law has just made virgin plastic more expensive than gold, and big corporations are scrambling. Here is what you need to know.',
-        date: 'Jan 2026',
-        originalReadTime: '6 min read',
-        url: '#',
-        contextBox: {
-            title: "The Production Cap",
-            content: "For 50 years, plastic companies could make as much as they wanted. The new 2026 Global Plastics Treaty changes the rules: it limits how much *new* plastic can be created, forcing companies to recycle what already exists.",
-            source: "UNEP 2026 Treaty Text"
-        },
-        content: extendContent(["Imagine walking into a supermarket...", "For decades...", "That changed on January 1st...", "The Panic in the Boardroom", "You might think big companies would fight this...", "Right now, there is a gold rush happening...", "What This Means for You", "So, is your grocery bill going to go up?...", "Before this law, only about 9% of plastic was actually recycled...", "The End of the Throwaway Culture", "This law forces us to stop treating materials as if they are infinite...", "It might feel annoying at first..."], 'Policy', 'Pollution')
-    },
-
-    // --- 1. CLIMATE CHANGE ---
-    { id: 'cc-1', title: "Global Temp Hits 1.5°C for 12 Consecutive Months", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-1", excerpt: "For the first time in history, the 12-month global average has exceeded the Paris Agreement limit.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "For the first time in history, the 12-month global average has exceeded the Paris Agreement limit."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-2', title: "Antarctic Heatwave: 30°C Above Normal", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-2", excerpt: "Unprecedented temperatures in East Antarctica are rewriting climate models.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "Unprecedented temperatures in East Antarctica are rewriting climate models."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-3', title: "The Carbon Budget is Officially Depleted", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-3", excerpt: "New analysis suggests we have crossed the threshold for 50% probability of staying under 1.5°C.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "New analysis suggests we have crossed the threshold for 50% probability of staying under 1.5°C."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-4', title: "The Cost of Extreme Weather: $3 Trillion in 2025", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-4", excerpt: "Reinsurers warn that large parts of the globe are becoming uninsurable.", date: "Dec 2025", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Economy', 'Climate Change', "Reinsurers warn that large parts of the globe are becoming uninsurable."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-5', title: "Methane Feedback Loops Detected in Siberia", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-5", excerpt: "Exploding permafrost craters are releasing ancient methane caches.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "Exploding permafrost craters are releasing ancient methane caches."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-6', title: "Attribution Science: Naming the Hurricane", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-6", excerpt: "Scientists can now calculate exactly how much climate change intensified a specific storm.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "Scientists can now calculate exactly how much climate change intensified a specific storm."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-7', title: "Global South Adaptation Fund Shortfall", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-7", excerpt: "Developing nations demand fulfilled pledges at the latest summit.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Climate Change', "Developing nations demand fulfilled pledges at the latest summit."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-8', title: "Jet Stream Instability: Why Winter is Weird", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-8", excerpt: "A weakening polar vortex is causing chaotic weather patterns in the Northern Hemisphere.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "A weakening polar vortex is causing chaotic weather patterns in the Northern Hemisphere."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-9', title: "Ocean Circulation Slowdown Confirmed", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-9", excerpt: "Sensors in the Atlantic confirm the AMOC is at its weakest in a millennium.", date: "Jan 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "Sensors in the Atlantic confirm the AMOC is at its weakest in a millennium."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'cc-10', title: "Urban Heat Islands: Cities are 10°C Hotter", category: 'Climate Change', topic: 'Climate Change', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=cc-10", excerpt: "New thermal mapping exposes the deadly impact of concrete over greenery.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Science', 'Climate Change', "New thermal mapping exposes the deadly impact of concrete over greenery."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 2. ENERGY ---
-    { id: 'en-1', title: "Perovskite Solar Record: 35% Efficiency", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-1", excerpt: "A breakthrough in tandem solar cells makes panels cheaper and more powerful.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "A breakthrough in tandem solar cells makes panels cheaper and more powerful."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-2', title: "Fusion Power: Commercial Pilot Announced", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-2", excerpt: "Following net energy gain, the first commercial fusion plant breaks ground in France.", date: "Feb 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "Following net energy gain, the first commercial fusion plant breaks ground in France."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-3', title: "Iron-Air Batteries Scale Up", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-3", excerpt: "Rust-based batteries are solving the grid storage problem for days, not hours.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "Rust-based batteries are solving the grid storage problem for days, not hours."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-4', title: "Offshore Wind: Floating Turbines Go Deep", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-4", excerpt: "New floating tech unlocks wind energy in deep waters previously inaccessible.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "New floating tech unlocks wind energy in deep waters previously inaccessible."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-5', title: "Geothermal: The Superhot Rock Revolution", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-5", excerpt: "Deep drilling allows geothermal energy to be accessed anywhere, not just volcanic zones.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "Deep drilling allows geothermal energy to be accessed anywhere, not just volcanic zones."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-6', title: "Global Coal Peak: It Happened in 2025", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-6", excerpt: "IEA confirms coal consumption has entered structural decline.", date: "Jan 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Economy', 'Energy', "IEA confirms coal consumption has entered structural decline."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-7', title: "Hydrogen Transport: Heavy Trucking shifts", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-7", excerpt: "Green hydrogen infrastructure is finally ready for long-haul logistics.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "Green hydrogen infrastructure is finally ready for long-haul logistics."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-8', title: "Solid State Batteries: EV Range Doubled", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-8", excerpt: "Toyota and VW release first mass-market cars with 1000km range.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "Toyota and VW release first mass-market cars with 1000km range."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-9', title: "Small Modular Reactors (SMRs) Go Online", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-9", excerpt: "Factory-built nuclear reactors begin powering remote communities.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Energy', "Factory-built nuclear reactors begin powering remote communities."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'en-10', title: "Virtual Power Plants Stabilize the Grid", category: 'Energy', topic: 'Energy', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=en-10", excerpt: "Home batteries networked together saved California from blackouts this winter.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Action', 'Energy', "Home batteries networked together saved California from blackouts this winter."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 3. POLLUTION ---
-    { id: 'pol-1', title: "Global Plastics Treaty Signed", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-1", excerpt: "Legally binding caps on plastic production come into force.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Pollution', "Legally binding caps on plastic production come into force."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-2', title: "PFAS Total Ban: The End of Teflon", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-2", excerpt: "EU and US regulators agree on a complete phase-out of forever chemicals.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Pollution', "EU and US regulators agree on a complete phase-out of forever chemicals."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-3', title: "Microplastics Found in Human Hearts", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-3", excerpt: "New medical study confirms plastic particles are crossing biological barriers.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Science', 'Pollution', "New medical study confirms plastic particles are crossing biological barriers."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-4', title: "E-Waste Recycling Hits 90% in Nordic Nations", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-4", excerpt: "Strict deposit schemes prove that circular electronics are possible.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Pollution', "Strict deposit schemes prove that circular electronics are possible."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-5', title: "Ocean Cleanup: System 03 Success", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-5", excerpt: "The Great Pacific Garbage Patch is shrinking for the first time.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Pollution', "The Great Pacific Garbage Patch is shrinking for the first time."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-6', title: "Nitrogen Crisis: Farming Runoff Rules", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-6", excerpt: "New legislation targets algal blooms by capping fertilizer use.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Pollution', "New legislation targets algal blooms by capping fertilizer use."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-7', title: "Air Quality AI: Street-Level Monitoring", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-7", excerpt: "Hyper-local sensors reveal inequality in urban smog exposure.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Pollution', "Hyper-local sensors reveal inequality in urban smog exposure."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-8', title: "Right to Repair Electronics Act", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-8", excerpt: "Manufacturers must now provide parts and manuals for 10 years.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Pollution', "Manufacturers must now provide parts and manuals for 10 years."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-9', title: "Chemical Fertilizer Tax Implemented", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-9", excerpt: "Incentivizing regenerative agriculture through fiscal policy.", date: "Jan 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Economy', 'Pollution', "Incentivizing regenerative agriculture through fiscal policy."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pol-10', title: "Space Debris Removal Mission Launches", category: 'Pollution', topic: 'Pollution', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pol-10", excerpt: "First commercial satellite capture successfully demonstrates orbit cleanup.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Pollution', "First commercial satellite capture successfully demonstrates orbit cleanup."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 4. POLICY & ECONOMICS ---
-    { id: 'pe-1', title: "Carbon Border Tax (CBAM) Global Rollout", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-1", excerpt: "Imports to the EU and UK now face levies based on their carbon footprint.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Policy & Economics', "Imports to the EU and UK now face levies based on their carbon footprint."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-2', title: "Beyond GDP: Adopting Green Ecosystem Product", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-2", excerpt: "Five nations replace GDP with GEP to measure true economic health.", date: "Feb 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Economy', 'Policy & Economics', "Five nations replace GDP with GEP to measure true economic health."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-3', title: "Fossil Fuel Divestment Hits $50 Trillion", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-3", excerpt: "Pension funds continue the mass exodus from oil and gas assets.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Economy', 'Policy & Economics', "Pension funds continue the mass exodus from oil and gas assets."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-4', title: "Ecocide Law Recognized by ICC", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-4", excerpt: "Destruction of ecosystems can now be prosecuted as a crime against humanity.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Policy & Economics', "Destruction of ecosystems can now be prosecuted as a crime against humanity."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-5', title: "Climate Migration Visas Established", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-5", excerpt: "New Zealand creates legal pathway for Pacific islanders displaced by sea level rise.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Policy & Economics', "New Zealand creates legal pathway for Pacific islanders displaced by sea level rise."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-6', title: "Corporate Liability: CEOs Sued Personally", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-6", excerpt: "Landmark ruling holds directors accountable for climate risk negligence.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Policy & Economics', "Landmark ruling holds directors accountable for climate risk negligence."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-7', title: "Subsidies Shift: From Fossil to Green", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-7", excerpt: "G20 nations agree to redirect $500B in oil subsidies to renewables.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Economy', 'Policy & Economics', "G20 nations agree to redirect $500B in oil subsidies to renewables."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-8', title: "Circular Economy Act Enforced", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-8", excerpt: "Mandatory recycling and durability standards for all consumer goods.", date: "Jan 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Policy', 'Policy & Economics', "Mandatory recycling and durability standards for all consumer goods."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-9', title: "Just Transition Fund Operational", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-9", excerpt: "Billions allocated to retrain coal workers for the clean energy sector.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Policy & Economics', "Billions allocated to retrain coal workers for the clean energy sector."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'pe-10', title: "Insurance Market Retreat", category: 'Policy & Economics', topic: 'Policy & Economics', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=pe-10", excerpt: "Major insurers pull coverage from coastal zones, triggering real estate shock.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Economy', 'Policy & Economics', "Major insurers pull coverage from coastal zones, triggering real estate shock."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 5. OCEANS ---
-    { id: 'oc-1', title: "High Seas Treaty Ratified", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-1", excerpt: "Protection now extends to international waters, covering 60% of the ocean.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Oceans', "Protection now extends to international waters, covering 60% of the ocean."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-2', title: "Deep Sea Mining Moratorium", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-2", excerpt: "Nations vote to pause seabed mining until environmental impacts are understood.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Oceans', "Nations vote to pause seabed mining until environmental impacts are understood."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-3', title: "Coral Reef 3D Printing Success", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-3", excerpt: "Artificial structures are successfully hosting new polyps in the Great Barrier Reef.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Science', 'Oceans', "Artificial structures are successfully hosting new polyps in the Great Barrier Reef."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-4', title: "Seagrass Restoration Scales Up", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-4", excerpt: "Robotic planting of seagrass meadows to capture blue carbon.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Conservation', 'Oceans', "Robotic planting of seagrass meadows to capture blue carbon."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-5', title: "Arctic Ocean Acidification Alert", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-5", excerpt: "pH levels in the north are dropping faster than anywhere else on Earth.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Science', 'Oceans', "pH levels in the north are dropping faster than anywhere else on Earth."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-6', title: "Whale Carbon Credits Launched", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-6", excerpt: "Financial market now values whales for their carbon sequestration role.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Economy', 'Oceans', "Financial market now values whales for their carbon sequestration role."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-7', title: "Sustainable Fisheries Tech", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-7", excerpt: "AI cameras on nets reduce bycatch by 95% in commercial fleets.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Oceans', "AI cameras on nets reduce bycatch by 95% in commercial fleets."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-8', title: "Ocean Thermal Energy Conversion", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-8", excerpt: "OTEC plant in Hawaii proves viability of temperature-gradient power.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Oceans', "OTEC plant in Hawaii proves viability of temperature-gradient power."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-9', title: "Plastic Free Coastlines Initiative", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-9", excerpt: "Global volunteer network clears record tonnage from beaches.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Action', 'Oceans', "Global volunteer network clears record tonnage from beaches."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'oc-10', title: "Marine Protected Areas Hit 30%", category: 'Oceans', topic: 'Oceans', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=oc-10", excerpt: "The world achieves the 30x30 target for ocean conservation early.", date: "Dec 2025", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Conservation', 'Oceans', "The world achieves the 30x30 target for ocean conservation early."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 6. BIODIVERSITY ---
-    { id: 'bio-1', title: "30x30 Target Met on Land", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-1", excerpt: "30% of global land is now under protection status.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Biodiversity', "30% of global land is now under protection status."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-2', title: "De-Extinction: Mammoth Genes Edited", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-2", excerpt: "Colossal Biosciences creates first viable mammoth hybrid embryo.", date: "Feb 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Science', 'Biodiversity', "Colossal Biosciences creates first viable mammoth hybrid embryo."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-3', title: "Indigenous Guardianship Programs", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-3", excerpt: "Returning land management rights to indigenous groups boosts biodiversity.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Biodiversity', "Returning land management rights to indigenous groups boosts biodiversity."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-4', title: "Pollinator Recovery Plan", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-4", excerpt: "Banning neonics leads to bounce back in wild bee populations.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Conservation', 'Biodiversity', "Banning neonics leads to bounce back in wild bee populations."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-5', title: "Invasive Species AI Monitoring", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-5", excerpt: "Autonomous drones identify and map invasive plants in real-time.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Biodiversity', "Autonomous drones identify and map invasive plants in real-time."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-6', title: "Soil Microbiome Mapping", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-6", excerpt: "Global census of soil bacteria reveals the hidden web of life.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Science', 'Biodiversity', "Global census of soil bacteria reveals the hidden web of life."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-7', title: "Wildlife Corridors Connect Continents", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-7", excerpt: "New 'Highway for Nature' links national parks across borders.", date: "Dec 2025", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Conservation', 'Biodiversity', "New 'Highway for Nature' links national parks across borders."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-8', title: "Amazon Tipping Point Averted?", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-8", excerpt: "Deforestation rates drop to near zero, giving the rainforest a chance.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Science', 'Biodiversity', "Deforestation rates drop to near zero, giving the rainforest a chance."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-9', title: "Global Seed Vault Expansion", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-9", excerpt: "Svalbard receives largest ever deposit of crop varieties.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Conservation', 'Biodiversity', "Svalbard receives largest ever deposit of crop varieties."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'bio-10', title: "Rewilding Europe: The Bison Return", category: 'Biodiversity', topic: 'Biodiversity', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=bio-10", excerpt: "Herds of wild bison roam the UK and Germany for the first time in centuries.", date: "Dec 2025", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Conservation', 'Biodiversity', "Herds of wild bison roam the UK and Germany for the first time in centuries."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 7. CONSERVATION ---
-    { id: 'con-1', title: "Congo Basin Protection Deal", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-1", excerpt: "Historic agreement to preserve the world's second lung.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Conservation', "Historic agreement to preserve the world's second lung."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-2', title: "Wetland Credits Market Booms", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-2", excerpt: "Financial incentives drive massive peatland restoration.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Economy', 'Conservation', "Financial incentives drive massive peatland restoration."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-3', title: "Anti-Poaching Drones Success", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-3", excerpt: "Thermal imaging drones reduce Rhino poaching to zero in key parks.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Conservation', "Thermal imaging drones reduce Rhino poaching to zero in key parks."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-4', title: "River Rights Movement", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-4", excerpt: "More rivers granted legal personhood status in South America.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Conservation', "More rivers granted legal personhood status in South America."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-5', title: "Forest Stewardship Council 2.0", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-5", excerpt: "Stricter standards for sustainable timber eradicate loopholes.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Policy', 'Conservation', "Stricter standards for sustainable timber eradicate loopholes."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-6', title: "Desert Greening Projects", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-6", excerpt: "Great Green Wall in Africa shows visible progress from space.", date: "Jan 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Innovation', 'Conservation', "Great Green Wall in Africa shows visible progress from space."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-7', title: "Urban Nature Reserves", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-7", excerpt: "Cities converting golf courses into public wildlands.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Action', 'Conservation', "Cities converting golf courses into public wildlands."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-8', title: "National Parks Digital Twin", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-8", excerpt: "VR tourism generates revenue for parks without the foot traffic.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Conservation', "VR tourism generates revenue for parks without the foot traffic."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-9', title: "Community Conservation Fund", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-9", excerpt: "Crowdfunding buys huge tracts of Patagonian wilderness.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Action', 'Conservation', "Crowdfunding buys huge tracts of Patagonian wilderness."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'con-10', title: "Endangered Species Recovery", category: 'Conservation', topic: 'Conservation', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=con-10", excerpt: "Tiger numbers double in Nepal thanks to habitat corridors.", date: "Dec 2025", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Science', 'Conservation', "Tiger numbers double in Nepal thanks to habitat corridors."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 8. SOLUTIONS ---
-    { id: 'sol-1', title: "Direct Air Capture Hubs Online", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-1", excerpt: "Massive carbon sucking plants in Texas and Iceland begin operations.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Solutions', "Massive carbon sucking plants in Texas and Iceland begin operations."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-2', title: "Lab-Grown Meat Price Parity", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-2", excerpt: "Cultivated chicken is now cheaper than farmed chicken in Singapore.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Economy', 'Solutions', "Cultivated chicken is now cheaper than farmed chicken in Singapore."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-3', title: "15-Minute Cities Success", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-3", excerpt: "Paris report shows 40% drop in car traffic and improved mental health.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Policy', 'Solutions', "Paris report shows 40% drop in car traffic and improved mental health."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-4', title: "Hempcrete Construction Boom", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-4", excerpt: "Carbon-negative building materials gain mainstream adoption.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Solutions', "Carbon-negative building materials gain mainstream adoption."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-5', title: "Algae Bioplastics", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-5", excerpt: "Seaweed-based packaging replaces single-use plastics in major supermarkets.", date: "Feb 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Solutions', "Seaweed-based packaging replaces single-use plastics in major supermarkets."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-6', title: "Passive Cooling Architecture", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-6", excerpt: "Ancient techniques revived to cool buildings without AC.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Solutions', "Ancient techniques revived to cool buildings without AC."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-7', title: "Precision Agriculture AI", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-7", excerpt: "Robots reduce herbicide use by 90% through spot-spraying.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Innovation', 'Solutions', "Robots reduce herbicide use by 90% through spot-spraying."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-8', title: "Desalination Solar Tech", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-8", excerpt: "New zero-brine solar domes provide water for arid regions.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Solutions', "New zero-brine solar domes provide water for arid regions."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-9', title: "Circular Fashion Industry", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-9", excerpt: "Resale market overtakes fast fashion for the first time.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Economy', 'Solutions', "Resale market overtakes fast fashion for the first time."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-    { id: 'sol-10', title: "Carbon Negative Concrete", category: 'Solutions', topic: 'Solutions', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=sol-10", excerpt: "New cement recipe absorbs CO2 as it cures.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Innovation', 'Solutions', "New cement recipe absorbs CO2 as it cures."), contextBox: { title: "Analysis", content: "Data...", source: "Source" } },
-
-    // --- 9. GUIDES ---
-    { id: 'act-1', title: "Green Your Money", category: 'Guides', topic: 'Guides', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=act-1", excerpt: "Switching to an ethical bank cuts more personal carbon than going vegan.", date: "Jan 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Guides', 'Guides', "Switching to an ethical bank cuts more personal carbon than going vegan."), contextBox: { title: "Impact", content: "High", source: "BankGreen" } },
-    { id: 'act-2', title: "The Ultimate Heat Pump Guide", category: 'Guides', topic: 'Guides', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=act-2", excerpt: "How to electrify your home heating and save money.", date: "Feb 2026", originalReadTime: "6 min read", url: "#", content: generateBodyContent('Guides', 'Guides', "How to electrify your home heating and save money."), contextBox: { title: "Savings", content: "High", source: "Rewiring America" } },
-    { id: 'act-3', title: "Plant-Rich Diet: A Transition Plan", category: 'Guides', topic: 'Guides', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=act-3", excerpt: "Practical steps to reducing meat consumption without sacrificing flavor.", date: "Dec 2025", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Guides', 'Guides', "Practical steps to reducing meat consumption without sacrificing flavor."), contextBox: { title: "Health", content: "High", source: "Lancet" } },
-    { id: 'act-4', title: "Composting 101: Urban & Rural", category: 'Guides', topic: 'Guides', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=act-4", excerpt: "Turn your food waste into soil, not methane.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Guides', 'Guides', "Turn your food waste into soil, not methane."), contextBox: { title: "Waste", content: "Medium", source: "EPA" } },
-    { id: 'act-5', title: "Community Solar: No Roof Required", category: 'Guides', topic: 'Guides', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=act-5", excerpt: "How to join a solar garden if you rent your home.", date: "Feb 2026", originalReadTime: "5 min read", url: "#", content: generateBodyContent('Guides', 'Guides', "How to join a solar garden if you rent your home."), contextBox: { title: "Energy", content: "High", source: "SolarAssoc" } },
-    { id: 'act-6', title: "Textiles: Buy Less, Repair More", category: 'Guides', topic: 'Guides', source: "GreenShift Intelligence", imageUrl: "https://placehold.co/1200x800?text=act-6", excerpt: "Building a capsule wardrobe that lasts a lifetime.", date: "Jan 2026", originalReadTime: "4 min read", url: "#", content: generateBodyContent('Guides', 'Guides', "Building a capsule wardrobe that lasts a lifetime."), contextBox: { title: "Fashion", content: "Medium", source: "FashionRevolution" } },
+  {
+    "id": "placeholder-climate-1",
+    "title": "Decarbonization: Key Developments in Climate & Energy Systems (Article 1)",
+    "excerpt": "Latest analysis on Decarbonization. This is a placeholder excerpt for article 1 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Decarbonization, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Decarbonization is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Decarbonization",
+    "keywords": [
+      "Decarbonization",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+1",
+    "source": "Design Demo",
+    "isFeaturedCategory": true,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-2",
+    "title": "Renewable Energy: Key Developments in Climate & Energy Systems (Article 2)",
+    "excerpt": "Latest analysis on Renewable Energy. This is a placeholder excerpt for article 2 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Renewable Energy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Renewable Energy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Renewable Energy",
+    "keywords": [
+      "Renewable Energy",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+2",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-3",
+    "title": "Extreme Weather: Key Developments in Climate & Energy Systems (Article 3)",
+    "excerpt": "Latest analysis on Extreme Weather. This is a placeholder excerpt for article 3 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Extreme Weather, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Extreme Weather is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Extreme Weather",
+    "keywords": [
+      "Extreme Weather",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+3",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-4",
+    "title": "Carbon Markets: Key Developments in Climate & Energy Systems (Article 4)",
+    "excerpt": "Latest analysis on Carbon Markets. This is a placeholder excerpt for article 4 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Markets, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Markets is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Carbon Markets",
+    "keywords": [
+      "Carbon Markets",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+4",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-5",
+    "title": "Methane: Key Developments in Climate & Energy Systems (Article 5)",
+    "excerpt": "Latest analysis on Methane. This is a placeholder excerpt for article 5 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Methane, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Methane is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Methane",
+    "keywords": [
+      "Methane",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+5",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-6",
+    "title": "Decarbonization: Key Developments in Climate & Energy Systems (Article 6)",
+    "excerpt": "Latest analysis on Decarbonization. This is a placeholder excerpt for article 6 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Decarbonization, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Decarbonization is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Decarbonization",
+    "keywords": [
+      "Decarbonization",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+6",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-7",
+    "title": "Renewable Energy: Key Developments in Climate & Energy Systems (Article 7)",
+    "excerpt": "Latest analysis on Renewable Energy. This is a placeholder excerpt for article 7 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Renewable Energy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Renewable Energy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Renewable Energy",
+    "keywords": [
+      "Renewable Energy",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+7",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-8",
+    "title": "Extreme Weather: Key Developments in Climate & Energy Systems (Article 8)",
+    "excerpt": "Latest analysis on Extreme Weather. This is a placeholder excerpt for article 8 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Extreme Weather, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Extreme Weather is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Extreme Weather",
+    "keywords": [
+      "Extreme Weather",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+8",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-9",
+    "title": "Carbon Markets: Key Developments in Climate & Energy Systems (Article 9)",
+    "excerpt": "Latest analysis on Carbon Markets. This is a placeholder excerpt for article 9 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Markets, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Markets is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Carbon Markets",
+    "keywords": [
+      "Carbon Markets",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+9",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-10",
+    "title": "Methane: Key Developments in Climate & Energy Systems (Article 10)",
+    "excerpt": "Latest analysis on Methane. This is a placeholder excerpt for article 10 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Methane, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Methane is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Methane",
+    "keywords": [
+      "Methane",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+10",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-11",
+    "title": "Decarbonization: Key Developments in Climate & Energy Systems (Article 11)",
+    "excerpt": "Latest analysis on Decarbonization. This is a placeholder excerpt for article 11 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Decarbonization, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Decarbonization is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Decarbonization",
+    "keywords": [
+      "Decarbonization",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+11",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-12",
+    "title": "Renewable Energy: Key Developments in Climate & Energy Systems (Article 12)",
+    "excerpt": "Latest analysis on Renewable Energy. This is a placeholder excerpt for article 12 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Renewable Energy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Renewable Energy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Renewable Energy",
+    "keywords": [
+      "Renewable Energy",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+12",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-13",
+    "title": "Extreme Weather: Key Developments in Climate & Energy Systems (Article 13)",
+    "excerpt": "Latest analysis on Extreme Weather. This is a placeholder excerpt for article 13 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Extreme Weather, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Extreme Weather is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Extreme Weather",
+    "keywords": [
+      "Extreme Weather",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+13",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-14",
+    "title": "Carbon Markets: Key Developments in Climate & Energy Systems (Article 14)",
+    "excerpt": "Latest analysis on Carbon Markets. This is a placeholder excerpt for article 14 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Markets, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Markets is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Carbon Markets",
+    "keywords": [
+      "Carbon Markets",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+14",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-climate-15",
+    "title": "Methane: Key Developments in Climate & Energy Systems (Article 15)",
+    "excerpt": "Latest analysis on Methane. This is a placeholder excerpt for article 15 in Climate & Energy Systems. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Methane, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Methane is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Climate & Energy Systems",
+    "topic": "Methane",
+    "keywords": [
+      "Methane",
+      "Environment",
+      "Global",
+      "Climate & Energy Systems"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/ef4444/ffffff?text=Energy+15",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-1",
+    "title": "Air Quality: Key Developments in Planetary Health & Society (Article 1)",
+    "excerpt": "Latest analysis on Air Quality. This is a placeholder excerpt for article 1 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Air Quality, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Air Quality is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Air Quality",
+    "keywords": [
+      "Air Quality",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+1",
+    "source": "Design Demo",
+    "isFeaturedCategory": true,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-2",
+    "title": "Water Security: Key Developments in Planetary Health & Society (Article 2)",
+    "excerpt": "Latest analysis on Water Security. This is a placeholder excerpt for article 2 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Water Security, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Water Security is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Water Security",
+    "keywords": [
+      "Water Security",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+2",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-3",
+    "title": "Environmental Justice: Key Developments in Planetary Health & Society (Article 3)",
+    "excerpt": "Latest analysis on Environmental Justice. This is a placeholder excerpt for article 3 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Environmental Justice, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Environmental Justice is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Environmental Justice",
+    "keywords": [
+      "Environmental Justice",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+3",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-4",
+    "title": "Urban Resilience: Key Developments in Planetary Health & Society (Article 4)",
+    "excerpt": "Latest analysis on Urban Resilience. This is a placeholder excerpt for article 4 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Urban Resilience, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Urban Resilience is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Urban Resilience",
+    "keywords": [
+      "Urban Resilience",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+4",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-5",
+    "title": "Plastic Pollution: Key Developments in Planetary Health & Society (Article 5)",
+    "excerpt": "Latest analysis on Plastic Pollution. This is a placeholder excerpt for article 5 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Plastic Pollution, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Plastic Pollution is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Plastic Pollution",
+    "keywords": [
+      "Plastic Pollution",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+5",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-6",
+    "title": "Air Quality: Key Developments in Planetary Health & Society (Article 6)",
+    "excerpt": "Latest analysis on Air Quality. This is a placeholder excerpt for article 6 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Air Quality, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Air Quality is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Air Quality",
+    "keywords": [
+      "Air Quality",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+6",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-7",
+    "title": "Water Security: Key Developments in Planetary Health & Society (Article 7)",
+    "excerpt": "Latest analysis on Water Security. This is a placeholder excerpt for article 7 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Water Security, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Water Security is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Water Security",
+    "keywords": [
+      "Water Security",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+7",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-8",
+    "title": "Environmental Justice: Key Developments in Planetary Health & Society (Article 8)",
+    "excerpt": "Latest analysis on Environmental Justice. This is a placeholder excerpt for article 8 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Environmental Justice, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Environmental Justice is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Environmental Justice",
+    "keywords": [
+      "Environmental Justice",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+8",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-9",
+    "title": "Urban Resilience: Key Developments in Planetary Health & Society (Article 9)",
+    "excerpt": "Latest analysis on Urban Resilience. This is a placeholder excerpt for article 9 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Urban Resilience, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Urban Resilience is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Urban Resilience",
+    "keywords": [
+      "Urban Resilience",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+9",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-10",
+    "title": "Plastic Pollution: Key Developments in Planetary Health & Society (Article 10)",
+    "excerpt": "Latest analysis on Plastic Pollution. This is a placeholder excerpt for article 10 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Plastic Pollution, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Plastic Pollution is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Plastic Pollution",
+    "keywords": [
+      "Plastic Pollution",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+10",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-11",
+    "title": "Air Quality: Key Developments in Planetary Health & Society (Article 11)",
+    "excerpt": "Latest analysis on Air Quality. This is a placeholder excerpt for article 11 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Air Quality, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Air Quality is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Air Quality",
+    "keywords": [
+      "Air Quality",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+11",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-12",
+    "title": "Water Security: Key Developments in Planetary Health & Society (Article 12)",
+    "excerpt": "Latest analysis on Water Security. This is a placeholder excerpt for article 12 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Water Security, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Water Security is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Water Security",
+    "keywords": [
+      "Water Security",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+12",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-13",
+    "title": "Environmental Justice: Key Developments in Planetary Health & Society (Article 13)",
+    "excerpt": "Latest analysis on Environmental Justice. This is a placeholder excerpt for article 13 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Environmental Justice, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Environmental Justice is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Environmental Justice",
+    "keywords": [
+      "Environmental Justice",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+13",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-14",
+    "title": "Urban Resilience: Key Developments in Planetary Health & Society (Article 14)",
+    "excerpt": "Latest analysis on Urban Resilience. This is a placeholder excerpt for article 14 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Urban Resilience, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Urban Resilience is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Urban Resilience",
+    "keywords": [
+      "Urban Resilience",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+14",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-planetary-15",
+    "title": "Plastic Pollution: Key Developments in Planetary Health & Society (Article 15)",
+    "excerpt": "Latest analysis on Plastic Pollution. This is a placeholder excerpt for article 15 in Planetary Health & Society. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Plastic Pollution, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Plastic Pollution is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Planetary Health & Society",
+    "topic": "Plastic Pollution",
+    "keywords": [
+      "Plastic Pollution",
+      "Environment",
+      "Global",
+      "Planetary Health & Society"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/8b5cf6/ffffff?text=Health+15",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-1",
+    "title": "ESG & Reporting: Key Developments in Policy, Governance & Finance (Article 1)",
+    "excerpt": "Latest analysis on ESG & Reporting. This is a placeholder excerpt for article 1 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on ESG & Reporting, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding ESG & Reporting is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "ESG & Reporting",
+    "keywords": [
+      "ESG & Reporting",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+1",
+    "source": "Design Demo",
+    "isFeaturedCategory": true,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-2",
+    "title": "Global Treaties: Key Developments in Policy, Governance & Finance (Article 2)",
+    "excerpt": "Latest analysis on Global Treaties. This is a placeholder excerpt for article 2 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Global Treaties, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Global Treaties is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Global Treaties",
+    "keywords": [
+      "Global Treaties",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+2",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-3",
+    "title": "Green Finance: Key Developments in Policy, Governance & Finance (Article 3)",
+    "excerpt": "Latest analysis on Green Finance. This is a placeholder excerpt for article 3 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Green Finance, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Green Finance is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Green Finance",
+    "keywords": [
+      "Green Finance",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+3",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-4",
+    "title": "Carbon Pricing: Key Developments in Policy, Governance & Finance (Article 4)",
+    "excerpt": "Latest analysis on Carbon Pricing. This is a placeholder excerpt for article 4 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Pricing, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Pricing is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Carbon Pricing",
+    "keywords": [
+      "Carbon Pricing",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+4",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-5",
+    "title": "Corporate Strategy: Key Developments in Policy, Governance & Finance (Article 5)",
+    "excerpt": "Latest analysis on Corporate Strategy. This is a placeholder excerpt for article 5 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Corporate Strategy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Corporate Strategy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Corporate Strategy",
+    "keywords": [
+      "Corporate Strategy",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+5",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-6",
+    "title": "ESG & Reporting: Key Developments in Policy, Governance & Finance (Article 6)",
+    "excerpt": "Latest analysis on ESG & Reporting. This is a placeholder excerpt for article 6 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on ESG & Reporting, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding ESG & Reporting is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "ESG & Reporting",
+    "keywords": [
+      "ESG & Reporting",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+6",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-7",
+    "title": "Global Treaties: Key Developments in Policy, Governance & Finance (Article 7)",
+    "excerpt": "Latest analysis on Global Treaties. This is a placeholder excerpt for article 7 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Global Treaties, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Global Treaties is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Global Treaties",
+    "keywords": [
+      "Global Treaties",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+7",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-8",
+    "title": "Green Finance: Key Developments in Policy, Governance & Finance (Article 8)",
+    "excerpt": "Latest analysis on Green Finance. This is a placeholder excerpt for article 8 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Green Finance, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Green Finance is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Green Finance",
+    "keywords": [
+      "Green Finance",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+8",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-9",
+    "title": "Carbon Pricing: Key Developments in Policy, Governance & Finance (Article 9)",
+    "excerpt": "Latest analysis on Carbon Pricing. This is a placeholder excerpt for article 9 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Pricing, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Pricing is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Carbon Pricing",
+    "keywords": [
+      "Carbon Pricing",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+9",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-10",
+    "title": "Corporate Strategy: Key Developments in Policy, Governance & Finance (Article 10)",
+    "excerpt": "Latest analysis on Corporate Strategy. This is a placeholder excerpt for article 10 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Corporate Strategy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Corporate Strategy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Corporate Strategy",
+    "keywords": [
+      "Corporate Strategy",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+10",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-11",
+    "title": "ESG & Reporting: Key Developments in Policy, Governance & Finance (Article 11)",
+    "excerpt": "Latest analysis on ESG & Reporting. This is a placeholder excerpt for article 11 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on ESG & Reporting, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding ESG & Reporting is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "ESG & Reporting",
+    "keywords": [
+      "ESG & Reporting",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+11",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-12",
+    "title": "Global Treaties: Key Developments in Policy, Governance & Finance (Article 12)",
+    "excerpt": "Latest analysis on Global Treaties. This is a placeholder excerpt for article 12 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Global Treaties, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Global Treaties is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Global Treaties",
+    "keywords": [
+      "Global Treaties",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+12",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-13",
+    "title": "Green Finance: Key Developments in Policy, Governance & Finance (Article 13)",
+    "excerpt": "Latest analysis on Green Finance. This is a placeholder excerpt for article 13 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Green Finance, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Green Finance is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Green Finance",
+    "keywords": [
+      "Green Finance",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+13",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-14",
+    "title": "Carbon Pricing: Key Developments in Policy, Governance & Finance (Article 14)",
+    "excerpt": "Latest analysis on Carbon Pricing. This is a placeholder excerpt for article 14 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Pricing, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Pricing is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Carbon Pricing",
+    "keywords": [
+      "Carbon Pricing",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+14",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-policy-15",
+    "title": "Corporate Strategy: Key Developments in Policy, Governance & Finance (Article 15)",
+    "excerpt": "Latest analysis on Corporate Strategy. This is a placeholder excerpt for article 15 in Policy, Governance & Finance. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Corporate Strategy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Corporate Strategy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Policy, Governance & Finance",
+    "topic": "Corporate Strategy",
+    "keywords": [
+      "Corporate Strategy",
+      "Environment",
+      "Global",
+      "Policy, Governance & Finance"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/3b82f6/ffffff?text=Policy+15",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-1",
+    "title": "Marine Protected Areas: Key Developments in Biodiversity & Oceans (Article 1)",
+    "excerpt": "Latest analysis on Marine Protected Areas. This is a placeholder excerpt for article 1 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Marine Protected Areas, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Marine Protected Areas is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Marine Protected Areas",
+    "keywords": [
+      "Marine Protected Areas",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+1",
+    "source": "Design Demo",
+    "isFeaturedCategory": true,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-2",
+    "title": "Species Conservation: Key Developments in Biodiversity & Oceans (Article 2)",
+    "excerpt": "Latest analysis on Species Conservation. This is a placeholder excerpt for article 2 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Species Conservation, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Species Conservation is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Species Conservation",
+    "keywords": [
+      "Species Conservation",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+2",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-3",
+    "title": "Forests & Land Use: Key Developments in Biodiversity & Oceans (Article 3)",
+    "excerpt": "Latest analysis on Forests & Land Use. This is a placeholder excerpt for article 3 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Forests & Land Use, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Forests & Land Use is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Forests & Land Use",
+    "keywords": [
+      "Forests & Land Use",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+3",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-4",
+    "title": "Blue Economy: Key Developments in Biodiversity & Oceans (Article 4)",
+    "excerpt": "Latest analysis on Blue Economy. This is a placeholder excerpt for article 4 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Blue Economy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Blue Economy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Blue Economy",
+    "keywords": [
+      "Blue Economy",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+4",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-5",
+    "title": "Rewilding: Key Developments in Biodiversity & Oceans (Article 5)",
+    "excerpt": "Latest analysis on Rewilding. This is a placeholder excerpt for article 5 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Rewilding, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Rewilding is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Rewilding",
+    "keywords": [
+      "Rewilding",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+5",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-6",
+    "title": "Marine Protected Areas: Key Developments in Biodiversity & Oceans (Article 6)",
+    "excerpt": "Latest analysis on Marine Protected Areas. This is a placeholder excerpt for article 6 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Marine Protected Areas, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Marine Protected Areas is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Marine Protected Areas",
+    "keywords": [
+      "Marine Protected Areas",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+6",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-7",
+    "title": "Species Conservation: Key Developments in Biodiversity & Oceans (Article 7)",
+    "excerpt": "Latest analysis on Species Conservation. This is a placeholder excerpt for article 7 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Species Conservation, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Species Conservation is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Species Conservation",
+    "keywords": [
+      "Species Conservation",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+7",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-8",
+    "title": "Forests & Land Use: Key Developments in Biodiversity & Oceans (Article 8)",
+    "excerpt": "Latest analysis on Forests & Land Use. This is a placeholder excerpt for article 8 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Forests & Land Use, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Forests & Land Use is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Forests & Land Use",
+    "keywords": [
+      "Forests & Land Use",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+8",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-9",
+    "title": "Blue Economy: Key Developments in Biodiversity & Oceans (Article 9)",
+    "excerpt": "Latest analysis on Blue Economy. This is a placeholder excerpt for article 9 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Blue Economy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Blue Economy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Blue Economy",
+    "keywords": [
+      "Blue Economy",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+9",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-10",
+    "title": "Rewilding: Key Developments in Biodiversity & Oceans (Article 10)",
+    "excerpt": "Latest analysis on Rewilding. This is a placeholder excerpt for article 10 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Rewilding, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Rewilding is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Rewilding",
+    "keywords": [
+      "Rewilding",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+10",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-11",
+    "title": "Marine Protected Areas: Key Developments in Biodiversity & Oceans (Article 11)",
+    "excerpt": "Latest analysis on Marine Protected Areas. This is a placeholder excerpt for article 11 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Marine Protected Areas, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Marine Protected Areas is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Marine Protected Areas",
+    "keywords": [
+      "Marine Protected Areas",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+11",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-12",
+    "title": "Species Conservation: Key Developments in Biodiversity & Oceans (Article 12)",
+    "excerpt": "Latest analysis on Species Conservation. This is a placeholder excerpt for article 12 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Species Conservation, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Species Conservation is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Species Conservation",
+    "keywords": [
+      "Species Conservation",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+12",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-13",
+    "title": "Forests & Land Use: Key Developments in Biodiversity & Oceans (Article 13)",
+    "excerpt": "Latest analysis on Forests & Land Use. This is a placeholder excerpt for article 13 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Forests & Land Use, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Forests & Land Use is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Forests & Land Use",
+    "keywords": [
+      "Forests & Land Use",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+13",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-14",
+    "title": "Blue Economy: Key Developments in Biodiversity & Oceans (Article 14)",
+    "excerpt": "Latest analysis on Blue Economy. This is a placeholder excerpt for article 14 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Blue Economy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Blue Economy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Blue Economy",
+    "keywords": [
+      "Blue Economy",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+14",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-biodiversity-15",
+    "title": "Rewilding: Key Developments in Biodiversity & Oceans (Article 15)",
+    "excerpt": "Latest analysis on Rewilding. This is a placeholder excerpt for article 15 in Biodiversity & Oceans. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Rewilding, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Rewilding is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Biodiversity & Oceans",
+    "topic": "Rewilding",
+    "keywords": [
+      "Rewilding",
+      "Environment",
+      "Global",
+      "Biodiversity & Oceans"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/06b6d4/ffffff?text=Oceans+15",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-1",
+    "title": "Climate Modeling: Key Developments in Science & Data (Article 1)",
+    "excerpt": "Latest analysis on Climate Modeling. This is a placeholder excerpt for article 1 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Climate Modeling, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Climate Modeling is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Climate Modeling",
+    "keywords": [
+      "Climate Modeling",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+1",
+    "source": "Design Demo",
+    "isFeaturedCategory": true,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-2",
+    "title": "Remote Sensing: Key Developments in Science & Data (Article 2)",
+    "excerpt": "Latest analysis on Remote Sensing. This is a placeholder excerpt for article 2 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Remote Sensing, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Remote Sensing is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Remote Sensing",
+    "keywords": [
+      "Remote Sensing",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+2",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-3",
+    "title": "Methodology: Key Developments in Science & Data (Article 3)",
+    "excerpt": "Latest analysis on Methodology. This is a placeholder excerpt for article 3 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Methodology, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Methodology is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Methodology",
+    "keywords": [
+      "Methodology",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+3",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-4",
+    "title": "Academic Research: Key Developments in Science & Data (Article 4)",
+    "excerpt": "Latest analysis on Academic Research. This is a placeholder excerpt for article 4 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Academic Research, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Academic Research is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Academic Research",
+    "keywords": [
+      "Academic Research",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+4",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-5",
+    "title": "Data Visualization: Key Developments in Science & Data (Article 5)",
+    "excerpt": "Latest analysis on Data Visualization. This is a placeholder excerpt for article 5 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Data Visualization, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Data Visualization is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Data Visualization",
+    "keywords": [
+      "Data Visualization",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+5",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-6",
+    "title": "Climate Modeling: Key Developments in Science & Data (Article 6)",
+    "excerpt": "Latest analysis on Climate Modeling. This is a placeholder excerpt for article 6 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Climate Modeling, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Climate Modeling is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Climate Modeling",
+    "keywords": [
+      "Climate Modeling",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+6",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-7",
+    "title": "Remote Sensing: Key Developments in Science & Data (Article 7)",
+    "excerpt": "Latest analysis on Remote Sensing. This is a placeholder excerpt for article 7 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Remote Sensing, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Remote Sensing is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Remote Sensing",
+    "keywords": [
+      "Remote Sensing",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+7",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-8",
+    "title": "Methodology: Key Developments in Science & Data (Article 8)",
+    "excerpt": "Latest analysis on Methodology. This is a placeholder excerpt for article 8 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Methodology, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Methodology is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Methodology",
+    "keywords": [
+      "Methodology",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+8",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-9",
+    "title": "Academic Research: Key Developments in Science & Data (Article 9)",
+    "excerpt": "Latest analysis on Academic Research. This is a placeholder excerpt for article 9 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Academic Research, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Academic Research is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Academic Research",
+    "keywords": [
+      "Academic Research",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+9",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-10",
+    "title": "Data Visualization: Key Developments in Science & Data (Article 10)",
+    "excerpt": "Latest analysis on Data Visualization. This is a placeholder excerpt for article 10 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Data Visualization, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Data Visualization is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Data Visualization",
+    "keywords": [
+      "Data Visualization",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+10",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-11",
+    "title": "Climate Modeling: Key Developments in Science & Data (Article 11)",
+    "excerpt": "Latest analysis on Climate Modeling. This is a placeholder excerpt for article 11 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Climate Modeling, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Climate Modeling is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Climate Modeling",
+    "keywords": [
+      "Climate Modeling",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+11",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-12",
+    "title": "Remote Sensing: Key Developments in Science & Data (Article 12)",
+    "excerpt": "Latest analysis on Remote Sensing. This is a placeholder excerpt for article 12 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Remote Sensing, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Remote Sensing is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Remote Sensing",
+    "keywords": [
+      "Remote Sensing",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+12",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-13",
+    "title": "Methodology: Key Developments in Science & Data (Article 13)",
+    "excerpt": "Latest analysis on Methodology. This is a placeholder excerpt for article 13 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Methodology, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Methodology is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Methodology",
+    "keywords": [
+      "Methodology",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+13",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-14",
+    "title": "Academic Research: Key Developments in Science & Data (Article 14)",
+    "excerpt": "Latest analysis on Academic Research. This is a placeholder excerpt for article 14 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Academic Research, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Academic Research is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Academic Research",
+    "keywords": [
+      "Academic Research",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+14",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-science-15",
+    "title": "Data Visualization: Key Developments in Science & Data (Article 15)",
+    "excerpt": "Latest analysis on Data Visualization. This is a placeholder excerpt for article 15 in Science & Data. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Data Visualization, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Data Visualization is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Science & Data",
+    "topic": "Data Visualization",
+    "keywords": [
+      "Data Visualization",
+      "Environment",
+      "Global",
+      "Science & Data"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/f59e0b/ffffff?text=Science+15",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-1",
+    "title": "Carbon Capture: Key Developments in Technology & Innovation (Article 1)",
+    "excerpt": "Latest analysis on Carbon Capture. This is a placeholder excerpt for article 1 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Capture, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Capture is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Carbon Capture",
+    "keywords": [
+      "Carbon Capture",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+1",
+    "source": "Design Demo",
+    "isFeaturedCategory": true,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-2",
+    "title": "Circular Economy: Key Developments in Technology & Innovation (Article 2)",
+    "excerpt": "Latest analysis on Circular Economy. This is a placeholder excerpt for article 2 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Circular Economy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Circular Economy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Circular Economy",
+    "keywords": [
+      "Circular Economy",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+2",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-3",
+    "title": "AgriTech: Key Developments in Technology & Innovation (Article 3)",
+    "excerpt": "Latest analysis on AgriTech. This is a placeholder excerpt for article 3 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on AgriTech, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding AgriTech is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "AgriTech",
+    "keywords": [
+      "AgriTech",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+3",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": true,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-4",
+    "title": "Clean Mobility: Key Developments in Technology & Innovation (Article 4)",
+    "excerpt": "Latest analysis on Clean Mobility. This is a placeholder excerpt for article 4 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Clean Mobility, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Clean Mobility is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Clean Mobility",
+    "keywords": [
+      "Clean Mobility",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+4",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-5",
+    "title": "Materials Science: Key Developments in Technology & Innovation (Article 5)",
+    "excerpt": "Latest analysis on Materials Science. This is a placeholder excerpt for article 5 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Materials Science, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Materials Science is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Materials Science",
+    "keywords": [
+      "Materials Science",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+5",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-6",
+    "title": "Carbon Capture: Key Developments in Technology & Innovation (Article 6)",
+    "excerpt": "Latest analysis on Carbon Capture. This is a placeholder excerpt for article 6 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Capture, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Capture is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Carbon Capture",
+    "keywords": [
+      "Carbon Capture",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+6",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-7",
+    "title": "Circular Economy: Key Developments in Technology & Innovation (Article 7)",
+    "excerpt": "Latest analysis on Circular Economy. This is a placeholder excerpt for article 7 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Circular Economy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Circular Economy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Circular Economy",
+    "keywords": [
+      "Circular Economy",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+7",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-8",
+    "title": "AgriTech: Key Developments in Technology & Innovation (Article 8)",
+    "excerpt": "Latest analysis on AgriTech. This is a placeholder excerpt for article 8 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on AgriTech, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding AgriTech is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "AgriTech",
+    "keywords": [
+      "AgriTech",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+8",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-9",
+    "title": "Clean Mobility: Key Developments in Technology & Innovation (Article 9)",
+    "excerpt": "Latest analysis on Clean Mobility. This is a placeholder excerpt for article 9 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Clean Mobility, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Clean Mobility is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Clean Mobility",
+    "keywords": [
+      "Clean Mobility",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+9",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-10",
+    "title": "Materials Science: Key Developments in Technology & Innovation (Article 10)",
+    "excerpt": "Latest analysis on Materials Science. This is a placeholder excerpt for article 10 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Materials Science, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Materials Science is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Materials Science",
+    "keywords": [
+      "Materials Science",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+10",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-11",
+    "title": "Carbon Capture: Key Developments in Technology & Innovation (Article 11)",
+    "excerpt": "Latest analysis on Carbon Capture. This is a placeholder excerpt for article 11 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Carbon Capture, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Carbon Capture is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Carbon Capture",
+    "keywords": [
+      "Carbon Capture",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "4 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+11",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-12",
+    "title": "Circular Economy: Key Developments in Technology & Innovation (Article 12)",
+    "excerpt": "Latest analysis on Circular Economy. This is a placeholder excerpt for article 12 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Circular Economy, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Circular Economy is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Circular Economy",
+    "keywords": [
+      "Circular Economy",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "5 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+12",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-13",
+    "title": "AgriTech: Key Developments in Technology & Innovation (Article 13)",
+    "excerpt": "Latest analysis on AgriTech. This is a placeholder excerpt for article 13 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on AgriTech, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding AgriTech is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "AgriTech",
+    "keywords": [
+      "AgriTech",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "6 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+13",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-14",
+    "title": "Clean Mobility: Key Developments in Technology & Innovation (Article 14)",
+    "excerpt": "Latest analysis on Clean Mobility. This is a placeholder excerpt for article 14 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Clean Mobility, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Clean Mobility is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Clean Mobility",
+    "keywords": [
+      "Clean Mobility",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "7 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+14",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "placeholder-technology-15",
+    "title": "Materials Science: Key Developments in Technology & Innovation (Article 15)",
+    "excerpt": "Latest analysis on Materials Science. This is a placeholder excerpt for article 15 in Technology & Innovation. It demonstrates the typography and layout spacing.",
+    "content": [
+      "Focusing on Materials Science, this article explores the implications for global environmental systems.",
+      "## Key Findings",
+      "The data suggests a critical turning point...",
+      "//“The shift in policy regarding Materials Science is unprecedented.”//",
+      "Final paragraph of the placeholder content."
+    ],
+    "category": "Technology & Innovation",
+    "topic": "Materials Science",
+    "keywords": [
+      "Materials Science",
+      "Environment",
+      "Global",
+      "Technology & Innovation"
+    ],
+    "date": "Feb 15, 2026",
+    "originalReadTime": "3 min read",
+    "imageUrl": "https://placehold.co/1200x800/10b981/ffffff?text=Tech+15",
+    "source": "Design Demo",
+    "isFeaturedCategory": false,
+    "isFeaturedDiscover": false,
+    "status": "published"
+  },
+  {
+    "id": "hero-demo-1",
+    "title": "GLOBAL HERO: Major Environmental Shift Observed",
+    "excerpt": "This is the main hero article for the design demo. It should have the most prominent placement and a high-impact image.",
+    "content": [
+      "Main hero content..."
+    ],
+    "category": "Climate & Energy Systems",
+    "date": "Feb 15, 2026",
+    "imageUrl": "https://placehold.co/1600x900/1a1a1a/ffffff?text=HERO+IMAGE",
+    "isFeaturedCategory": true,
+    "source": "GreenShift Exclusive"
+  }
 ];
 
 export default seedArticles;

@@ -139,13 +139,16 @@ const Navigation: React.FC<NavigationProps> = ({
             {/* Logo */}
             <div className="flex items-center gap-8">
               <div
-                className="cursor-pointer flex items-center gap-2 group"
+                className="cursor-pointer group"
                 onClick={() => { onCategorySelect('All'); }}
               >
-                <span className="font-serif text-2xl font-bold tracking-tighter uppercase transition-opacity hover:opacity-90">
+                <div className="font-serif text-2xl font-bold tracking-tighter uppercase transition-opacity hover:opacity-90">
                   <span className="text-news-accent">Planetary</span>
                   <span className="text-white">Brief</span>
-                </span>
+                </div>
+                <div className="text-gray-400 text-[10px] font-sans font-normal tracking-wide mt-0.5">
+                  Environmental Intelligence, Explained.
+                </div>
               </div>
             </div>
 
@@ -169,18 +172,6 @@ const Navigation: React.FC<NavigationProps> = ({
 
           {/* Nav Buttons (Row 2 on Mobile, Centered/Left on Desktop) */}
           <div className="flex items-center gap-2 w-full md:w-auto md:ml-12">
-            <button
-              onClick={() => { onCategorySelect('All'); }}
-              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${['home', 'category', 'article', 'sources'].includes(currentView) ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-            >
-              Articles
-            </button>
-            <button
-              onClick={onActionGuideClick}
-              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider shadow-sm transition-all ${(currentView === 'action-guide' || currentView === 'support') ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-            >
-              Action
-            </button>
             <button
               onClick={onDashboardClick}
               className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${['dashboard', 'explanation'].includes(currentView) ? 'bg-news-accent/10 text-news-accent' : 'text-news-accent hover:bg-white/10'}`}
@@ -251,14 +242,18 @@ const Navigation: React.FC<NavigationProps> = ({
             {/* PlanetDash Submenu */}
             {['dashboard', 'explanation'].includes(currentView) ? (
               <div className="flex items-center gap-4 w-full animate-fade-in">
-                <span className="px-2 py-0.5 rounded border border-news-accent/30 bg-news-accent/5 text-news-accent text-[10px] font-mono uppercase tracking-wider shadow-[0_0_10px_rgba(0,255,157,0.1)]">
-                  Beta Version
+                <span className="px-2 py-0.5 rounded border border-white/10 bg-white/5 text-gray-400 text-[10px] font-mono uppercase tracking-wider">
+                  System Snapshot
                 </span>
                 {lastSyncTime && (
-                  <span className="text-[10px] uppercase tracking-wider text-news-accent font-mono ml-auto md:ml-4 animate-pulse-slow">
-                    Last sync: <span className="font-bold">{lastSyncTime.replace(' (Local time)', '')}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-gray-500 font-mono">
+                    Last Updated: <span className="font-bold text-gray-400">{lastSyncTime.replace(' (Local time)', '')}</span>
                   </span>
                 )}
+                <span className="text-[10px] text-gray-600 font-mono ml-auto hidden md:flex items-center gap-1.5">
+                  <Activity size={10} className="text-news-accent" />
+                  Sources: NASA · ESA · NOAA · IPCC
+                </span>
               </div>
             ) : (
               currentView !== 'action-guide' && currentView !== 'support' && navCategories.map(cat => (
@@ -315,54 +310,58 @@ const Navigation: React.FC<NavigationProps> = ({
       </div>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-28 bg-black z-40 p-6 animate-fade-in md:hidden border-t border-white/10">
-          <div className="flex flex-col gap-6 text-sm font-bold uppercase tracking-widest">
-            <button onClick={() => { onCategorySelect('All'); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">Home</button>
-            <button onClick={() => { onShowAbout(); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">About</button>
-            <button onClick={() => { onSubscribeClick(); setIsMobileMenuOpen(false); }} className="text-left text-white flex items-center gap-2">
-              Subscribe
-            </button>
+      {
+        isMobileMenuOpen && (
+          <div className="fixed inset-0 top-28 bg-black z-40 p-6 animate-fade-in md:hidden border-t border-white/10">
+            <div className="flex flex-col gap-6 text-sm font-bold uppercase tracking-widest">
+              <button onClick={() => { onCategorySelect('All'); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">Home</button>
+              <button onClick={() => { onShowAbout(); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">About</button>
+              <button onClick={() => { onSubscribeClick(); setIsMobileMenuOpen(false); }} className="text-left text-white flex items-center gap-2">
+                Subscribe
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Search Dropdown Portal - renders outside navigation hierarchy */}
-      {suggestions.length > 0 && typeof document !== 'undefined' && ReactDOM.createPortal(
-        <div
-          style={{
-            position: 'fixed',
-            top: `${dropdownPosition.top}px`,
-            left: `${dropdownPosition.left}px`,
-            width: `${dropdownPosition.width}px`,
-            zIndex: 9999
-          }}
-          className="bg-zinc-950 border border-news-accent/30 rounded-xl shadow-2xl overflow-hidden max-h-[400px] overflow-y-auto"
-        >
-          {suggestions.map(article => (
-            <div
-              key={article.id}
-              onClick={() => handleSuggestionClick(article)}
-              className="p-3 border-b border-white/5 hover:bg-white/10 cursor-pointer flex items-center gap-3 transition-colors"
-            >
-              <div className="flex-grow min-w-0">
-                <h4 className="text-xs font-bold text-white truncate">{article.title}</h4>
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-1 flex items-center gap-2">
-                  <span>{(() => {
-                    const cat = Array.isArray(article.category) ? article.category[0] : article.category;
-                    return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
-                  })()}</span>
-                  <span className="text-gray-600">•</span>
-                  <span>{article.date}</span>
-                </p>
+      {
+        suggestions.length > 0 && typeof document !== 'undefined' && ReactDOM.createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`,
+              zIndex: 9999
+            }}
+            className="bg-zinc-950 border border-news-accent/30 rounded-xl shadow-2xl overflow-hidden max-h-[400px] overflow-y-auto"
+          >
+            {suggestions.map(article => (
+              <div
+                key={article.id}
+                onClick={() => handleSuggestionClick(article)}
+                className="p-3 border-b border-white/5 hover:bg-white/10 cursor-pointer flex items-center gap-3 transition-colors"
+              >
+                <div className="flex-grow min-w-0">
+                  <h4 className="text-xs font-bold text-white truncate">{article.title}</h4>
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-1 flex items-center gap-2">
+                    <span>{(() => {
+                      const cat = Array.isArray(article.category) ? article.category[0] : article.category;
+                      return cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
+                    })()}</span>
+                    <span className="text-gray-600">•</span>
+                    <span>{article.date}</span>
+                  </p>
+                </div>
+                <ChevronRight size={12} className="text-gray-600" />
               </div>
-              <ChevronRight size={12} className="text-gray-600" />
-            </div>
-          ))}
-        </div>,
-        document.body
-      )}
-    </div>
+            ))}
+          </div>,
+          document.body
+        )
+      }
+    </div >
   );
 };
 

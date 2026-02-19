@@ -1,29 +1,19 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Trash2, Edit, Save, Plus, Download, Upload, Calendar, Eye, EyeOff, Sparkles, Image as ImageIcon, Clock, Copy, FileImage, Volume2, Loader2, ArrowLeft, LogOut, Search, Headphones, ExternalLink, ArrowRight } from 'lucide-react';
+import { Trash2, Edit, Save, Plus, Download, Upload, Calendar, Eye, EyeOff, Sparkles, Image as ImageIcon, Clock, Copy, FileImage, Volume2, Loader2, ArrowLeft, LogOut, Search, Headphones, ExternalLink, ArrowRight, AlertTriangle } from 'lucide-react';
 import { generateSlug } from '../utils/slugify';
 import { Article } from '../types';
 import { newsArticles as staticArticles } from '../data/content';
+import { CATEGORIES, CATEGORY_COLORS } from '../data/categories';
 import AdminLogin from './AdminLogin';
+import RedirectManager from './RedirectManager';
+import NewsletterManager from './NewsletterManager';
+import TagSelector from './TagSelector';
+import { TAG_DICTIONARY } from '../data/tagDictionary';
 
 interface AdminDashboardProps {
     onBack: () => void;
 }
-
-
-const CATEGORIES = ['Climate Change', 'Energy', 'Pollution', 'Policy & Economics', 'Oceans', 'Biodiversity', 'Conservation', 'Solutions', 'Guides'];
-
-const CATEGORY_COLORS: Record<string, string> = {
-    'Climate Change': 'text-red-400',
-    'Energy': 'text-yellow-400',
-    'Pollution': 'text-gray-400',
-    'Policy & Economics': 'text-blue-400',
-    'Oceans': 'text-cyan-400',
-    'Biodiversity': 'text-green-400',
-    'Conservation': 'text-emerald-400',
-    'Solutions': 'text-purple-400',
-    'Guides': 'text-news-accent'
-};
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     // Authentication State
@@ -51,18 +41,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         twitter?: { text: string, headline: string },
         facebook?: { text: string, headline: string },
         instagram?: { text: string, headline: string },
-        tiktok?: { text: string, headline: string }
+        linkedin?: { text: string, headline: string }
     } | null>(null);
     const [socialLoading, setSocialLoading] = useState(false);
-    const [activeSocialTab, setActiveSocialTab] = useState<'twitter' | 'facebook' | 'instagram' | 'tiktok'>('instagram');
+    const [activeSocialTab, setActiveSocialTab] = useState<'twitter' | 'facebook' | 'instagram' | 'linkedin'>('instagram');
     const [imagePrompt, setImagePrompt] = useState('');
     const [imagePromptLoading, setImagePromptLoading] = useState(false);
+
+    // Cloudinary Browser State
+    const [showCloudinaryBrowser, setShowCloudinaryBrowser] = useState(false);
+    const [cloudinaryImages, setCloudinaryImages] = useState<any[]>([]);
+    const [cloudinaryFolders, setCloudinaryFolders] = useState<string[]>([]);
+    const [cloudinaryFolder, setCloudinaryFolder] = useState('');
+    const [cloudinaryNextCursor, setCloudinaryNextCursor] = useState<string | null>(null);
+    const [cloudinaryLoading, setCloudinaryLoading] = useState(false);
 
     // Audio Generation State
     const [audioLoading, setAudioLoading] = useState(false);
 
     // Database Status
     const [dbOnline, setDbOnline] = useState(true);
+
+    // View State (articles or redirects or newsletter)
+    const [currentView, setCurrentView] = useState<'articles' | 'redirects' | 'newsletter'>('articles');
 
     // Auth helper to get token
     const getAuthHeaders = () => {
@@ -133,7 +134,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     // Form State
     const [formData, setFormData] = useState<Partial<Article>>({
         title: '',
-        category: ['Climate Change'],
+        category: ['Climate & Energy Systems'],
         topic: '',
         excerpt: '',
         content: [],
@@ -147,6 +148,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             content: '',
             source: ''
         },
+        featuredInDepth: false,
         sources: [],
         status: 'draft', // Default to draft for new articles
         scheduledPublishDate: undefined,
@@ -247,6 +249,46 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         }
     };
 
+    const loadCloudinaryImages = async (folder = '', cursor: string | null = null) => {
+        setCloudinaryLoading(true);
+        try {
+            const params = new URLSearchParams();
+            if (folder) params.set('folder', folder);
+            if (cursor) params.set('next_cursor', cursor);
+            params.set('max_results', '30');
+
+            const res = await fetch(`/api/cloudinary/browse?${params}`, {
+                headers: getAuthHeaders()
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (cursor) {
+                    // Append for "load more"
+                    setCloudinaryImages(prev => [...prev, ...data.images]);
+                } else {
+                    setCloudinaryImages(data.images);
+                }
+                setCloudinaryFolders(data.folders || []);
+                setCloudinaryNextCursor(data.next_cursor);
+            } else {
+                alert('Failed to load Cloudinary images');
+            }
+        } catch (err) {
+            console.error('Cloudinary browse error:', err);
+            alert('Failed to connect to Cloudinary');
+        } finally {
+            setCloudinaryLoading(false);
+        }
+    };
+
+    const handleOpenCloudinaryBrowser = () => {
+        setShowCloudinaryBrowser(true);
+        setCloudinaryFolder('');
+        setCloudinaryImages([]);
+        setCloudinaryNextCursor(null);
+        loadCloudinaryImages();
+    };
 
     const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return;
@@ -306,31 +348,58 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             return match ? match[1].trim() : '';
         };
 
+        // Core Fields
         const newTitle = parseTag('HEADLINE');
+        const newSubheadline = parseTag('SUBHEADLINE'); // New Field
         const newDate = parseTag('DISPLAY_DATE');
         const newReadTime = parseTag('READ_TIME');
         const newExcerpt = parseTag('TEASER');
 
-        const genTitle = parseTag('GENERAL_TITLE');
-        const genContent = parseTag('GENERAL_TEXT');
-        const genSource = parseTag('GENERAL_SOURCES');
+        // NEW: Article Type & Topics (Feb 2026)
+        const articleType = parseTag('ARTICLE_TYPE');
+        const primaryTopic = parseTag('PRIMARY_TOPIC');
+        const secondaryTopicsRaw = parseTag('SECONDARY_TOPICS');
+        const secondaryTopics = secondaryTopicsRaw
+            ? secondaryTopicsRaw.split(/[,;]/).map(s => s.trim()).filter(s => s).map(tag => {
+                // Auto-match to dictionary label (case-insensitive)
+                const dictMatch = TAG_DICTIONARY.find(t => t.label.toLowerCase() === tag.toLowerCase());
+                return dictMatch ? dictMatch.label : tag;
+            })
+            : [];
 
+        // NEW: Why It Matters
+        const whyItMatters = parseTag('WHY_IT_MATTERS');
+
+        // NEW: Entities
+        const entitiesRaw = parseTag('ENTITIES');
+        const entities = entitiesRaw
+            ? entitiesRaw.split(/[\n,]/).map(s => s.trim()).filter(s => s)
+            : [];
+
+        // NEW: Enhanced General Information
+        const genTitle = parseTag('GENERAL_TITLE');
+        const genText = parseTag('GENERAL_TEXT');
+        const genSources = parseTag('GENERAL_SOURCES');
+
+        // Main Body & Sources
         const mainBodyRaw = parseTag('MAIN_BODY');
         const mainBody = mainBodyRaw ? mainBodyRaw.split(/\n\s*\n/).map(p => p.trim()).filter(p => p) : [];
 
-        const keywordsRaw = parseTag('KEYWORDS');
+        // SEO
+        const keywordsRaw = parseTag('KEYWORDS'); // Legacy support
         const metaDesc = parseTag('META');
 
-        // Parse Voiceover Text
+        // Voiceover Text
         const voText = parseTag('VO');
 
-        // Parse Sources
+        // Sources
         const sourcesRaw = parseTag('MAIN_BODY_SOURCES');
         const newSources = sourcesRaw ? sourcesRaw.split(/\n/).map(s => s.trim()).filter(s => s) : [];
 
         setFormData(prev => ({
             ...prev,
             title: newTitle || prev.title,
+            subheadline: newSubheadline || prev.subheadline,
             date: newDate || prev.date,
             originalReadTime: newReadTime || prev.originalReadTime,
             excerpt: newExcerpt || prev.excerpt,
@@ -338,11 +407,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             seoDescription: metaDesc || prev.seoDescription,
             sources: newSources.length > 0 ? newSources : prev.sources,
             voiceoverText: voText || prev.voiceoverText,
-            contextBox: {
+
+            // NEW FIELDS (Feb 2026 - Enhanced SEO)
+            articleType: (articleType as any) || prev.articleType,
+            primaryTopic: primaryTopic || prev.primaryTopic,
+            secondaryTopics: secondaryTopics.length > 0 ? secondaryTopics : prev.secondaryTopics,
+            whyItMatters: whyItMatters || prev.whyItMatters,
+            entities: entities.length > 0 ? entities : prev.entities,
+
+            // Enhanced General Information (new structure)
+            generalInformation: (genTitle || genText || genSources) ? {
+                title: genTitle || prev.generalInformation?.title || '',
+                text: genText || prev.generalInformation?.text || '',
+                sources: genSources || prev.generalInformation?.sources || ''
+            } : prev.generalInformation,
+
+            // Backward Compatibility: Keep contextBox for old articles
+            contextBox: (genTitle || genText || genSources) ? {
                 title: genTitle || prev.contextBox?.title || '',
-                content: genContent || prev.contextBox?.content || '',
-                source: genSource || prev.contextBox?.source || ''
-            }
+                content: genText || prev.contextBox?.content || '',
+                source: genSources || prev.contextBox?.source || ''
+            } : prev.contextBox
         }));
 
         if (keywordsRaw) {
@@ -523,7 +608,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         alert('Copied to clipboard!');
     };
 
-    const handlePostIntent = (platform: 'twitter' | 'facebook' | 'instagram' | 'tiktok', text: string) => {
+    const handlePostIntent = (platform: 'twitter' | 'facebook' | 'instagram' | 'linkedin', text: string) => {
         const suffix = "Read on planetarybrief.com";
         let finalText = text.trim();
         if (!finalText.includes(suffix)) {
@@ -546,9 +631,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 alert('Instagram does not support direct posting via web. Text copied! Please open Instagram to post.');
                 copyToClipboard(finalText);
                 return;
-            case 'tiktok':
-                alert('TikTok does not support direct posting via web. Text copied! Please open TikTok to post.');
+            case 'linkedin':
+                alert('LinkedIn does not support direct text posting via web intent. Text copied! Please open LinkedIn to post.');
                 copyToClipboard(finalText);
+                window.open('https://www.linkedin.com/feed/', '_blank');
                 return;
         }
 
@@ -557,7 +643,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         }
     };
 
-    const generateSocialImage = async (platform: 'instagram' | 'twitter' | 'facebook' | 'tiktok') => {
+    const generateSocialImage = async (platform: 'instagram' | 'twitter' | 'facebook' | 'linkedin') => {
         if (!formData.imageUrl || !formData.title) {
             alert("No image or title available to generate graphic.");
             return;
@@ -571,12 +657,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         let width = 1080;
         let height = 1350; // Default Insta Portrait 4:5
 
-        if (platform === 'twitter' || platform === 'facebook') {
+        if (platform === 'twitter' || platform === 'facebook' || platform === 'linkedin') {
             width = 1200;
             height = 630; // Landscape 1.91:1
-        } else if (platform === 'tiktok') {
-            width = 1080;
-            height = 1920; // Vertical 9:16
         }
 
         canvas.width = width;
@@ -627,7 +710,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         let brandScale = 0.028; // Default logo scale (reduced from 0.035)
         let verticalLift = canvas.height * 0.055; // Lowering again (was 0.075, orig 0.03)
 
-        if (platform === 'twitter' || platform === 'facebook') {
+        if (platform === 'twitter' || platform === 'facebook' || platform === 'linkedin') {
             titleScale = 0.045; // Aggressive reduction
             subScaleFactor = 0.018;
             brandScale = 0.018; // Smaller logo for landscape (reduced from 0.025)
@@ -849,19 +932,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 alert('Article saved successfully!');
                 // Refresh article list to show updated status (draft/published)
                 await loadArticles();
-                setEditingId(null);
-                setFormData({
-                    title: '',
-                    category: ['Climate Change'],
-                    topic: '',
-                    excerpt: '',
-                    content: [],
-                    date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-                    originalReadTime: '5 min read',
-                    imageUrl: '',
-                    audioUrl: '',
-                    contextBox: { title: '', content: '', source: '' }
-                });
+
+                if (editingId) {
+                    // Stay in editor when editing — just refresh the list
+                    // (form data and editingId are preserved)
+                } else {
+                    // Only clear form when publishing a brand-new article
+                    setEditingId(null);
+                    setFormData({
+                        title: '',
+                        subheadline: '',
+                        category: ['Climate & Energy Systems'],
+                        topic: '',
+                        excerpt: '',
+                        content: [],
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+                        originalReadTime: '5 min read',
+                        imageUrl: '',
+                        audioUrl: '',
+                        featuredInDepth: false,
+                        contextBox: { title: '', content: '', source: '' }
+                    });
+                }
                 loadArticles();
             } else {
                 const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
@@ -889,6 +981,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                     setEditingId(null);
                     setFormData({
                         title: '',
+                        subheadline: '',
                         category: ['Climate Change'],
                         topic: '',
                         excerpt: '',
@@ -974,7 +1067,56 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         }
     };
 
+    const handleRestoreFromBackup = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
+        // Confirm before restoring
+        const confirmed = confirm(
+            `⚠️ RESTORE FROM BACKUP\n\nThis will REPLACE ALL current articles with the backup file "${file.name}".\n\nThis cannot be undone. Continue?`
+        );
+        if (!confirmed) {
+            e.target.value = ''; // Reset file input
+            return;
+        }
+
+        try {
+            const text = await file.text();
+            const backup = JSON.parse(text);
+
+            // Support both formats: { articles: [...] } or direct array [...]
+            const articles = backup.articles || (Array.isArray(backup) ? backup : null);
+
+            if (!articles || !Array.isArray(articles)) {
+                alert('Invalid backup file format. Expected a JSON file with an "articles" array.');
+                e.target.value = '';
+                return;
+            }
+
+            const res = await fetch('/api/articles/restore', {
+                method: 'POST',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ articles })
+            });
+
+            if (res.ok) {
+                const result = await res.json();
+                alert(`✅ Restore successful!\n\n${result.message}`);
+                window.location.reload();
+            } else {
+                const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+                alert(`❌ Restore failed: ${error.error}`);
+            }
+        } catch (err) {
+            console.error('Restore error:', err);
+            alert('Failed to restore from backup. Is the file valid JSON?');
+        }
+
+        e.target.value = ''; // Reset file input
+    };
 
     const startEdit = (article: Article) => {
         // Check if this is a static fallback article
@@ -1015,9 +1157,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     }
 
     return (
-        <div className="bg-zinc-950 min-h-screen text-gray-100 font-sans selection:bg-news-accent/30 pt-20 pb-10 px-4 md:px-8 animate-fade-in">
+        <div className="bg-zinc-950 w-full flex flex-col text-gray-100 font-sans selection:bg-news-accent/30 animate-fade-in min-h-screen lg:h-screen lg:overflow-hidden">
             {/* Header */}
-            <header className="fixed top-0 left-0 w-full h-16 bg-zinc-900/80 backdrop-blur-md border-b border-white/5 z-20 flex items-center justify-between px-8">
+            <header className="flex-none w-full h-16 bg-zinc-900 border-b border-white/5 z-20 flex items-center justify-between px-4 md:px-8">
                 <div className="flex items-center gap-4">
                     <button onClick={onBack} className="p-2 -ml-2 hover:bg-white/5 rounded-full text-gray-400 hover:text-white transition-colors">
                         <ArrowLeft size={20} />
@@ -1026,6 +1168,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                         <span className="w-2 h-2 rounded-full bg-news-accent shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                         CMS Dashboard
                     </h1>
+                    <div className="flex items-center gap-2 ml-6">
+                        <button
+                            onClick={() => setCurrentView('articles')}
+                            className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider transition-colors ${currentView === 'articles'
+                                ? 'bg-emerald-500 text-white'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            Articles
+                        </button>
+                        <button
+                            onClick={() => setCurrentView('redirects')}
+                            className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider transition-colors ${currentView === 'redirects'
+                                ? 'bg-emerald-500 text-white'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            Redirects
+                        </button>
+                        <button
+                            onClick={() => setCurrentView('newsletter')}
+                            className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider transition-colors ${currentView === 'newsletter'
+                                ? 'bg-emerald-500 text-white'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            Newsletter
+                        </button>
+                    </div>
                 </div>
                 <div className="flex items-center gap-4 text-xs font-mono text-zinc-500">
                     <span>STATUS: {loading ? 'SAVING...' : 'READY'}</span>
@@ -1051,6 +1222,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                         <Download size={16} />
                         <span>Images</span>
                     </button>
+                    <label
+                        className="flex items-center gap-2 text-gray-400 hover:text-amber-400 transition-colors px-2 py-1 rounded hover:bg-white/5 cursor-pointer"
+                        title="Restore articles from a backup JSON file"
+                    >
+                        <Upload size={16} />
+                        <span>Restore</span>
+                        <input type="file" className="hidden" accept=".json" onChange={handleRestoreFromBackup} />
+                    </label>
                     <span>|</span>
                     <button
                         onClick={handleLogout}
@@ -1063,491 +1242,590 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 </div>
             </header>
 
-            <div className="w-full max-w-[1800px] mx-auto h-full pt-6">
-                <div className="grid grid-cols-12 gap-6 h-full">
-
-                    {/* LEFT COLUMN: LIST (3/12 columns on large screens) -- MOVED TO RIGHT? No, usually Editor is Main. 
-                        User had Editor Left, List Right. I will keep that.
-                        Actually, standard CMS has sidebar left.
-                        But code had Editor (col-span-2) and List (col-span-1).
-                        I'll keep Editor as the MAIN focus (Left/Center) and List as sidebar (Right).
-                    */}
+            {/* Conditional Rendering based on current view */}
+            {currentView === 'redirects' ? (
+                <div className="flex-1 overflow-y-auto p-4 md:p-8"><RedirectManager authToken={authToken} /></div>
+            ) : currentView === 'newsletter' ? (
+                <NewsletterManager articles={articles} />
+            ) : (
+                <div className="flex-1 lg:overflow-hidden grid grid-cols-12">
 
                     {/* MAIN EDITOR AREA */}
-                    <div className="col-span-12 lg:col-span-8 xl:col-span-9 space-y-6">
+                    <div className="col-span-12 lg:col-span-8 xl:col-span-9 lg:h-full flex flex-col lg:overflow-hidden relative">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar space-y-6">
 
-                        {/* AI ORCHESTRATOR PANEL */}
-                        <div className="bg-gradient-to-r from-emerald-950/20 to-zinc-900 border border-emerald-500/10 hover:border-emerald-500/30 transition-colors p-6 rounded-2xl relative overflow-hidden group">
-                            <div className="absolute -right-10 -top-10 opacity-10 group-hover:opacity-20 transition-opacity duration-700">
-                                <Sparkles size={150} className="text-emerald-400 rotate-12" />
-                            </div>
-                            <div className="relative z-10 flex flex-col md:flex-row gap-6">
-                                <div className="flex-1 space-y-4">
-                                    <h2 className="text-sm font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                                        <Sparkles size={14} /> AI Assistant
-                                        <span className="text-zinc-600">|</span>
-                                        <select
-                                            value={aiModel}
-                                            onChange={(e) => setAiModel(e.target.value)}
-                                            className="bg-black/40 border border-emerald-500/20 rounded px-2 py-0.5 text-[10px] text-emerald-400 focus:outline-none focus:border-emerald-500/50"
-                                        >
-                                            <optgroup label="Google Gemini" className="bg-zinc-900">
-                                                <option value="gemini-1.5-flash-latest">1.5 Flash (Fast)</option>
-                                                <option value="gemini-1.5-pro-latest">1.5 Pro (Precision)</option>
-                                                <option value="gemini-2.0-flash-exp">2.0 Flash (Next-Gen)</option>
-                                            </optgroup>
-                                            <optgroup label="OpenAI (Fallback)" className="bg-zinc-900">
-                                                <option value="gpt-4o">GPT-4o (Reliable)</option>
-                                                <option value="gpt-4o-mini">GPT-4o-mini (Speed)</option>
-                                            </optgroup>
-                                        </select>
-                                        <span className="text-zinc-600">|</span>
-                                        <button
-                                            onClick={() => setShowImport(!showImport)}
-                                            className="text-white/50 hover:text-white transition-colors text-xs flex items-center gap-1"
-                                        >
-                                            <Upload size={12} /> Import Text
-                                        </button>
-                                    </h2>
-
-                                    {showImport && (
-                                        <div className="bg-black/80 border border-zinc-700/50 p-4 rounded-xl mb-4 animate-in fade-in slide-in-from-top-2">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <h3 className="text-xs font-bold text-zinc-400 uppercase">Paste Formatted Text</h3>
-                                                <button onClick={() => setShowImport(false)} className="text-zinc-500 hover:text-white text-xs">Close</button>
-                                            </div>
-                                            <textarea
-                                                className="w-full h-48 bg-zinc-900/50 border border-zinc-700/50 rounded-lg p-3 text-xs font-mono text-zinc-300 focus:border-emerald-500/50 outline-none resize-none"
-                                                placeholder={`<<<HEADLINE>>>\nTitle here\n<<<END_HEADLINE>>>\n\n<<<META>>>\nDescription here\n<<<END_META>>>\n...`}
-                                                value={importText}
-                                                onChange={(e) => setImportText(e.target.value)}
-                                            />
-                                            <div className="mt-2 flex justify-end">
-                                                <button
-                                                    onClick={handleImport}
-                                                    className="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2"
-                                                >
-                                                    <Sparkles size={12} /> Parse & Populate
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                    <textarea
-                                        className="w-full bg-black/40 border border-emerald-500/20 p-4 rounded-xl text-emerald-100 h-24 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all resize-none text-sm placeholder-emerald-800/50"
-                                        placeholder="Command the AI agent (e.g. 'Write a breaking news piece on arctic drilling...')"
-                                        value={aiPrompt}
-                                        onChange={e => setAiPrompt(e.target.value)}
-                                    />
-                                    <div className="flex flex-wrap gap-2">
-                                        <select
-                                            className="bg-black/40 border border-emerald-500/20 p-2 rounded-lg text-xs text-emerald-400 outline-none hover:bg-emerald-500/10 cursor-pointer"
-                                            value={aiModel}
-                                            onChange={e => setAiModel(e.target.value)}
-                                        >
-                                            <optgroup label="Google Gemini" className="bg-zinc-900">
-                                                <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash</option>
-                                                <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro</option>
-                                                <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash</option>
-                                            </optgroup>
-                                            <optgroup label="OpenAI" className="bg-zinc-900">
-                                                <option value="gpt-4o">GPT-4o</option>
-                                                <option value="gpt-4o-mini">GPT-4o-mini</option>
-                                            </optgroup>
-                                        </select>
-
-                                        {/* Length Selectors */}
-                                        <div className="flex items-center gap-2 bg-black/40 border border-emerald-500/20 p-2 rounded-lg">
-                                            <span className="text-[10px] text-emerald-500/60 uppercase font-bold">Length:</span>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                max="30"
-                                                value={minMinutes}
-                                                onChange={e => setMinMinutes(parseInt(e.target.value) || 1)}
-                                                className="w-12 bg-black/60 border border-emerald-500/20 rounded px-2 py-1 text-xs text-emerald-400 outline-none text-center"
-                                            />
-                                            <span className="text-emerald-500/40">-</span>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                max="30"
-                                                value={maxMinutes}
-                                                onChange={e => setMaxMinutes(parseInt(e.target.value) || 1)}
-                                                className="w-12 bg-black/60 border border-emerald-500/20 rounded px-2 py-1 text-xs text-emerald-400 outline-none text-center"
-                                            />
-                                            <span className="text-[10px] text-emerald-500/60">min</span>
-                                        </div>
-
-                                        <button
-                                            onClick={() => handleAiGenerate('full')}
-                                            disabled={aiLoading}
-                                            className="ml-auto bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-6 rounded-lg text-xs tracking-wider uppercase transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                        >
-                                            {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                                            {aiLoading ? 'Generating...' : 'Generate Article'}
-                                        </button>
-                                    </div>
+                            {/* AI ORCHESTRATOR PANEL */}
+                            <div className="bg-gradient-to-r from-emerald-950/20 to-zinc-900 border border-emerald-500/10 hover:border-emerald-500/30 transition-colors p-6 rounded-2xl relative overflow-hidden group">
+                                <div className="absolute -right-10 -top-10 opacity-10 group-hover:opacity-20 transition-opacity duration-700">
+                                    <Sparkles size={150} className="text-emerald-400 rotate-12" />
                                 </div>
-                            </div>
-                        </div>
+                                <div className="relative z-10 flex flex-col md:flex-row gap-6">
+                                    <div className="flex-1 space-y-4">
+                                        <h2 className="text-sm font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                                            <Sparkles size={14} /> AI Assistant
+                                            <span className="text-zinc-600">|</span>
+                                            <select
+                                                value={aiModel}
+                                                onChange={(e) => setAiModel(e.target.value)}
+                                                className="bg-black/40 border border-emerald-500/20 rounded px-2 py-0.5 text-[10px] text-emerald-400 focus:outline-none focus:border-emerald-500/50"
+                                            >
+                                                <optgroup label="Google Gemini" className="bg-zinc-900">
+                                                    <option value="gemini-1.5-flash-latest">1.5 Flash (Fast)</option>
+                                                    <option value="gemini-1.5-pro-latest">1.5 Pro (Precision)</option>
+                                                    <option value="gemini-2.0-flash-exp">2.0 Flash (Next-Gen)</option>
+                                                </optgroup>
+                                                <optgroup label="OpenAI (Fallback)" className="bg-zinc-900">
+                                                    <option value="gpt-4o">GPT-4o (Reliable)</option>
+                                                    <option value="gpt-4o-mini">GPT-4o-mini (Speed)</option>
+                                                </optgroup>
+                                            </select>
+                                            <span className="text-zinc-600">|</span>
+                                            <button
+                                                onClick={() => setShowImport(!showImport)}
+                                                className="text-white/50 hover:text-white transition-colors text-xs flex items-center gap-1"
+                                            >
+                                                <Upload size={12} /> Import Text
+                                            </button>
+                                        </h2>
 
-                        {/* EDITOR FORM */}
-                        <div className="bg-zinc-900/50 backdrop-blur-sm border border-white/5 p-8 rounded-2xl shadow-xl">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/50"></span>
-                                    {editingId ? 'Edit Mode' : 'Drafting Mode'}
-                                </h2>
-                                <span className="text-xs font-mono text-zinc-600 bg-black/30 px-2 py-1 rounded">{editingId || 'NEW_ENTRY'}</span>
-                            </div>
-
-                            <form onSubmit={handleSubmit} className="space-y-8">
-                                {/* Row 1: Title & Meta */}
-                                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                                    <div className="md:col-span-8 space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Headline</label>
-                                            <button type="button" onClick={() => handleAiGenerate('title')} className="text-[10px] text-news-accent hover:underline flex items-center gap-1"><Sparkles size={10} /> Suggest</button>
-                                        </div>
-                                        <input
-                                            className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-xl md:text-2xl font-bold text-white placeholder-zinc-700 focus:border-news-accent focus:ring-1 focus:ring-news-accent/20 outline-none transition-all"
-                                            placeholder="Article Headline..."
-                                            value={formData.title}
-                                            onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="md:col-span-4 space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Topic Tag</label>
-                                        <input
-                                            className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-sm text-gray-300 focus:border-news-accent outline-none"
-                                            placeholder="e.g. Solar"
-                                            value={formData.topic}
-                                            onChange={e => setFormData({ ...formData, topic: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Row 2: Categories & Details */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-3">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Categories (Max 3)</label>
-                                        <div className="flex flex-wrap gap-2 bg-zinc-950/30 p-4 rounded-xl border border-white/5 min-h-[100px]">
-                                            {CATEGORIES.map(c => (
-                                                <button
-                                                    type="button"
-                                                    key={c}
-                                                    onClick={() => {
-                                                        const current = Array.isArray(formData.category) ? formData.category : [];
-                                                        const exists = current.includes(c);
-                                                        let newCats = exists ? current.filter(cat => cat !== c) : [...current, c];
-                                                        if (newCats.length > 3) newCats = newCats.slice(0, 3);
-                                                        setFormData({ ...formData, category: newCats });
-                                                    }}
-                                                    className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wide transition-all border
-                                                        ${(Array.isArray(formData.category) ? formData.category.includes(c) : formData.category === c)
-                                                            ? 'bg-white text-black border-white shadow-lg shadow-white/10'
-                                                            : 'bg-transparent text-zinc-500 border-zinc-800 hover:border-zinc-600 hover:text-zinc-300'}`}
-                                                >
-                                                    {c}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Display Date</label>
-                                            <input
-                                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none"
-                                                value={formData.date}
-                                                onChange={e => setFormData({ ...formData, date: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Read Time</label>
-                                            <input
-                                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none"
-                                                value={formData.originalReadTime}
-                                                onChange={e => setFormData({ ...formData, originalReadTime: e.target.value })}
-                                            />
-                                        </div>
-
-                                        {/* FEATURED IMAGE */}
-                                        <div className="col-span-2 space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Cover Image</label>
-                                                <button type="button" onClick={handleImagePromptGenerate} className="text-[10px] text-zinc-500 hover:text-white flex items-center gap-1 transition-colors">
-                                                    <Sparkles size={10} /> {imagePromptLoading ? 'Creating Prompt...' : 'Generate Image Prompt'}
-                                                </button>
-                                            </div>
-                                            {imagePrompt && (
-                                                <div className="mb-2 p-3 bg-zinc-900 border border-white/10 rounded-lg">
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <span className="text-[10px] font-bold text-news-accent uppercase">Midjourney / DALL-E Prompt</span>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => navigator.clipboard.writeText(imagePrompt)}
-                                                            className="text-[10px] text-zinc-500 hover:text-white bg-white/5 px-2 py-0.5 rounded"
-                                                        >
-                                                            Copy
-                                                        </button>
-                                                    </div>
-                                                    <p className="text-xs text-zinc-300 select-all font-serif italic">{imagePrompt}</p>
-                                                </div>
-                                            )}
-                                            <div className="flex gap-4">
-                                                <input
-                                                    className="flex-1 bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none"
-                                                    value={formData.imageUrl}
-                                                    onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                                                    placeholder="Valid Image URL..."
-                                                />
-                                                <label className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-4 flex items-center justify-center cursor-pointer transition-colors">
-                                                    <Upload size={16} />
-                                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                                                </label>
-                                            </div>
-                                            {formData.imageUrl && (
-                                                <div className="h-24 w-full rounded-xl overflow-hidden border border-white/5 relative mt-3">
-                                                    <img src={formData.imageUrl} className="w-full h-full object-cover opacity-60" />
-                                                    <div className="absolute inset-0 flex items-center justify-center text-xs font-mono bg-black/20">PREVIEW</div>
-                                                </div>
-                                            )}
-                                            <div className="mt-2">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Image Attribution</label>
-                                                <input
-                                                    className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none mt-1"
-                                                    value={formData.imageAttribution || ''}
-                                                    onChange={e => setFormData({ ...formData, imageAttribution: e.target.value })}
-                                                    placeholder="Photo by Jane Doe / Unsplash"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* AUDIO NARRATION */}
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                            <Headphones size={14} className="text-emerald-500" />
-                                            Audio Narration
-                                        </h3>
-                                        <div className="space-y-3">
-                                            <div className="flex gap-2">
-                                                <label className="flex-1 cursor-pointer">
-                                                    <input
-                                                        type="file"
-                                                        accept=".mp3,.wav,.m4a"
-                                                        onChange={handleAudioUpload}
-                                                        className="hidden"
-                                                    />
-                                                    <div className="bg-zinc-950/30 border border-white/10 hover:border-emerald-500/30 rounded-lg p-3 text-xs text-center text-white hover:text-emerald-400 transition-all flex items-center justify-center gap-2">
-                                                        <Upload size={14} />
-                                                        Upload Audio
-                                                    </div>
-                                                </label>
-                                                <button
-                                                    type="button"
-                                                    onClick={handleGenerateAudio}
-                                                    disabled={audioLoading || !editingId}
-                                                    className="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 disabled:bg-zinc-800 disabled:text-zinc-600 text-emerald-400 border border-emerald-500/30 px-3 py-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    {audioLoading ? (
-                                                        <>
-                                                            <Loader2 size={14} className="animate-spin" />
-                                                            Generating...
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Sparkles size={14} />
-                                                            Generate Audio
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </div>
-                                            {formData.audioUrl && (
-                                                <div className="bg-black/40 border border-emerald-500/20 rounded-lg p-3">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Headphones size={12} className="text-emerald-500" />
-                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Audio Ready</span>
-                                                    </div>
-                                                    <audio controls className="w-full" src={formData.audioUrl}></audio>
-                                                </div>
-                                            )}
-
-                                            {/* Voiceover Text Field */}
-                                            <div className="space-y-2 mt-4">
-                                                <div className="flex items-center justify-between">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                                                        Voiceover Script (Auto-extracted from VO tags)
-                                                    </label>
-                                                    {formData.voiceoverText && (
-                                                        <span className="text-[9px] text-emerald-500 font-mono">
-                                                            {formData.voiceoverText.length} chars
-                                                        </span>
-                                                    )}
+                                        {showImport && (
+                                            <div className="bg-black/80 border border-zinc-700/50 p-4 rounded-xl mb-4 animate-in fade-in slide-in-from-top-2">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <h3 className="text-xs font-bold text-zinc-400 uppercase">Paste Formatted Text</h3>
+                                                    <button onClick={() => setShowImport(false)} className="text-zinc-500 hover:text-white text-xs">Close</button>
                                                 </div>
                                                 <textarea
-                                                    className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-sm text-gray-300 focus:border-emerald-500 outline-none h-32 font-mono text-xs leading-relaxed"
-                                                    value={formData.voiceoverText || ''}
-                                                    onChange={e => setFormData({ ...formData, voiceoverText: e.target.value })}
-                                                    placeholder="Voiceover text will be auto-extracted from content between <<<VO>>> and <<<END_VO>>> tags, or you can manually enter it here..."
+                                                    className="w-full h-48 bg-zinc-900/50 border border-zinc-700/50 rounded-lg p-3 text-xs font-mono text-zinc-300 focus:border-emerald-500/50 outline-none resize-none"
+                                                    placeholder={`<<<HEADLINE>>>\nTitle here\n<<<END_HEADLINE>>>\n\n<<<META>>>\nDescription here\n<<<END_META>>>\n...`}
+                                                    value={importText}
+                                                    onChange={(e) => setImportText(e.target.value)}
                                                 />
-                                                <p className="text-[9px] text-zinc-600 italic">
-                                                    This text will be used for audio generation instead of the full article.
-                                                </p>
+                                                <div className="mt-2 flex justify-end">
+                                                    <button
+                                                        onClick={handleImport}
+                                                        className="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-2"
+                                                    >
+                                                        <Sparkles size={12} /> Parse & Populate
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <textarea
+                                            className="w-full bg-black/40 border border-emerald-500/20 p-4 rounded-xl text-emerald-100 h-24 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all resize-none text-sm placeholder-emerald-800/50"
+                                            placeholder="Command the AI agent (e.g. 'Write a breaking news piece on arctic drilling...')"
+                                            value={aiPrompt}
+                                            onChange={e => setAiPrompt(e.target.value)}
+                                        />
+                                        <div className="flex flex-wrap gap-2">
+                                            <select
+                                                className="bg-black/40 border border-emerald-500/20 p-2 rounded-lg text-xs text-emerald-400 outline-none hover:bg-emerald-500/10 cursor-pointer"
+                                                value={aiModel}
+                                                onChange={e => setAiModel(e.target.value)}
+                                            >
+                                                <optgroup label="Google Gemini" className="bg-zinc-900">
+                                                    <option value="gemini-1.5-flash-latest">Gemini 1.5 Flash</option>
+                                                    <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro</option>
+                                                    <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash</option>
+                                                </optgroup>
+                                                <optgroup label="OpenAI" className="bg-zinc-900">
+                                                    <option value="gpt-4o">GPT-4o</option>
+                                                    <option value="gpt-4o-mini">GPT-4o-mini</option>
+                                                </optgroup>
+                                            </select>
+
+                                            {/* Length Selectors */}
+                                            <div className="flex items-center gap-2 bg-black/40 border border-emerald-500/20 p-2 rounded-lg">
+                                                <span className="text-[10px] text-emerald-500/60 uppercase font-bold">Length:</span>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="30"
+                                                    value={minMinutes}
+                                                    onChange={e => setMinMinutes(parseInt(e.target.value) || 1)}
+                                                    className="w-12 bg-black/60 border border-emerald-500/20 rounded px-2 py-1 text-xs text-emerald-400 outline-none text-center"
+                                                />
+                                                <span className="text-emerald-500/40">-</span>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="30"
+                                                    value={maxMinutes}
+                                                    onChange={e => setMaxMinutes(parseInt(e.target.value) || 1)}
+                                                    className="w-12 bg-black/60 border border-emerald-500/20 rounded px-2 py-1 text-xs text-emerald-400 outline-none text-center"
+                                                />
+                                                <span className="text-[10px] text-emerald-500/60">min</span>
+                                            </div>
+
+                                            <button
+                                                onClick={() => handleAiGenerate('full')}
+                                                disabled={aiLoading}
+                                                className="ml-auto bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-6 rounded-lg text-xs tracking-wider uppercase transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                            >
+                                                {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                                                {aiLoading ? 'Generating...' : 'Generate Article'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* EDITOR FORM */}
+                            <div className="bg-zinc-900/50 backdrop-blur-sm border border-white/5 p-8 rounded-2xl shadow-xl">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-white/50"></span>
+                                        {editingId ? 'Edit Mode' : 'Drafting Mode'}
+                                    </h2>
+                                    <span className="text-xs font-mono text-zinc-600 bg-black/30 px-2 py-1 rounded">{editingId || 'NEW_ENTRY'}</span>
+                                </div>
+
+                                <form id="article-form" onSubmit={handleSubmit} className="space-y-8">
+                                    {/* Row 1: Title & Meta */}
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                        <div className="md:col-span-8 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Headline</label>
+                                                <button type="button" onClick={() => handleAiGenerate('title')} className="text-[10px] text-news-accent hover:underline flex items-center gap-1"><Sparkles size={10} /> Suggest</button>
+                                            </div>
+                                            <input
+                                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-xl md:text-2xl font-bold text-white placeholder-zinc-700 focus:border-news-accent focus:ring-1 focus:ring-news-accent/20 outline-none transition-all"
+                                                placeholder="Article Headline..."
+                                                value={formData.title}
+                                                onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="md:col-span-4 space-y-2">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Topic Tag</label>
+                                            <input
+                                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-sm text-gray-300 focus:border-news-accent outline-none"
+                                                placeholder="e.g. Solar"
+                                                value={formData.topic}
+                                                onChange={e => setFormData({ ...formData, topic: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Subheadline */}
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Subheadline (Above Image)</label>
+                                        </div>
+                                        <input
+                                            className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-lg font-serif italic text-white/90 placeholder-zinc-700 focus:border-news-accent outline-none transition-all"
+                                            placeholder="Optional secondary headline..."
+                                            value={formData.subheadline || ''}
+                                            onChange={e => setFormData({ ...formData, subheadline: e.target.value })}
+                                        />
+                                    </div>
+
+                                    {/* Row 2: Categories & Details */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Categories (Max 3)</label>
+                                            <div className="flex flex-wrap gap-2 bg-zinc-950/30 p-4 rounded-xl border border-white/5 min-h-[100px]">
+                                                {CATEGORIES.map(c => (
+                                                    <button
+                                                        type="button"
+                                                        key={c.id}
+                                                        onClick={() => {
+                                                            const current = Array.isArray(formData.category) ? formData.category : [];
+                                                            const exists = current.includes(c.id);
+                                                            let newCats = exists ? current.filter(cat => cat !== c.id) : [...current, c.id];
+                                                            if (newCats.length > 3) newCats = newCats.slice(0, 3);
+                                                            setFormData({ ...formData, category: newCats });
+                                                        }}
+                                                        className={`px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wide transition-all border
+                                                        ${(Array.isArray(formData.category) ? formData.category.includes(c.id) : formData.category === c.id)
+                                                                ? 'bg-white text-black border-white shadow-lg shadow-white/10'
+                                                                : 'bg-transparent text-zinc-500 border-zinc-800 hover:border-zinc-600 hover:text-zinc-300'}`}
+                                                    >
+                                                        {c.label}
+                                                    </button>
+                                                ))}
+
+                                                {/* Cleanup: Show categories that are selected but NOT in the official list (e.g. "Climate Change") so they can be unchecked */}
+                                                {(Array.isArray(formData.category) ? formData.category : [formData.category]).filter(cat => !CATEGORIES.some(c => c.id === cat) && cat !== '').map(legacyCat => (
+                                                    <button
+                                                        type="button"
+                                                        key={legacyCat}
+                                                        onClick={() => {
+                                                            const current = Array.isArray(formData.category) ? formData.category : [];
+                                                            // Only logic needed here is REMOVAL, as you can't add legacy cats back
+                                                            const newCats = current.filter(cat => cat !== legacyCat);
+                                                            setFormData({ ...formData, category: newCats });
+                                                        }}
+                                                        className="px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wide transition-all border bg-red-500/10 text-red-400 border-red-500/50 hover:bg-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.2)] animate-pulse"
+                                                        title="Legacy Category (Click to Remove)"
+                                                    >
+                                                        {legacyCat} ✕
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Display Date</label>
+                                                <input
+                                                    className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none"
+                                                    value={formData.date}
+                                                    onChange={e => setFormData({ ...formData, date: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Read Time</label>
+                                                <input
+                                                    className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none"
+                                                    value={formData.originalReadTime}
+                                                    onChange={e => setFormData({ ...formData, originalReadTime: e.target.value })}
+                                                />
+                                            </div>
+
+                                            {/* FEATURED IMAGE */}
+                                            <div className="col-span-2 space-y-2">
+                                                <div className="flex justify-between items-center">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Cover Image</label>
+                                                    <button type="button" onClick={handleImagePromptGenerate} className="text-[10px] text-zinc-500 hover:text-white flex items-center gap-1 transition-colors">
+                                                        <Sparkles size={10} /> {imagePromptLoading ? 'Creating Prompt...' : 'Generate Image Prompt'}
+                                                    </button>
+                                                </div>
+                                                {imagePrompt && (
+                                                    <div className="mb-2 p-3 bg-zinc-900 border border-white/10 rounded-lg">
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <span className="text-[10px] font-bold text-news-accent uppercase">Midjourney / DALL-E Prompt</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => navigator.clipboard.writeText(imagePrompt)}
+                                                                className="text-[10px] text-zinc-500 hover:text-white bg-white/5 px-2 py-0.5 rounded"
+                                                            >
+                                                                Copy
+                                                            </button>
+                                                        </div>
+                                                        <p className="text-xs text-zinc-300 select-all font-serif italic">{imagePrompt}</p>
+                                                    </div>
+                                                )}
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        className="flex-1 bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none"
+                                                        value={formData.imageUrl}
+                                                        onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                                                        placeholder="Valid Image URL..."
+                                                    />
+                                                    <label className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-4 flex items-center justify-center cursor-pointer transition-colors" title="Upload new image">
+                                                        <Upload size={16} />
+                                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleOpenCloudinaryBrowser}
+                                                        className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-4 flex items-center justify-center cursor-pointer transition-colors text-zinc-400 hover:text-white gap-2"
+                                                        title="Browse Cloudinary images"
+                                                    >
+                                                        <ImageIcon size={16} />
+                                                        <span className="text-[10px] uppercase tracking-wider font-bold">Browse</span>
+                                                    </button>
+                                                </div>
+                                                {formData.imageUrl && (
+                                                    <div className="h-24 w-full rounded-xl overflow-hidden border border-white/5 relative mt-3">
+                                                        <img src={formData.imageUrl} className="w-full h-full object-cover opacity-60" />
+                                                        <div className="absolute inset-0 flex items-center justify-center text-xs font-mono bg-black/20">PREVIEW</div>
+                                                    </div>
+                                                )}
+                                                <div className="mt-2">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Image Attribution</label>
+                                                    <input
+                                                        className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-sm text-gray-300 focus:border-news-accent outline-none mt-1"
+                                                        value={formData.imageAttribution || ''}
+                                                        onChange={e => setFormData({ ...formData, imageAttribution: e.target.value })}
+                                                        placeholder="Photo by Jane Doe / Unsplash"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* AUDIO NARRATION */}
+                                        <div className="space-y-4">
+                                            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                                <Headphones size={14} className="text-emerald-500" />
+                                                Audio Narration
+                                            </h3>
+                                            <div className="space-y-3">
+                                                <div className="flex gap-2">
+                                                    <label className="flex-1 cursor-pointer">
+                                                        <input
+                                                            type="file"
+                                                            accept=".mp3,.wav,.m4a"
+                                                            onChange={handleAudioUpload}
+                                                            className="hidden"
+                                                        />
+                                                        <div className="bg-zinc-950/30 border border-white/10 hover:border-emerald-500/30 rounded-lg p-3 text-xs text-center text-white hover:text-emerald-400 transition-all flex items-center justify-center gap-2">
+                                                            <Upload size={14} />
+                                                            Upload Audio
+                                                        </div>
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleGenerateAudio}
+                                                        disabled={audioLoading || !editingId}
+                                                        className="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 disabled:bg-zinc-800 disabled:text-zinc-600 text-emerald-400 border border-emerald-500/30 px-3 py-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2"
+                                                    >
+                                                        {audioLoading ? (
+                                                            <>
+                                                                <Loader2 size={14} className="animate-spin" />
+                                                                Generating...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Sparkles size={14} />
+                                                                Generate Audio
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                                {formData.audioUrl && (
+                                                    <div className="bg-black/40 border border-emerald-500/20 rounded-lg p-3">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <Headphones size={12} className="text-emerald-500" />
+                                                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Audio Ready</span>
+                                                        </div>
+                                                        <audio controls className="w-full" src={formData.audioUrl}></audio>
+                                                    </div>
+                                                )}
+
+                                                {/* Voiceover Text Field */}
+                                                <div className="space-y-2 mt-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                            Voiceover Script (Auto-extracted from VO tags)
+                                                        </label>
+                                                        {formData.voiceoverText && (
+                                                            <span className="text-[9px] text-emerald-500 font-mono">
+                                                                {formData.voiceoverText.length} chars
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <textarea
+                                                        className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-sm text-gray-300 focus:border-emerald-500 outline-none h-32 font-mono text-xs leading-relaxed"
+                                                        value={formData.voiceoverText || ''}
+                                                        onChange={e => setFormData({ ...formData, voiceoverText: e.target.value })}
+                                                        placeholder="Voiceover text will be auto-extracted from content between <<<VO>>> and <<<END_VO>>> tags, or you can manually enter it here..."
+                                                    />
+                                                    <p className="text-[9px] text-zinc-600 italic">
+                                                        This text will be used for audio generation instead of the full article.
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Content Areas */}
-                                <div className="space-y-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Teaser / Excerpt</label>
-                                        <textarea
-                                            className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-sm font-serif italic text-zinc-400 focus:border-news-accent outline-none h-24"
-                                            value={formData.excerpt}
-                                            onChange={e => setFormData({ ...formData, excerpt: e.target.value })}
-                                            placeholder="Hook the reader..."
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Sources (One per line)</label>
-                                        <textarea
-                                            className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-xs font-mono text-zinc-400 focus:border-news-accent outline-none h-24"
-                                            value={formData.sources?.join('\n') || ''}
-                                            onChange={e => setFormData({ ...formData, sources: e.target.value.split('\n') })}
-                                            placeholder="IPCC Report 2024&#10;NOAA Climate Data&#10;..."
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Main Body</label>
-                                            <button type="button" onClick={() => handleAiGenerate('body')} className="text-[10px] text-zinc-500 hover:text-white flex items-center gap-1 transition-colors"><Sparkles size={10} /> Auto-Complete Body</button>
-                                        </div>
-                                        <textarea
-                                            className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-6 text-base font-serif leading-relaxed text-zinc-300 focus:border-news-accent outline-none min-h-[500px]"
-                                            value={Array.isArray(formData.content) ? formData.content.join('\n\n') : formData.content}
-                                            onChange={e => setFormData({ ...formData, content: e.target.value.split('\n\n') })}
-                                            placeholder="Write your story here..."
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* EXTRAS: Context & Visibility */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-white/5">
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider">Deep Dive Context</h3>
-                                        <input
-                                            className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-white"
-                                            placeholder="Context Title"
-                                            value={formData.contextBox?.title || ''}
-                                            onChange={e => setFormData({ ...formData, contextBox: { ...(formData.contextBox || {}), title: e.target.value } as any })}
-                                        />
-                                        <textarea
-                                            className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-zinc-400 h-20"
-                                            placeholder="Context details..."
-                                            value={formData.contextBox?.content || ''}
-                                            onChange={e => setFormData({ ...formData, contextBox: { ...(formData.contextBox || {}), content: e.target.value } as any })}
-                                        />
-                                        <input
-                                            className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-zinc-500"
-                                            placeholder="Source (e.g. NOAA)"
-                                            value={formData.contextBox?.source || ''}
-                                            onChange={e => setFormData({ ...formData, contextBox: { ...(formData.contextBox || {}), source: e.target.value } as any })}
-                                        />
-                                    </div>
-
-                                    {/* SEO META */}
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider">Search Engine Optimization</h3>
+                                    {/* Content Areas */}
+                                    <div className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Focus Keywords (Comma Separated)</label>
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Teaser / Excerpt</label>
+                                            <textarea
+                                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-sm font-serif italic text-zinc-400 focus:border-news-accent outline-none h-24"
+                                                value={formData.excerpt}
+                                                onChange={e => setFormData({ ...formData, excerpt: e.target.value })}
+                                                placeholder="Hook the reader..."
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Sources (One per line)</label>
+                                            <textarea
+                                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-4 text-xs font-mono text-zinc-400 focus:border-news-accent outline-none h-24"
+                                                value={formData.sources?.join('\n') || ''}
+                                                onChange={e => setFormData({ ...formData, sources: e.target.value.split('\n') })}
+                                                placeholder="IPCC Report 2024&#10;NOAA Climate Data&#10;..."
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Main Body</label>
+                                                <button type="button" onClick={() => handleAiGenerate('body')} className="text-[10px] text-zinc-500 hover:text-white flex items-center gap-1 transition-colors"><Sparkles size={10} /> Auto-Complete Body</button>
+                                            </div>
+                                            <textarea
+                                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-6 text-base font-serif leading-relaxed text-zinc-300 focus:border-news-accent outline-none min-h-[500px]"
+                                                value={Array.isArray(formData.content) ? formData.content.join('\n\n') : formData.content}
+                                                onChange={e => setFormData({ ...formData, content: e.target.value.split('\n\n') })}
+                                                placeholder="Write your story here..."
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* EXTRAS: Context & Visibility */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-white/5">
+                                        <div className="space-y-4">
+                                            <h3 className="text-xs font-bold text-white uppercase tracking-wider">Deep Dive Context</h3>
                                             <input
                                                 className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-white"
-                                                placeholder="e.g. climate change, emissions, carbon tax"
-                                                value={seoKeywords}
-                                                onChange={e => setSeoKeywords(e.target.value)}
+                                                placeholder="Context Title"
+                                                value={formData.contextBox?.title || ''}
+                                                onChange={e => setFormData({ ...formData, contextBox: { ...(formData.contextBox || {}), title: e.target.value } as any })}
                                             />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Meta Description</label>
                                             <textarea
-                                                className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-zinc-400 h-24"
-                                                placeholder="Brief summary for search results (max 160 chars recommended)..."
-                                                value={formData.seoDescription || ''}
-                                                onChange={e => setFormData({ ...formData, seoDescription: e.target.value })}
+                                                className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-zinc-400 h-20"
+                                                placeholder="Context details..."
+                                                value={formData.contextBox?.content || ''}
+                                                onChange={e => setFormData({ ...formData, contextBox: { ...(formData.contextBox || {}), content: e.target.value } as any })}
+                                            />
+                                            <input
+                                                className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-zinc-500"
+                                                placeholder="Source (e.g. NOAA)"
+                                                value={formData.contextBox?.source || ''}
+                                                onChange={e => setFormData({ ...formData, contextBox: { ...(formData.contextBox || {}), source: e.target.value } as any })}
                                             />
                                         </div>
-                                    </div>
-                                </div>
 
-                                <div className="space-y-6">
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider">Visibility & SEO</h3>
-                                        <div className="flex gap-4">
-                                            <label className="flex items-center gap-2 cursor-pointer p-3 rounded-lg border border-white/5 hover:bg-white/5 transition-colors flex-1">
-                                                <input type="checkbox" className="accent-news-accent scale-110" checked={formData.isFeaturedDiscover || false} onChange={e => setFormData({ ...formData, isFeaturedDiscover: e.target.checked })} />
-                                                <span className="text-xs text-zinc-400">Article Feed</span>
-                                            </label>
-                                            <label className="flex items-center gap-2 cursor-pointer p-3 rounded-lg border border-white/5 hover:bg-white/5 transition-colors flex-1">
-                                                <input type="checkbox" className="accent-news-accent scale-110" checked={formData.isFeaturedCategory || false} onChange={e => setFormData({ ...formData, isFeaturedCategory: e.target.checked })} />
-                                                <span className="text-xs text-zinc-400">Category Hero</span>
-                                            </label>
-                                        </div>
-
-
-                                    </div>
-
-                                    {/* PUBLICATION SETTINGS */}
-                                    <div className="space-y-4">
-                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider">Publication Settings</h3>
-
-                                        <div className="space-y-3">
-                                            <label className="block">
-                                                <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Status</span>
-                                                <select
-                                                    value={formData.status || 'published'}
-                                                    onChange={e => {
-                                                        const newStatus = e.target.value as 'draft' | 'published' | 'scheduled';
-                                                        setFormData({
-                                                            ...formData,
-                                                            status: newStatus,
-                                                            scheduledPublishDate: newStatus === 'scheduled' ? formData.scheduledPublishDate : undefined
-                                                        });
-                                                    }}
-                                                    className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-sm text-white mt-2"
-                                                >
-                                                    <option value="draft">Draft (Save Without Publishing)</option>
-                                                    <option value="published">Publish Now</option>
-                                                    <option value="scheduled">Schedule for Later</option>
-                                                </select>
-                                            </label>
-
-                                            {formData.status === 'scheduled' && (
-                                                <label className="block">
-                                                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Publish Date & Time</span>
-                                                    <input
-                                                        type="datetime-local"
-                                                        value={formData.scheduledPublishDate
-                                                            ? new Date(formData.scheduledPublishDate).toISOString().slice(0, 16)
-                                                            : ''
-                                                        }
-                                                        onChange={e => setFormData({
-                                                            ...formData,
-                                                            scheduledPublishDate: e.target.value ? new Date(e.target.value).toISOString() : undefined
-                                                        })}
-                                                        min={new Date().toISOString().slice(0, 16)}
-                                                        className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-sm text-white mt-2"
-                                                    />
-                                                    <span className="text-[10px] text-zinc-600 mt-1 block">Article will automatically publish at this time</span>
+                                        {/* SEO META */}
+                                        <div className="space-y-4">
+                                            <h3 className="text-xs font-bold text-white uppercase tracking-wider">Search Engine Optimization</h3>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Focus Keywords (Comma Separated)</label>
+                                                <input
+                                                    className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-white"
+                                                    placeholder="e.g. climate change, emissions, carbon tax"
+                                                    value={seoKeywords}
+                                                    onChange={e => setSeoKeywords(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                    Article Type
                                                 </label>
+                                                <select
+                                                    className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-white"
+                                                    value={formData.articleType || ''}
+                                                    onChange={e => setFormData({ ...formData, articleType: e.target.value as any })}
+                                                >
+                                                    <option value="">Select Type...</option>
+                                                    <option value="Policy Brief">Policy Brief</option>
+                                                    <option value="Data Signal">Data Signal</option>
+                                                    <option value="In-Depth Analysis">In-Depth Analysis</option>
+                                                    <option value="Technology Assessment">Technology Assessment</option>
+                                                    <option value="Treaty Explainer">Treaty Explainer</option>
+                                                </select>
+                                                <p className="text-[9px] text-zinc-600 italic">Will appear as a badge on cards and in article header</p>
+                                            </div>
+                                            <TagSelector
+                                                selectedTags={Array.isArray(formData.secondaryTopics) ? formData.secondaryTopics : []}
+                                                onChange={(tags) => setFormData({ ...formData, secondaryTopics: tags })}
+                                                maxTags={5}
+                                            />
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Meta Description</label>
+                                                <textarea
+                                                    className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-zinc-400 h-24"
+                                                    placeholder="Brief summary for search results (max 160 chars recommended)..."
+                                                    value={formData.seoDescription || ''}
+                                                    onChange={e => setFormData({ ...formData, seoDescription: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* QUARTERLY HIGHLIGHTS (Phase 14) */}
+                                    <div className="space-y-4 pt-6 border-t border-white/5">
+                                        <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-news-accent"></span>
+                                            Quarterly Intelligence Highlights
+                                        </h3>
+                                        <div className="bg-zinc-950/30 p-4 rounded-xl border border-white/5 space-y-4">
+                                            <label className="flex items-center gap-3 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="accent-news-accent scale-125"
+                                                    checked={formData.isQuarterlyHighlight || false}
+                                                    onChange={e => setFormData({ ...formData, isQuarterlyHighlight: e.target.checked })}
+                                                />
+                                                <span className="text-sm font-bold text-white">Mark as Quarterly Highlight</span>
+                                            </label>
+
+                                            {formData.isQuarterlyHighlight && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                                                    {(() => {
+                                                        const activeRegion = formData.highlightQuarter;
+                                                        if (!activeRegion) return null;
+
+                                                        // Simplify Category Match Logic
+                                                        const currentCats = Array.isArray(formData.category) ? formData.category : [formData.category];
+
+                                                        const count = articles.filter(a => {
+                                                            if (a.id === (editingId || formData.id)) return false;
+                                                            if (!a.isQuarterlyHighlight) return false;
+                                                            if (a.highlightQuarter !== activeRegion) return false;
+
+                                                            const aCats = Array.isArray(a.category) ? a.category : [a.category];
+                                                            // Check for intersection
+                                                            return aCats.some(ac => currentCats.includes(ac));
+                                                        }).length;
+
+                                                        if (count >= 4) {
+                                                            return (
+                                                                <div className="col-span-1 md:col-span-2 text-[10px] text-amber-400 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20 flex items-center gap-2">
+                                                                    <AlertTriangle size={14} className="text-amber-500" />
+                                                                    <span>
+                                                                        <strong>Warning:</strong> {count} other articles are already highlighted for <strong>{activeRegion}</strong> in this hub.
+                                                                        Recommended limit is 3-4.
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })()}
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Quarter (Required)</label>
+                                                        <select
+                                                            className="w-full bg-zinc-900 border border-white/10 rounded-lg p-3 text-xs text-white focus:border-news-accent outline-none"
+                                                            value={formData.highlightQuarter || ''}
+                                                            onChange={e => setFormData({ ...formData, highlightQuarter: e.target.value as any })}
+                                                            required={formData.isQuarterlyHighlight}
+                                                        >
+                                                            <option value="">Select Quarter...</option>
+                                                            <option value="Q1-2025">Q1 2025</option>
+                                                            <option value="Q2-2025">Q2 2025</option>
+                                                            <option value="Q3-2025">Q3 2025</option>
+                                                            <option value="Q4-2025">Q4 2025</option>
+                                                            <option value="Q1-2026">Q1 2026</option>
+                                                            <option value="Q2-2026">Q2 2026</option>
+                                                            <option value="Q3-2026">Q3 2026</option>
+                                                            <option value="Q4-2026">Q4 2026</option>
+                                                            <option value="Q1-2027">Q1 2027</option>
+                                                            <option value="Q2-2027">Q2 2027</option>
+                                                            <option value="Q3-2027">Q3 2027</option>
+                                                            <option value="Q4-2027">Q4 2027</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Priority (Higher = First)</label>
+                                                        <input
+                                                            type="number"
+                                                            className="w-full bg-zinc-900 border border-white/10 rounded-lg p-3 text-xs text-white focus:border-news-accent outline-none"
+                                                            value={formData.highlightPriority || 0}
+                                                            onChange={e => setFormData({ ...formData, highlightPriority: parseInt(e.target.value) || 0 })}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1 md:col-span-2 space-y-2">
+                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Summary Override (Max 160 chars)</label>
+                                                        <textarea
+                                                            className="w-full bg-zinc-900 border border-white/10 rounded-lg p-3 text-xs text-zinc-400 focus:border-news-accent outline-none h-20"
+                                                            placeholder="Custom summary specifically for the highlights module..."
+                                                            value={formData.quarterlySummaryOverride || ''}
+                                                            onChange={e => setFormData({ ...formData, quarterlySummaryOverride: e.target.value })}
+                                                            maxLength={160}
+                                                        />
+                                                        <div className="text-[9px] text-zinc-600 text-right">
+                                                            {(formData.quarterlySummaryOverride || '').length}/160
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
+
+
 
                                     {/* SOCIAL MEDIA TRANSFORMER */}
                                     <div className="pt-6 border-t border-white/5 space-y-4">
@@ -1616,7 +1894,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                             <div className="space-y-3">
                                                 {/* Tabs */}
                                                 <div className="flex border-b border-white/5">
-                                                    {(['instagram', 'facebook', 'twitter', 'tiktok'] as const).map(platform => (
+                                                    {(['instagram', 'facebook', 'twitter', 'linkedin'] as const).map(platform => (
                                                         <button
                                                             type="button"
                                                             key={platform}
@@ -1670,8 +1948,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                         <div className="flex items-center gap-3">
                                                             <div className={`border border-white/10 bg-white/5 flex items-center justify-center rounded-sm transition-all duration-300
                                                             ${activeSocialTab === 'instagram' ? 'w-6 h-8' : // 4:5
-                                                                    activeSocialTab === 'tiktok' ? 'w-6 h-10' : // 9:16
-                                                                        'w-10 h-5' // 1.91:1
+                                                                    'w-10 h-5' // 1.91:1
                                                                 }`}>
                                                                 <ImageIcon size={10} className="text-zinc-600" />
                                                             </div>
@@ -1710,35 +1987,90 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                         )}
                                     </div>
 
-                                    {/* Generate Audio Button */}
-                                    {editingId && (
-                                        <button
-                                            type="button"
-                                            onClick={handleGenerateAudio}
-                                            disabled={audioLoading}
-                                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-xs rounded-xl transition-all flex justify-center items-center gap-2 mb-3"
-                                        >
-                                            {audioLoading ? <Loader2 size={16} className="animate-spin" /> : <Headphones size={16} />}
-                                            {audioLoading ? 'Generating Audio...' : (formData.audioUrl ? 'Regenerate Audio' : 'Generate Audio')}
-                                        </button>
-                                    )}
 
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="w-full py-4 bg-news-accent text-black font-bold uppercase tracking-widest text-sm rounded-xl hover:bg-emerald-400 hover:scale-[1.01] transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)] flex justify-center items-center gap-2"
-                                    >
-                                        {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                                        {editingId ? 'Save Changes' : 'Publish Article'}
-                                    </button>
+
+
+
+                                </form>
+                            </div>
+                        </div>
+                        {/* Persistent Footer */}
+                        <div className="p-4 bg-zinc-900 border-t border-white/5 z-30 shrink-0 flex items-center justify-between shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+                            <div className="flex items-center gap-4">
+                                <div className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase hidden xl:block mr-2">
+                                    {editingId ? <span className="text-emerald-500">Editing Mode</span> : 'Creating New'}
                                 </div>
-                            </form>
+                                <div className="flex items-center gap-2 bg-black/20 p-1 rounded-lg border border-white/5">
+                                    <label className="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded hover:bg-white/5 transition-colors" title="Show in Main Article Feed">
+                                        <input type="checkbox" className="accent-news-accent" checked={formData.isFeaturedDiscover || false} onChange={e => setFormData({ ...formData, isFeaturedDiscover: e.target.checked })} />
+                                        <span className="text-[10px] text-zinc-400 uppercase font-bold">Global Hero</span>
+                                    </label>
+                                    <div className="w-px h-4 bg-white/10"></div>
+                                    <label className="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded hover:bg-white/5 transition-colors" title="Feature as Category Hero">
+                                        <input type="checkbox" className="accent-news-accent" checked={formData.isFeaturedCategory || false} onChange={e => setFormData({ ...formData, isFeaturedCategory: e.target.checked })} />
+                                        <span className="text-[10px] text-zinc-400 uppercase font-bold">Category Hero</span>
+                                    </label>
+                                    <div className="w-px h-4 bg-white/10"></div>
+                                    <label className="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded hover:bg-white/5 transition-colors" title="Mark as In-Depth Analysis">
+                                        <input type="checkbox" className="accent-purple-500" checked={formData.featuredInDepth || false} onChange={e => setFormData({ ...formData, featuredInDepth: e.target.checked })} />
+                                        <span className="text-[10px] text-zinc-400 uppercase font-bold">Deep Dive</span>
+                                    </label>
+                                </div>
+
+                                <div className="h-6 w-px bg-white/10 mx-2 hidden md:block"></div>
+
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <select
+                                        value={formData.status || 'published'}
+                                        onChange={e => {
+                                            const newStatus = e.target.value as 'draft' | 'published' | 'scheduled';
+                                            setFormData({
+                                                ...formData,
+                                                status: newStatus,
+                                                scheduledPublishDate: newStatus === 'scheduled' ? formData.scheduledPublishDate : undefined
+                                            });
+                                        }}
+                                        className="bg-black/40 border border-white/10 rounded-lg py-1.5 px-3 text-xs font-bold uppercase tracking-wider text-zinc-300 outline-none focus:border-news-accent focus:text-white"
+                                    >
+                                        <option value="draft">Draft (Unpublished)</option>
+                                        <option value="published">Publish Immediately</option>
+                                        <option value="scheduled">Schedule Publish</option>
+                                    </select>
+
+                                    {formData.status === 'scheduled' && (
+                                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+                                            <input
+                                                type="datetime-local"
+                                                value={formData.scheduledPublishDate
+                                                    ? new Date(formData.scheduledPublishDate).toISOString().slice(0, 16)
+                                                    : ''
+                                                }
+                                                onChange={e => setFormData({
+                                                    ...formData,
+                                                    scheduledPublishDate: e.target.value ? new Date(e.target.value).toISOString() : undefined
+                                                })}
+                                                min={new Date().toISOString().slice(0, 16)}
+                                                className="bg-black/40 border border-white/10 rounded-lg py-1.5 px-2 text-xs text-white outline-none focus:border-news-accent"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                form="article-form"
+                                disabled={loading}
+                                className="w-full md:w-auto px-8 py-3 bg-news-accent text-black font-bold uppercase tracking-widest text-sm rounded-xl hover:bg-emerald-400 hover:scale-[1.01] transition-all shadow-[0_0_20px_rgba(16,185,129,0.15)] flex justify-center items-center gap-2"
+                            >
+                                {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                {editingId ? 'Save Changes' : 'Publish Article'}
+                            </button>
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN: LIST SIDEBAR (3/12 columns on large screens) */}
-                    <div className="col-span-12 lg:col-span-4 xl:col-span-3 h-full flex flex-col gap-4">
-                        <div className="bg-zinc-900/80 backdrop-blur border border-white/10 p-4 rounded-xl flex-1 flex flex-col h-[calc(100vh-140px)] sticky top-24">
+                    {/* RIGHT COLUMN: LIST SIDEBAR */}
+                    <div className="col-span-12 lg:col-span-4 xl:col-span-3 lg:h-full lg:overflow-y-auto border-l border-white/5 bg-zinc-900/30 flex flex-col">
+                        <div className="p-4 flex-1 flex flex-col h-full">
                             <div className="flex justify-between items-center mb-4 pb-4 border-b border-white/5">
                                 <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Library</h3>
                                 <div className="text-[10px] text-zinc-600 font-mono">{articles.length} ITEMS</div>
@@ -1835,6 +2167,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                         📅 {new Date(article.scheduledPublishDate).toLocaleString()}
                                                     </span>
                                                 )}
+                                                {article.isFeaturedDiscover && (
+                                                    <span className="text-[8px] px-1.5 py-0.5 rounded border border-purple-500/30 bg-purple-500/10 text-purple-400 font-bold uppercase">
+                                                        Global Hero
+                                                    </span>
+                                                )}
+                                                {article.isFeaturedCategory && (
+                                                    <span className="text-[8px] px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-bold uppercase">
+                                                        Category Hero
+                                                    </span>
+                                                )}
+                                                {article.featuredInDepth && (
+                                                    <span className="text-[8px] px-1.5 py-0.5 rounded border border-blue-500/30 bg-blue-500/10 text-blue-400 font-bold uppercase">
+                                                        Deep Dive
+                                                    </span>
+                                                )}
                                             </div>
                                             <h4 className={`font-bold text-sm leading-tight mb-1.5 ${editingId === article.id ? 'text-news-accent' : 'text-zinc-300'}`}>
                                                 {article.title}
@@ -1848,9 +2195,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-1">
-                                                    {(Array.isArray(article.category) ? article.category.slice(0, 2) : [article.category]).map(c => (
-                                                        <span key={c} className={`w-1.5 h-1.5 rounded-full ${CATEGORY_COLORS[c]?.replace('text-', 'bg-') || 'bg-gray-500'}`} title={c}></span>
-                                                    ))}
+                                                    {Array.isArray(article.category) ? (
+                                                        article.category.map(c => (
+                                                            <span
+                                                                key={c}
+                                                                className="w-1.5 h-1.5 rounded-full"
+                                                                style={{ backgroundColor: CATEGORY_COLORS[c] || '#6b7280' }}
+                                                                title={c}
+                                                            ></span>
+                                                        ))
+                                                    ) : (
+                                                        <span
+                                                            className="w-1.5 h-1.5 rounded-full"
+                                                            style={{ backgroundColor: CATEGORY_COLORS[article.category as string] || '#6b7280' }}
+                                                            title={article.category as string}
+                                                        ></span>
+                                                    )}
                                                 </div>
                                             </div>
                                             {/* Hover Delete */}
@@ -1866,9 +2226,111 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div >
+            )
+            }
+            {/* Cloudinary Image Browser Modal */}
+            {
+                showCloudinaryBrowser && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                        <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden">
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-4 border-b border-white/10">
+                                <div className="flex items-center gap-3">
+                                    <ImageIcon size={20} className="text-emerald-400" />
+                                    <h3 className="text-white font-bold text-sm uppercase tracking-wider">Cloudinary Image Browser</h3>
+                                </div>
+                                <button
+                                    onClick={() => setShowCloudinaryBrowser(false)}
+                                    className="text-zinc-400 hover:text-white text-xl transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            {/* Folder Navigation */}
+                            {cloudinaryFolders.length > 0 && (
+                                <div className="flex items-center gap-2 p-3 border-b border-white/10 overflow-x-auto">
+                                    <button
+                                        onClick={() => { setCloudinaryFolder(''); loadCloudinaryImages(''); }}
+                                        className={`px-3 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider border transition-all whitespace-nowrap ${cloudinaryFolder === '' ? 'bg-white text-black border-white' : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500'
+                                            }`}
+                                    >
+                                        All
+                                    </button>
+                                    {cloudinaryFolders.map(f => (
+                                        <button
+                                            key={f}
+                                            onClick={() => { setCloudinaryFolder(f); loadCloudinaryImages(f); }}
+                                            className={`px-3 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider border transition-all whitespace-nowrap ${cloudinaryFolder === f ? 'bg-white text-black border-white' : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500'
+                                                }`}
+                                        >
+                                            {f}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Image Grid */}
+                            <div className="flex-1 overflow-y-auto p-4">
+                                {cloudinaryLoading && cloudinaryImages.length === 0 ? (
+                                    <div className="flex items-center justify-center h-48">
+                                        <Loader2 size={32} className="animate-spin text-emerald-500" />
+                                    </div>
+                                ) : cloudinaryImages.length === 0 ? (
+                                    <div className="flex items-center justify-center h-48 text-zinc-500">
+                                        No images found
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                            {cloudinaryImages.map((img) => (
+                                                <button
+                                                    key={img.public_id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFormData(prev => ({ ...prev, imageUrl: img.url }));
+                                                        setShowCloudinaryBrowser(false);
+                                                    }}
+                                                    className="group relative aspect-square bg-zinc-800 rounded-xl overflow-hidden border border-white/5 hover:border-emerald-500/50 transition-all hover:shadow-lg hover:shadow-emerald-500/10"
+                                                >
+                                                    <img
+                                                        src={img.url}
+                                                        alt={img.public_id}
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                        loading="lazy"
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <p className="text-[9px] text-white font-mono truncate">{img.public_id.split('/').pop()}</p>
+                                                        <p className="text-[8px] text-zinc-400">{img.width}×{img.height} • {(img.bytes / 1024).toFixed(0)}KB</p>
+                                                    </div>
+                                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">✓</div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {cloudinaryNextCursor && (
+                                            <div className="flex justify-center mt-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => loadCloudinaryImages(cloudinaryFolder, cloudinaryNextCursor)}
+                                                    disabled={cloudinaryLoading}
+                                                    className="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs text-zinc-300 font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                                                >
+                                                    {cloudinaryLoading ? 'Loading...' : 'Load More'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </div >
     );
 };
 

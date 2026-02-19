@@ -24,7 +24,7 @@ const AudioPlayer: React.FC = () => {
                                     {currentArticle.title}
                                 </p>
                                 <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">
-                                    Audio Article
+                                    Audio Summary
                                 </p>
                             </div>
                         </div>
