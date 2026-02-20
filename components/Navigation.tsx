@@ -131,7 +131,7 @@ const Navigation: React.FC<NavigationProps> = ({
     <div className="fixed top-0 left-0 w-full z-50 flex flex-col font-sans overflow-visible">
 
       {/* Top Bar (Primary Nav) */}
-      <div className={`w-full transition-all duration-300 overflow-visible ${isScrolled ? 'bg-black border-b border-white/10' : 'bg-black/90 backdrop-blur-md border-b border-white/5'}`}>
+      <div className={`w-full transition-all duration-300 overflow-visible ${isScrolled ? 'bg-black' : 'bg-black/90 backdrop-blur-md'}`}>
         <div className="container mx-auto px-4 md:px-8 py-3 md:py-0 md:h-16 flex flex-col md:flex-row gap-3 md:gap-0 overflow-visible">
 
           {/* Top Row on Mobile: Logo + Right Actions */}
@@ -258,7 +258,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 <button
                   key={cat}
                   onClick={() => onCategorySelect(cat)}
-                  className={`text-[10px] md:text-sm font-serif font-bold transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
+                  className={`text-[10px] md:text-base font-serif font-bold transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
                     }`}
                 >
                   {cat}
