@@ -10,7 +10,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     }, []);
 
     return (
-        <div className="bg-zinc-950 min-h-screen text-white pt-44 pb-24 relative overflow-hidden font-sans">
+        <div className="bg-zinc-950 min-h-screen text-white pt-28 md:pt-40 pb-24 relative overflow-hidden font-sans">
             <div className="container mx-auto px-4 md:px-8 relative z-10 max-w-4xl">
 
                 {/* SECTION 1 — HERO */}
