@@ -234,11 +234,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
       {/* Secondary Bar (Categories or Action Menu) */}
       <div className={`relative w-full bg-black/80 backdrop-blur transition-all duration-300 ${isScrolled ? 'h-10' : 'h-12'}`}>
-        {/* Strip Bottom Fade-up (Aligned to Page Width) */}
-        <div className="container mx-auto px-4 md:px-8 absolute inset-0 pointer-events-none">
-          <div className="absolute bottom-0 left-4 md:left-8 right-4 md:right-8 h-[30%] bg-gradient-to-t from-zinc-500/20 to-transparent"></div>
-          <div className="absolute bottom-0 left-4 md:left-8 right-4 md:right-8 h-px bg-white/10"></div>
-        </div>
+
         <div className="container mx-auto px-4 md:px-8 h-full flex items-center overflow-x-auto hide-scrollbar">
           <div className="flex items-center gap-6 md:gap-8 min-w-max">
             {/* PlanetDash Submenu */}

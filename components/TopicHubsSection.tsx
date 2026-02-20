@@ -12,7 +12,7 @@ const TopicHubsSection: React.FC<TopicHubsSectionProps> = ({ title, categories, 
     if (!categories || categories.length === 0) return null;
 
     return (
-        <section className="w-full bg-zinc-950 pt-12 pb-20 md:pt-16 md:pb-32 border-t border-white/5">
+        <section className="w-full bg-zinc-950 pt-8 pb-12 md:pt-16 md:pb-32 border-t border-white/5">
             <div className="container mx-auto px-4 md:px-8">
                 <div className="mb-8 md:mb-16">
                     <span className="text-zinc-500 font-bold tracking-widest uppercase text-[10px] md:text-xs">Intelligence Architecture</span>
