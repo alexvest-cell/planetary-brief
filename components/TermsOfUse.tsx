@@ -7,7 +7,7 @@ interface TermsOfUseProps {
 
 const TermsOfUse: React.FC<TermsOfUseProps> = ({ onBack }) => {
     return (
-        <div className="min-h-screen bg-black text-white pt-36 pb-20">
+        <div className="min-h-screen bg-black text-white pt-20 md:pt-36 pb-20">
             <div className="container mx-auto px-4 md:px-8 max-w-4xl">
                 {/* Back Button */}
                 <button

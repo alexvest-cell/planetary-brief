@@ -297,7 +297,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         <div className="h-full bg-news-accent w-full animate-[width_1s_ease-out]"></div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-12 pt-32 md:pt-36 pb-12 md:pb-24 max-w-4xl">
+      <div className="container mx-auto px-4 md:px-12 pt-20 md:pt-36 pb-12 md:pb-24 max-w-4xl">
 
 
         <header className="mb-8 md:mb-10 text-left">

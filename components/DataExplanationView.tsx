@@ -26,7 +26,7 @@ const DataExplanationView: React.FC<DataExplanationViewProps> = ({ data, onBack 
                 style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
             </div>
 
-            <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-4xl pt-32 pb-24">
+            <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-4xl pt-20 md:pt-32 pb-24">
 
                 {/* Navigation */}
 

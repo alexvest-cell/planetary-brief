@@ -304,7 +304,7 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
     );
 
     return (
-        <div className="bg-black min-h-screen text-white font-sans pt-40 pb-4 md:pt-28 md:pb-8 animate-fade-in relative">
+        <div className="bg-black min-h-screen text-white font-sans pt-20 pb-4 md:pt-28 md:pb-8 animate-fade-in relative">
 
             {/* Background Grid */}
             <div className="fixed inset-0 pointer-events-none opacity-10"
@@ -312,6 +312,22 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
             </div>
 
             <div className="container mx-auto px-5 md:px-12 relative z-10 pt-4 pb-4 md:pt-6 md:pb-8">
+
+                {/* Mobile System Snapshot (Relocated from hidden nav) */}
+                <div className="md:hidden flex flex-col gap-2 mb-8 animate-fade-in px-1 border-l border-white/5 pl-4">
+                    <div className="flex items-center gap-3">
+                        <span className="px-2 py-0.5 rounded border border-white/10 bg-white/5 text-gray-400 text-[9px] font-mono uppercase tracking-wider">
+                            System Snapshot
+                        </span>
+                        <span className="text-[9px] uppercase tracking-wider text-gray-500 font-mono">
+                            Updated: <span className="font-bold text-gray-400">{syncTime.replace(' (Local time)', '')}</span>
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[9px] text-gray-600 font-mono">
+                        <Activity size={10} className="text-news-accent" />
+                        <span>Sources: NASA · ESA · NOAA · IPCC</span>
+                    </div>
+                </div>
 
                 {/* ════════════════════════════════════════════ */}
                 {/* GROUP 1: CLIMATE SYSTEM                      */}

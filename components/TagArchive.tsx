@@ -71,7 +71,7 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white animate-fade-in">
-            <div className="max-w-5xl mx-auto px-4 md:px-8 pt-36 pb-12 md:pt-40 md:pb-24">
+            <div className="max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-12 md:pt-40 md:pb-24">
 
                 {/* Header */}
                 <div className="mb-10 md:mb-14">
