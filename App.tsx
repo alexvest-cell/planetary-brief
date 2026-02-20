@@ -669,7 +669,7 @@ function App() {
             <>
               <div className="container mx-auto px-4 flex flex-col items-center">
                 {/* Vertical Line */}
-                <div className="w-px h-12 md:h-20 bg-gradient-to-b from-transparent via-white/30 to-transparent mb-5 md:mb-6 mt-20 md:mt-16"></div>
+                <div className="w-px h-8 md:h-20 bg-gradient-to-b from-transparent via-white/30 to-transparent mb-5 md:mb-6 mt-12 md:mt-16"></div>
 
                 <div className="text-center max-w-4xl pb-4 md:pb-8">
                   <p className="text-lg md:text-xl lg:text-2xl font-serif leading-relaxed text-zinc-300">

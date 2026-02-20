@@ -27,7 +27,7 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
         : "Planetary Intelligence";
 
     return (
-        <section id={Section.HERO} className="relative w-full bg-black text-white pt-4 md:pt-12 pb-6 md:pb-12 overflow-hidden border-b border-white/5">
+        <section id={Section.HERO} className="relative w-full bg-black text-white pt-2 md:pt-12 pb-6 md:pb-12 overflow-hidden border-b border-white/5">
             {/* Background elements */}
             <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-zinc-900/50 to-transparent pointer-events-none"></div>
 

@@ -316,8 +316,8 @@ const Navigation: React.FC<NavigationProps> = ({
 
               {/* Left Column: INTELLIGENCE BY SECTOR */}
               <div className="flex flex-col border-r border-white/10 pr-3 sm:pr-4">
-                <h3 className="text-[9px] text-white font-serif font-bold uppercase tracking-widest mb-4">Intelligence By Sector</h3>
-                <div className="flex flex-col gap-5 text-[11px] font-serif font-medium uppercase tracking-widest text-white">
+                <h3 className="text-[9px] text-white font-sans font-bold uppercase tracking-widest mb-4">Intelligence By Sector</h3>
+                <div className="flex flex-col gap-5 text-[11px] font-sans font-medium uppercase tracking-widest text-white">
                   {navCategories.filter(cat => cat !== 'All').map(cat => (
                     <button
                       key={cat}
@@ -335,8 +335,8 @@ const Navigation: React.FC<NavigationProps> = ({
 
                 {/* SECTION: INTELLIGENCE TOOLS */}
                 <div className="mb-8">
-                  <h3 className="text-[9px] text-white font-serif font-bold uppercase tracking-widest mb-4">Intelligence Tools</h3>
-                  <div className="flex flex-col gap-4 text-[11px] font-serif font-medium uppercase tracking-widest text-white">
+                  <h3 className="text-[9px] text-white font-sans font-bold uppercase tracking-widest mb-4">Intelligence Tools</h3>
+                  <div className="flex flex-col gap-4 text-[11px] font-sans font-medium uppercase tracking-widest text-white">
                     <button onClick={() => { onDashboardClick(); setIsMobileMenuOpen(false); }} className="text-left flex items-start gap-2 hover:text-white transition-colors leading-snug">
                       <Activity size={12} className={['dashboard', 'explanation'].includes(currentView) ? 'text-news-accent animate-pulse mt-0.5 flex-shrink-0' : 'text-news-accent mt-0.5 flex-shrink-0'} />
                       <span>PlanetDash</span>
@@ -346,8 +346,8 @@ const Navigation: React.FC<NavigationProps> = ({
 
                 {/* SECTION: ABOUT */}
                 <div className="mb-8">
-                  <h3 className="text-[9px] text-white font-serif font-bold uppercase tracking-widest mb-4">About</h3>
-                  <div className="flex flex-col gap-4 text-[10px] font-serif font-medium uppercase tracking-widest text-gray-400">
+                  <h3 className="text-[9px] text-white font-sans font-bold uppercase tracking-widest mb-4">About</h3>
+                  <div className="flex flex-col gap-4 text-[10px] font-sans font-medium uppercase tracking-widest text-gray-400">
                     <button onClick={() => { onShowAbout(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">About Planetary Brief</button>
                     <button onClick={() => { onSubscribeClick(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">Newsletter</button>
                     <button onClick={() => { onSupportClick(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">Contact</button>
