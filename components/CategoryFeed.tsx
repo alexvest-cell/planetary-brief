@@ -137,18 +137,18 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                     </div>
 
                     {/* Content Container (Grid) */}
-                    <div className="relative z-10 w-full p-6 md:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                    <div className="relative z-10 w-full p-4 md:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center">
 
                         {/* Left: Explainer Text */}
                         <div className="flex flex-col justify-center">
-                            <span className="text-news-accent text-[10px] font-bold uppercase tracking-widest mb-2 block bg-black/50 backdrop-blur w-fit px-1.5 py-0.5 rounded border border-news-accent/20">
+                            <span className="text-news-accent text-[8px] md:text-[10px] font-bold uppercase tracking-widest mb-2 block bg-black/50 backdrop-blur w-fit px-1.5 py-0.5 rounded border border-news-accent/20">
                                 Intelligence Overview
                             </span>
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-white mb-4 leading-[0.9] tracking-tight drop-shadow-2xl">
+                            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-white mb-3 md:mb-4 leading-[1.0] md:leading-[0.9] tracking-tight drop-shadow-2xl">
                                 {category}
                             </h1>
-                            <div className="h-1 w-16 bg-news-accent mb-4 shadow-[0_0_15px_#10b981]"></div>
-                            <p className="text-gray-200 text-base md:text-lg font-light leading-relaxed max-w-2xl drop-shadow-lg">
+                            <div className="h-1 w-12 md:w-16 bg-news-accent mb-3 md:mb-4 shadow-[0_0_15px_#10b981]"></div>
+                            <p className="text-gray-200 text-[13px] sm:text-sm md:text-lg font-light leading-relaxed max-w-2xl drop-shadow-lg">
                                 {description}
                             </p>
                         </div>
@@ -157,7 +157,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                         {heroArticle ? (
                             <div
                                 onClick={() => onArticleClick(heroArticle)}
-                                className="group relative aspect-[4/5] md:aspect-video lg:aspect-[2/1] w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
+                                className="group relative aspect-[4/3] sm:aspect-video lg:aspect-[2/1] w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
                             >
                                 <img
                                     src={heroArticle.imageUrl}
@@ -166,37 +166,38 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
 
-                                <div className="absolute bottom-0 left-0 w-full p-6 z-10">
-                                    <span className="text-news-accent text-[8px] font-bold uppercase tracking-widest mb-2 block bg-black/50 backdrop-blur w-fit px-1.5 py-0.5 rounded">
+                                {/* Listen Button - Top Right Overlay */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        playArticle(heroArticle);
+                                    }}
+                                    disabled={isLoading && currentArticle?.id === heroArticle.id}
+                                    className="absolute top-3 right-3 md:top-4 md:right-4 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
+                                    title="Listen to story"
+                                >
+                                    {isLoading && currentArticle?.id === heroArticle.id ? (
+                                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        <Headphones className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                    )}
+                                </button>
+
+                                <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-10">
+                                    <span className="text-news-accent text-[8px] font-bold uppercase tracking-widest mb-1 md:mb-2 block bg-black/50 backdrop-blur w-fit px-1.5 py-0.5 rounded">
                                         Featured
                                     </span>
-                                    <h2 className="text-lg md:text-2xl font-serif font-bold text-white leading-tight mb-2 group-hover:underline decoration-2 decoration-news-accent underline-offset-4 shadow-black drop-shadow-lg">
+                                    <h2 className="text-[17px] md:text-2xl font-serif font-bold text-white leading-tight mb-1.5 md:mb-2 group-hover:underline decoration-2 decoration-news-accent underline-offset-4 shadow-black drop-shadow-lg pr-8 md:pr-0">
                                         {heroArticle.title}
                                     </h2>
-                                    <p className="text-gray-300 line-clamp-2 text-xs md:text-sm mb-4 drop-shadow-md font-medium">
+                                    <p className="text-gray-300 line-clamp-2 text-[11px] md:text-sm mb-3 md:mb-4 drop-shadow-md font-medium">
                                         {heroArticle.excerpt}
                                     </p>
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white">
-                                            <span>Read Full Story</span> <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                                        <div className="flex items-center gap-2 text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-white">
+                                            <span>Read Full Story</span> <ArrowRight size={10} className="md:w-3 md:h-3 group-hover:translate-x-1 transition-transform" />
                                         </div>
                                     </div>
-                                    {/* Listen Button - Top Right Overlay */}
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            playArticle(heroArticle);
-                                        }}
-                                        disabled={isLoading && currentArticle?.id === heroArticle.id}
-                                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20"
-                                        title="Listen to story"
-                                    >
-                                        {isLoading && currentArticle?.id === heroArticle.id ? (
-                                            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                                        ) : (
-                                            <Headphones size={16} />
-                                        )}
-                                    </button>
                                 </div>
                             </div>
                         ) : (
@@ -345,7 +346,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                 // The first article of the remaining grid gets the "Featured" Bento treatment
                                 gridClass = "col-span-2 md:col-span-2";
                                 titleSize = "text-xl md:text-2xl";
-                                imageHeight = "aspect-video md:aspect-[2/1]";
+                                imageHeight = "aspect-[4/3] sm:aspect-video md:aspect-[2/1]";
                                 excerptClass = "line-clamp-3";
                             } else if (index === 1 || index === 2) {
                                 // Medium cards
@@ -402,13 +403,13 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                                     playArticle(article);
                                                 }}
                                                 disabled={isLoading && currentArticle?.id === article.id}
-                                                className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 ${index === 0 ? 'top-4 right-4 w-10 h-10' : ''}`}
+                                                className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-lg z-20 ${index === 0 ? 'md:top-4 md:right-4 md:w-10 md:h-10' : ''}`}
                                                 title="Listen to article"
                                             >
                                                 {isLoading && currentArticle?.id === article.id ? (
                                                     <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                                                 ) : (
-                                                    <Headphones size={index === 0 ? 16 : 14} />
+                                                    <Headphones className={index === 0 ? "w-3.5 h-3.5 md:w-4 md:h-4" : "w-3.5 h-3.5"} />
                                                 )}
                                             </button>
                                         </div>

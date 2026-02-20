@@ -16,12 +16,12 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
     if (!depthArticles || depthArticles.length === 0) return null;
 
     return (
-        <section className="py-16 bg-zinc-950 border-t border-white/5">
+        <section className="pt-6 md:pt-16 pb-8 md:pb-16 bg-zinc-950 border-t border-white/5">
             <div className="container mx-auto px-4 md:px-8">
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 md:mb-8 gap-4">
                     <div className="max-w-2xl">
-                        <span className="text-purple-400 font-bold tracking-widest uppercase text-xs">Deep Dives</span>
-                        <h2 className="text-3xl md:text-4xl font-serif font-bold text-white mt-2 leading-tight">
+                        <span className="text-purple-400 font-bold tracking-widest uppercase text-[9px] md:text-xs">Deep Dives</span>
+                        <h2 className="text-xl md:text-4xl font-serif font-bold text-white mt-0.5 md:mt-2 leading-tight">
                             {title}
                         </h2>
                     </div>
@@ -43,7 +43,7 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                             className="group cursor-pointer flex flex-col bg-zinc-900/20 border border-white/5 hover:border-purple-500/30 transition-all duration-300 rounded-xl overflow-hidden h-full"
                         >
                             {/* Image - Stacked on top */}
-                            <div className="relative aspect-[3/2] w-full overflow-hidden">
+                            <div className="relative aspect-[5/3] md:aspect-[3/2] w-full overflow-hidden">
                                 <img
                                     src={article.imageUrl}
                                     alt={article.title}
@@ -52,19 +52,19 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
                                 {/* Badge - Simplified for smaller cards */}
-                                <div className="absolute top-3 left-3 bg-purple-900/80 backdrop-blur px-2 py-0.5 rounded-full text-[8px] md:text-[9px] font-bold uppercase tracking-wide text-white flex items-center gap-1.5 border border-white/10 shadow-lg">
-                                    <BookOpen size={10} />
+                                <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-purple-900/80 backdrop-blur px-1.5 md:px-2 py-0.5 rounded-full text-[7px] md:text-[9px] font-bold uppercase tracking-wide text-white flex items-center gap-1 md:gap-1.5 border border-white/10 shadow-lg">
+                                    <BookOpen size={8} className="md:w-[10px] md:h-[10px]" />
                                     <span>Analysis</span>
                                 </div>
                             </div>
 
                             {/* Content */}
-                            <div className="p-4 flex flex-col flex-grow">
-                                <div className="flex items-center gap-2 text-[9px] md:text-[10px] text-purple-400 mb-2 font-mono uppercase tracking-wider">
+                            <div className="p-2.5 md:p-4 flex flex-col flex-grow min-h-[140px] md:min-h-0">
+                                <div className="flex items-center gap-2 text-[7px] md:text-[10px] text-purple-400 mb-1 md:mb-2 font-mono uppercase tracking-wider">
                                     <span>{Array.isArray(article.category) ? article.category[0] : article.category}</span>
                                 </div>
 
-                                <h3 className="text-base md:text-xl font-serif font-bold text-white leading-tight mb-2 group-hover:text-purple-300 transition-colors line-clamp-3">
+                                <h3 className="text-[12px] sm:text-[14px] md:text-xl font-serif font-bold text-white leading-tight mb-2 group-hover:text-purple-300 transition-colors line-clamp-none md:line-clamp-3">
                                     {article.title}
                                 </h3>
 

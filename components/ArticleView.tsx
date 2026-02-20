@@ -297,12 +297,12 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         <div className="h-full bg-news-accent w-full animate-[width_1s_ease-out]"></div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-12 pt-44 md:pt-32 pb-12 md:pb-24 max-w-4xl">
+      <div className="container mx-auto px-4 md:px-12 pt-32 md:pt-36 pb-12 md:pb-24 max-w-4xl">
 
 
         <header className="mb-8 md:mb-10 text-left">
           <div
-            className="text-news-accent font-bold uppercase tracking-widest text-xs mb-3 cursor-pointer hover:text-emerald-400 transition-colors inline-block"
+            className="text-news-accent font-bold uppercase tracking-widest text-[9px] md:text-xs mb-3 cursor-pointer hover:text-emerald-400 transition-colors inline-block"
             onClick={() => {
               const categories = Array.isArray(article.category) ? article.category : [article.category];
               if (categories.length > 0 && onCategoryClick) {
@@ -322,7 +322,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
           </h1>
 
           {/* Compact Header Metadata */}
-          <div className="flex items-center justify-between border-y border-white/10 py-3 md:py-4 my-6">
+          <div className="flex items-center justify-between border-y border-white/10 py-3 md:py-4 mt-6 md:my-6 mb-8 md:mb-10">
             <div className="flex items-center gap-2 md:gap-4 text-[10px] md:text-xs uppercase tracking-wider font-bold text-gray-400">
               <span className="text-white">{article.date}</span>
               <span className="w-1 h-1 rounded-full bg-gray-600"></span>
@@ -372,10 +372,10 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
           </div>
         </header>
 
-        <figure className="mb-12 md:mb-16 -mx-4 md:-mx-12 lg:mx-0">
+        <figure className="mb-4 md:mb-8 -mx-4 md:-mx-12 lg:mx-0">
           {article.subheadline && (
-            <div className="mb-6 px-4 md:px-0">
-              <h2 className="text-xl md:text-2xl font-serif text-white/90 leading-relaxed italic border-l-4 border-news-accent pl-4">
+            <div className="mb-10 md:mb-12 px-4 md:px-0">
+              <h2 className="text-lg md:text-2xl font-serif text-white/90 leading-relaxed italic border-l-4 border-news-accent pl-3 md:pl-4">
                 {article.subheadline}
               </h2>
             </div>

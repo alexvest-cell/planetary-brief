@@ -158,9 +158,6 @@ const Navigation: React.FC<NavigationProps> = ({
               <button onClick={toggleSearch} className="text-gray-400 hover:text-white transition-colors">
                 <Search size={18} />
               </button>
-              <button onClick={onSubscribeClick} className="text-gray-400 hover:text-white transition-colors">
-                <Bell size={18} />
-              </button>
               <button
                 className="text-white"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -170,8 +167,8 @@ const Navigation: React.FC<NavigationProps> = ({
             </div>
           </div>
 
-          {/* Nav Buttons (Row 2 on Mobile, Centered/Left on Desktop) */}
-          <div className="flex items-center gap-2 w-full md:w-auto md:ml-12">
+          {/* Nav Buttons (Hidden on Mobile, Centered/Left on Desktop) */}
+          <div className="hidden md:flex items-center gap-2 w-auto ml-12">
             <button
               onClick={onDashboardClick}
               className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${['dashboard', 'explanation'].includes(currentView) ? 'bg-news-accent/10 text-news-accent' : 'text-news-accent hover:bg-white/10'}`}
@@ -208,9 +205,9 @@ const Navigation: React.FC<NavigationProps> = ({
 
             <button
               onClick={onSubscribeClick}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-1.5 rounded-md bg-news-accent text-black text-[10px] md:text-xs font-bold uppercase tracking-wider hover:bg-emerald-400 transition-colors"
             >
-              <Bell size={18} />
+              Newsletter
             </button>
           </div>
         </div>
@@ -236,7 +233,12 @@ const Navigation: React.FC<NavigationProps> = ({
       </div>
 
       {/* Secondary Bar (Categories or Action Menu) */}
-      <div className={`w-full bg-black/80 backdrop-blur border-b border-white/10 transition-all duration-300 ${isScrolled ? 'h-10' : 'h-12'}`}>
+      <div className={`relative w-full bg-black/80 backdrop-blur transition-all duration-300 ${isScrolled ? 'h-10' : 'h-12'}`}>
+        {/* Strip Bottom Fade-up (Aligned to Page Width) */}
+        <div className="container mx-auto px-4 md:px-8 absolute inset-0 pointer-events-none">
+          <div className="absolute bottom-0 left-4 md:left-8 right-4 md:right-8 h-[30%] bg-gradient-to-t from-zinc-500/20 to-transparent"></div>
+          <div className="absolute bottom-0 left-4 md:left-8 right-4 md:right-8 h-px bg-white/10"></div>
+        </div>
         <div className="container mx-auto px-4 md:px-8 h-full flex items-center overflow-x-auto hide-scrollbar">
           <div className="flex items-center gap-6 md:gap-8 min-w-max">
             {/* PlanetDash Submenu */}
@@ -256,7 +258,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 </span>
               </div>
             ) : (
-              currentView !== 'action-guide' && currentView !== 'support' && navCategories.map(cat => (
+              currentView !== 'action-guide' && currentView !== 'support' && navCategories.filter(cat => cat !== 'All').map(cat => (
                 <button
                   key={cat}
                   onClick={() => onCategorySelect(cat)}
@@ -265,7 +267,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 >
                   {cat}
                   {activeCategory === cat && (
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full"></span>
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full z-10"></span>
                   )}
                 </button>
               )))}
@@ -301,7 +303,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   className="text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 text-news-accent"
                 >
                   Support
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full"></span>
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-news-accent rounded-full z-10"></span>
                 </button>
               </>
             )}
@@ -312,13 +314,52 @@ const Navigation: React.FC<NavigationProps> = ({
       {/* Mobile Menu Overlay */}
       {
         isMobileMenuOpen && (
-          <div className="fixed inset-0 top-28 bg-black z-40 p-6 animate-fade-in md:hidden border-t border-white/10">
-            <div className="flex flex-col gap-6 text-sm font-bold uppercase tracking-widest">
-              <button onClick={() => { onCategorySelect('All'); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">Home</button>
-              <button onClick={() => { onShowAbout(); setIsMobileMenuOpen(false); }} className="text-left text-white border-b border-white/10 pb-4">About</button>
-              <button onClick={() => { onSubscribeClick(); setIsMobileMenuOpen(false); }} className="text-left text-white flex items-center gap-2">
-                Subscribe
-              </button>
+          <div className="absolute top-full left-0 w-full bg-black z-40 p-4 sm:p-6 md:px-8 animate-fade-in md:hidden border-b border-white/10 shadow-2xl pb-6">
+
+            <div className="grid grid-cols-[1.3fr_1fr] gap-x-3 sm:gap-x-4">
+
+              {/* Left Column: INTELLIGENCE BY SECTOR */}
+              <div className="flex flex-col border-r border-white/10 pr-3 sm:pr-4">
+                <h3 className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-4">Intelligence By Sector</h3>
+                <div className="flex flex-col gap-5 text-[11px] font-medium uppercase tracking-widest text-white">
+                  {navCategories.filter(cat => cat !== 'All').map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => { onCategorySelect(cat); setIsMobileMenuOpen(false); }}
+                      className="text-left hover:text-news-accent transition-colors leading-snug"
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: TOOLS & ABOUT */}
+              <div className="flex flex-col pl-1 sm:pl-2">
+
+                {/* SECTION: INTELLIGENCE TOOLS */}
+                <div className="mb-8">
+                  <h3 className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-4">Intelligence Tools</h3>
+                  <div className="flex flex-col gap-4 text-[11px] font-medium uppercase tracking-widest text-white">
+                    <button onClick={() => { onDashboardClick(); setIsMobileMenuOpen(false); }} className="text-left flex items-start gap-2 hover:text-white transition-colors leading-snug">
+                      <Activity size={12} className={['dashboard', 'explanation'].includes(currentView) ? 'text-news-accent animate-pulse mt-0.5 flex-shrink-0' : 'text-news-accent mt-0.5 flex-shrink-0'} />
+                      <span>PlanetDash</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* SECTION: ABOUT */}
+                <div className="mb-8">
+                  <h3 className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-4">About</h3>
+                  <div className="flex flex-col gap-4 text-[10px] font-medium uppercase tracking-widest text-gray-400">
+                    <button onClick={() => { onShowAbout(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">About Planetary Brief</button>
+                    <button onClick={() => { onSubscribeClick(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">Newsletter</button>
+                    <button onClick={() => { onSupportClick(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">Contact</button>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
           </div>
         )

@@ -16,19 +16,19 @@ const LatestPolicySection: React.FC<LatestPolicySectionProps> = ({ title, articl
     if (!displayArticles || displayArticles.length === 0) return null;
 
     return (
-        <section className="py-16 bg-zinc-900 border-t border-white/5">
+        <section className="py-8 md:py-16 bg-zinc-900 border-t border-white/5">
             <div className="container mx-auto px-4 md:px-8">
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        <span className="text-blue-400 font-bold tracking-widest uppercase text-xs">Global Frameworks</span>
-                        <h2 className="text-2xl md:text-3xl font-serif font-bold text-white mt-1">{title}</h2>
+                <div className="flex items-center justify-between mb-6 md:mb-8 gap-2 md:gap-4">
+                    <div className="shrink-1 min-w-0">
+                        <span className="text-blue-400 font-bold tracking-widest uppercase text-[10px] md:text-xs truncate block">Global Frameworks</span>
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white mt-1 leading-tight">{title}</h2>
                     </div>
                     <button
                         onClick={() => window.location.href = '/category/policy-governance-and-finance'}
-                        className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors"
+                        className="group flex flex-row items-center justify-end gap-1 md:gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors shrink-0 whitespace-nowrap"
                     >
-                        <span>View All Policy</span>
-                        <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        <span className="text-right">View All Policy</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>
 

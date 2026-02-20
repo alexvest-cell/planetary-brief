@@ -71,16 +71,7 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white animate-fade-in">
-            <div className="max-w-5xl mx-auto px-4 md:px-8 pt-32 pb-12 md:pt-40 md:pb-24">
-
-                {/* Back Button */}
-                <button
-                    onClick={onBack}
-                    className="flex items-center gap-2 text-gray-400 hover:text-white text-xs uppercase tracking-widest font-bold mb-8 group transition-colors"
-                >
-                    <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                    Back
-                </button>
+            <div className="max-w-5xl mx-auto px-4 md:px-8 pt-36 pb-12 md:pt-40 md:pb-24">
 
                 {/* Header */}
                 <div className="mb-10 md:mb-14">
@@ -111,12 +102,12 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
 
                 {/* Filter Bar */}
                 {articleTypes.length > 1 && (
-                    <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-8 border-b border-white/10 pb-4">
                         <Filter size={12} className="text-gray-500" />
                         <span className="text-[9px] uppercase tracking-widest font-bold text-gray-500 mr-2">Filter by type:</span>
                         <button
                             onClick={() => setFilterType('all')}
-                            className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider border transition-all ${filterType === 'all'
+                            className={`whitespace-nowrap flex-shrink-0 px-2.5 py-1 md:px-3 rounded-full text-[9px] md:text-[10px] uppercase font-bold tracking-wider border transition-all ${filterType === 'all'
                                 ? 'bg-white text-black border-white'
                                 : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500'
                                 }`}
@@ -127,7 +118,7 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type)}
-                                className={`px-3 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider border transition-all ${filterType === type
+                                className={`whitespace-nowrap flex-shrink-0 px-2.5 py-1 md:px-3 rounded-full text-[9px] md:text-[10px] uppercase font-bold tracking-wider border transition-all ${filterType === type
                                     ? 'bg-white text-black border-white'
                                     : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500'
                                     }`}
@@ -176,17 +167,17 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
                                     {/* Content */}
                                     <div className="flex flex-col justify-center flex-grow min-w-0">
                                         {/* Meta row */}
-                                        <div className="flex items-center gap-3 mb-2">
+                                        <div className="flex flex-wrap items-center gap-1.5 md:gap-3 mb-1.5 md:mb-2">
                                             <span
-                                                className="text-[9px] uppercase tracking-widest font-bold"
+                                                className="text-[8px] md:text-[9px] uppercase tracking-widest font-bold"
                                                 style={{ color: catColor }}
                                             >
                                                 {categoryLabel}
                                             </span>
                                             {article.articleType && (
                                                 <>
-                                                    <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-                                                    <span className="text-[9px] uppercase tracking-widest font-bold text-emerald-400">
+                                                    <span className="w-1 h-1 rounded-full bg-gray-600 flex-shrink-0"></span>
+                                                    <span className="text-[8px] md:text-[9px] uppercase tracking-widest font-bold text-emerald-400">
                                                         {article.articleType}
                                                     </span>
                                                 </>
@@ -194,7 +185,7 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
                                         </div>
 
                                         {/* Title */}
-                                        <h3 className="text-sm md:text-lg font-serif font-bold text-white leading-snug group-hover:text-emerald-400 transition-colors line-clamp-2 mb-2">
+                                        <h3 className="text-[13px] md:text-lg font-serif font-bold text-white leading-snug group-hover:text-emerald-400 transition-colors line-clamp-3 md:line-clamp-2 mb-1.5 md:mb-2">
                                             {article.title}
                                         </h3>
 
@@ -204,7 +195,7 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
                                         </p>
 
                                         {/* Date & read time */}
-                                        <div className="flex items-center gap-3 mt-2 text-[10px] uppercase tracking-wider font-bold text-gray-600">
+                                        <div className="flex items-center gap-2 md:gap-3 mt-auto text-[8px] md:text-[10px] uppercase tracking-wider font-bold text-gray-600">
                                             <span>{article.date}</span>
                                             {article.originalReadTime && (
                                                 <>

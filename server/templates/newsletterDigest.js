@@ -120,7 +120,7 @@ export const generateWeeklyDigest = (data) => {
                     Manage Preferences or Unsubscribe
                 </a>
                 <div style="margin-top: 16px; font-family: 'Georgia', serif; font-size: 12px; color: #3f3f46;">
-                    Greenshift Environmental Intelligence
+                    Planetary Brief
                 </div>
             </div>
 
