@@ -128,7 +128,7 @@ const Navigation: React.FC<NavigationProps> = ({
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full z-50 flex flex-col font-serif overflow-visible">
+    <div className="fixed top-0 left-0 w-full z-50 flex flex-col font-sans overflow-visible">
 
       {/* Top Bar (Primary Nav) */}
       <div className={`w-full transition-all duration-300 overflow-visible ${isScrolled ? 'bg-black border-b border-white/10' : 'bg-black/90 backdrop-blur-md border-b border-white/5'}`}>
@@ -146,7 +146,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   <span className="text-news-accent">Planetary</span>
                   <span className="text-white">Brief</span>
                 </div>
-                <div className="text-gray-400 text-[10px] font-serif font-normal tracking-wide mt-0.5">
+                <div className="text-gray-400 text-[10px] font-sans font-normal tracking-wide mt-0.5">
                   Environmental Intelligence, Explained.
                 </div>
               </div>
@@ -258,7 +258,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 <button
                   key={cat}
                   onClick={() => onCategorySelect(cat)}
-                  className={`text-[10px] md:text-xs font-serif font-bold uppercase tracking-widest transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
+                  className={`text-[10px] md:text-sm font-serif font-bold transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
                     }`}
                 >
                   {cat}
