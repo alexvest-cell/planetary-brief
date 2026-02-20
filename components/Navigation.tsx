@@ -258,7 +258,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 <button
                   key={cat}
                   onClick={() => onCategorySelect(cat)}
-                  className={`text-[10px] md:text-base font-serif font-bold transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
+                  className={`text-[10px] md:text-base font-sans font-bold transition-colors whitespace-nowrap relative py-1 ${activeCategory === cat ? 'text-news-accent' : 'text-gray-400 hover:text-white'
                     }`}
                 >
                   {cat}
