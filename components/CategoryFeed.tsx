@@ -118,7 +118,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
     let gridArticles = [...priorityArticles, ...chronologicalRest];
 
     return (
-        <div className="min-h-screen bg-black pt-24 md:pt-28 pb-20">
+        <div className="min-h-screen bg-black pt-20 md:pt-28 pb-20">
             <div className="container mx-auto px-4 md:px-8">
 
                 {/* Unified Hero Section: Shared Background for Explainer and Hero Article */}
