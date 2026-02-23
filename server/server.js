@@ -63,6 +63,25 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
+// SEO: Canonical domain — redirect www to non-www with 301
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  if (host.startsWith('www.')) {
+    const canonicalHost = host.slice(4); // strip 'www.'
+    return res.redirect(301, `${req.protocol}://${canonicalHost}${req.originalUrl}`);
+  }
+  next();
+});
+
+// SEO: Strip trailing slashes — redirect /path/ → /path with 301
+app.use((req, res, next) => {
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    const query = req.url.slice(req.path.length); // preserve query string
+    return res.redirect(301, req.path.slice(0, -1) + query);
+  }
+  next();
+});
+
 // Serve static files from public directory (for robots.txt, etc.)
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -696,6 +715,27 @@ app.put('/api/articles/:id', requireAuth, async (req, res) => {
         return res.json(articles[index]);
       } else {
         return res.status(500).json({ error: 'Failed to write to local storage' });
+      }
+    }
+
+    // SEO: Auto-create redirect if slug changed
+    if (mongoose.connection.readyState === 1 && updates.slug) {
+      const existingArticle = await Article.findOne({ id: articleId });
+      if (existingArticle && existingArticle.slug && existingArticle.slug !== updates.slug) {
+        const fromPath = `/article/${existingArticle.slug}`;
+        const toPath = `/article/${updates.slug}`;
+        // Only create if not already present to avoid duplicates
+        const alreadyExists = await Redirect.findOne({ fromPath });
+        if (!alreadyExists) {
+          await Redirect.create({
+            fromPath,
+            toPath,
+            redirectType: 301,
+            description: `Auto: slug change for article "${existingArticle.title}"`,
+            isActive: true
+          });
+          console.log(`[SEO] Auto-redirect created: ${fromPath} -> ${toPath}`);
+        }
       }
     }
 

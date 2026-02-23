@@ -60,6 +60,14 @@ const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose }) => {
 
         try {
             await subscribeToNewsletter(email, finalTags);
+            // Step 9: Track newsletter signup in Google Analytics
+            if (typeof (window as any).gtag === 'function') {
+                (window as any).gtag('event', 'newsletter_signup', {
+                    event_category: 'engagement',
+                    event_label: 'Weekly Intelligence Briefing',
+                    value: selectedTopics.length
+                });
+            }
             setIsSuccess(true);
         } catch (error: any) {
             console.error('Subscription error:', error);

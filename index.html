@@ -3,6 +3,8 @@
 
 <head>
   <meta charset="UTF-8" />
+  <!-- Google Search Console Verification -->
+  <meta name="google-site-verification" content="ADD_YOUR_GSC_VERIFICATION_CODE_HERE" />
   <!-- Usercentrics CMP -->
   <script id="usercentrics-cmp" src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
     data-settings-id="HMrN1WLi23IQqs" async></script>
@@ -123,6 +125,37 @@
 }
 </script>
   <link rel="stylesheet" href="/index.css">
+  <!-- Static Sitewide JSON-LD: Organization + WebSite schemas -->
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Planetary Brief",
+      "url": "https://planetarybrief.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://planetarybrief.com/favicon.svg"
+      },
+      "description": "Environmental intelligence platform covering climate, biodiversity, policy, and planetary health."
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Planetary Brief",
+      "url": "https://planetarybrief.com",
+      "description": "Environmental Intelligence, Explained.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://planetarybrief.com/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+  </script>
 </head>
 
 <body>

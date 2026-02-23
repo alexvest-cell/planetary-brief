@@ -65,6 +65,25 @@ router.get('/sitemap.xml', async (req, res) => {
             priority: '0.8'
         });
 
+        // Add Hub / Category pages (6 core pillars)
+        const hubCategories = [
+            'Climate & Energy Systems',
+            'Planetary Health & Society',
+            'Policy, Governance & Finance',
+            'Biodiversity & Oceans',
+            'Science & Data',
+            'Technology & Innovation'
+        ];
+        const toSlug = (str) => str.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        hubCategories.forEach(cat => {
+            urls.push({
+                loc: `${baseUrl}/category/${toSlug(cat)}`,
+                lastmod: new Date().toISOString().split('T')[0],
+                changefreq: 'weekly',
+                priority: '0.85'
+            });
+        });
+
         // Add article pages
         articles.forEach(article => {
             const slug = article.slug || article.id;
@@ -77,6 +96,7 @@ router.get('/sitemap.xml', async (req, res) => {
                 priority: '0.9'
             });
         });
+
 
         // Generate XML
         const xml = `<?xml version="1.0" encoding="UTF-8"?>

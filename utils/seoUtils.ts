@@ -188,3 +188,80 @@ export function injectStructuredData(schema: object): () => void {
         script.remove();
     };
 }
+
+/**
+ * Generate sitewide Organization schema (inject once in index.html)
+ */
+export function generateOrganizationSchema(): object {
+    const baseUrl = 'https://planetarybrief.com';
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Planetary Brief',
+        url: baseUrl,
+        logo: {
+            '@type': 'ImageObject',
+            url: `${baseUrl}/favicon.svg`
+        },
+        sameAs: [
+            'https://twitter.com/planetarybrief'
+        ],
+        description: 'Environmental intelligence platform covering climate, biodiversity, policy, and planetary health.'
+    };
+}
+
+/**
+ * Generate sitewide WebSite schema with SearchAction (inject once in index.html)
+ */
+export function generateWebSiteSchema(): object {
+    const baseUrl = 'https://planetarybrief.com';
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Planetary Brief',
+        url: baseUrl,
+        description: 'Environmental Intelligence, Explained.',
+        potentialAction: {
+            '@type': 'SearchAction',
+            target: {
+                '@type': 'EntryPoint',
+                urlTemplate: `${baseUrl}/?q={search_term_string}`
+            },
+            'query-input': 'required name=search_term_string'
+        }
+    };
+}
+
+/**
+ * Generate a BreadcrumbList schema for article or category pages.
+ * @param crumbs Array of { name, url } in order from root → current page
+ */
+export function generateBreadcrumbSchema(crumbs: { name: string; url: string }[]): object {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: crumbs.map((crumb, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: crumb.name,
+            item: crumb.url
+        }))
+    };
+}
+
+/**
+ * Inject multiple JSON-LD schemas simultaneously (e.g. Article + BreadcrumbList)
+ */
+export function injectMultipleSchemas(schemas: object[]): () => void {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    // Use a JSON array when multiple schemas
+    script.text = JSON.stringify(schemas.length === 1 ? schemas[0] : schemas, null, 2);
+    script.id = 'structured-data';
+
+    const existing = document.getElementById('structured-data');
+    if (existing) existing.remove();
+
+    document.head.appendChild(script);
+    return () => { script.remove(); };
+}

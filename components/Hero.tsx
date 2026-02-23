@@ -39,11 +39,9 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
 
                         {/* Signal / Category */}
                         <div className="flex items-center gap-1.5 md:gap-3 mb-4 md:mb-6 w-full flex-nowrap overflow-hidden">
-                            <span className="shrink-0 bg-news-accent/10 border border-news-accent/20 px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[8px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest text-news-accent flex items-center gap-1 md:gap-2">
-                                <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-news-accent shadow-[0_0_5px_#10b981]"></span>
-                                {featuredArticleOverride?.articleType || "Deep Dive Analysis"}
-                            </span>
                             <span className="shrink min-w-0 flex items-center gap-1.5 md:gap-2 text-[8px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest text-gray-500">
+                                <span className="text-news-accent">{featuredArticleOverride?.articleType || "Deep Dive Analysis"}</span>
+                                <span className="shrink-0 w-px h-2.5 md:h-3 bg-gray-800"></span>
                                 <span className="truncate">{categoryLabel}</span>
                                 <span className="shrink-0 w-px h-2.5 md:h-3 bg-gray-800"></span>
                                 <span className="shrink-0 whitespace-nowrap">{displayDate}</span>

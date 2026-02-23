@@ -74,7 +74,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
     }, [sourceArticles, category]);
 
     const catData = CATEGORIES.find(c => c.id === category);
-    const description = catData?.description || "Latest intelligence, verified data, and policy updates.";
+    const description = catData?.shortDescription || "Latest intelligence, verified data, and policy updates.";
 
     // Get related data signals
     const categorySignals = homepageConfig.dataSignals.filter(s => s.relatedCategoryId === category);

@@ -4,7 +4,7 @@ import { useAudio } from '../contexts/AudioContext';
 import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck, Headphones, Pause, Play, Share2 } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
-import { generateArticleSchema, updateMetaTags, injectStructuredData } from '../utils/seoUtils';
+import { generateArticleSchema, generateBreadcrumbSchema, updateMetaTags, injectMultipleSchemas } from '../utils/seoUtils';
 import { tagLabelToSlug } from '../data/tagDictionary';
 
 interface ArticleViewProps {
@@ -225,9 +225,17 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         metaKeywords.setAttribute('content', `${cats}, ${article.topic}, environment, sustainability`);
       }
 
-      // Inject Article structured data (JSON-LD)
+      // Build BreadcrumbList schema
+      const primaryCategory = Array.isArray(article.category) ? article.category[0] : article.category;
+      const breadcrumbs = generateBreadcrumbSchema([
+        { name: 'Home', url: 'https://planetarybrief.com' },
+        { name: primaryCategory || 'Articles', url: `https://planetarybrief.com/category/${primaryCategory || ''}` },
+        { name: article.title, url: canonicalUrl }
+      ]);
+
+      // Inject Article + BreadcrumbList structured data (JSON-LD)
       const schema = generateArticleSchema(article);
-      const cleanup = injectStructuredData(schema);
+      const cleanup = injectMultipleSchemas([schema, breadcrumbs]);
 
       // Cleanup on unmount
       return cleanup;
@@ -299,6 +307,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
       <div className="container mx-auto px-4 md:px-12 pt-20 md:pt-36 pb-12 md:pb-24 max-w-4xl">
 
+        {/* Breadcrumb Navigation (Visual UI removed per request, JSON-LD Schema handles SEO) */}
 
         <header className="mb-8 md:mb-10 text-left">
           <div
@@ -322,20 +331,20 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
           </h1>
 
           {/* Compact Header Metadata */}
-          <div className="flex items-center justify-between border-y border-white/10 py-3 md:py-4 mt-6 md:my-6 mb-8 md:mb-10">
-            <div className="flex items-center gap-2 md:gap-4 text-[10px] md:text-xs uppercase tracking-wider font-bold text-gray-400">
-              <span className="text-white">{article.date}</span>
-              <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-              <span className="flex items-center gap-1 text-gray-400"><FileText size={10} className="md:w-3 md:h-3" /> {readTime}</span>
+          <div className="flex items-center justify-between border-y border-white/10 py-3 md:py-4 mt-6 md:my-6 mb-8 md:mb-10 w-full overflow-hidden flex-nowrap gap-2">
+            <div className="flex items-center gap-1.5 md:gap-4 text-[8.5px] sm:text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest font-bold text-gray-400 shrink truncate whitespace-nowrap">
+              <span className="text-white shrink-0">{article.date}</span>
+              <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
+              <span className="flex items-center gap-1 text-gray-400 shrink-0"><FileText size={10} className="md:w-3 md:h-3" /> <span className="hidden sm:inline"> {readTime}</span><span className="sm:hidden">{readTime.replace(' min read', ' MIN').replace(' minutes', ' MIN').replace(' min', ' MIN')}</span></span>
               {article.articleType && (
                 <>
-                  <span className="w-1 h-1 rounded-full bg-gray-600"></span>
-                  <span className="text-emerald-400">{article.articleType}</span>
+                  <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
+                  <span className="text-emerald-400 shrink truncate max-w-[120px] md:max-w-none">{article.articleType}</span>
                 </>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
               <button
                 onClick={handleToggleAudio}
                 disabled={isThisArticleLoading}
@@ -440,7 +449,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
               let emittedElement;
               if (isSubheader) {
-                emittedElement = <h3 key={index} className="text-2xl md:text-3xl font-serif font-bold text-white mt-12 mb-6 border-l-4 border-news-accent pl-4">{paragraph}</h3>
+                emittedElement = <h2 key={index} className="text-2xl md:text-3xl font-serif font-bold text-white mt-12 mb-6 border-l-4 border-news-accent pl-4">{paragraph}</h2>
               } else {
                 if (paragraph === article.excerpt) {
                   // Optional: still skip if exactly matches excerpt to avoid duplication if old data persists
@@ -577,7 +586,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
 
       </div>
-    </div>
+    </div >
   );
 };
 

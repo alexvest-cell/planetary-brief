@@ -73,11 +73,17 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                                 </p>
 
                                 <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3">
-                                    <div className="flex items-center gap-3 text-[9px] text-gray-500 font-mono">
+                                    <div className="flex flex-wrap items-center gap-1.5 md:gap-3 text-[9px] text-gray-500 font-mono tracking-wide">
                                         <div className="flex items-center gap-1">
                                             <Clock size={10} />
                                             <span>{article.originalReadTime || '10m'}</span>
                                         </div>
+                                        {article.date && (
+                                            <>
+                                                <span className="w-0.5 h-0.5 rounded-full bg-gray-600"></span>
+                                                <span>{article.date}</span>
+                                            </>
+                                        )}
                                     </div>
 
                                     {/* Mobile: Simple Arrow, Desktop: 'Read' */}

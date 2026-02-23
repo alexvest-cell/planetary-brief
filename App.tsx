@@ -213,8 +213,21 @@ function App() {
       if (pathname !== '/dashboard') {
         window.history.replaceState({}, '', '/dashboard');
       }
-      if (pathname !== '/dashboard') {
-        window.history.replaceState({}, '', '/dashboard');
+      // Step 7: Deep-link to a metric explanation via /dashboard/:metric-slug
+    } else if (pathname.startsWith('/dashboard/')) {
+      const metricSlug = pathname.replace('/dashboard/', '');
+      setView('dashboard');
+      // Restore explanation data from session if available
+      const savedData = sessionStorage.getItem('explanationData');
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          const restored = restoreIcon(parsed);
+          if (restored.title && metricSlug) {
+            setExplanationData(restored);
+            setView('explanation');
+          }
+        } catch (_) { }
       }
     } else if (viewParam === 'subscribe') {
       // Open modal instead of changing view
@@ -423,7 +436,21 @@ function App() {
         document.title = 'Admin Dashboard | Planetary Brief';
         break;
       // Article view is handled in ArticleView component
+      default: {
+        // Step 8: Noindex for unknown routes to prevent indexing 404 pages
+        let noindexMeta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+        if (!noindexMeta) {
+          noindexMeta = document.createElement('meta');
+          noindexMeta.setAttribute('name', 'robots');
+          document.head.appendChild(noindexMeta);
+        }
+        noindexMeta.setAttribute('content', 'noindex, follow');
+      }
     }
+    // Remove noindex from non-404 views
+    if (!['home', 'category', 'article', 'dashboard', 'explanation', 'about'].includes(view)) return;
+    const existingNoindex = document.querySelector('meta[name="robots"]');
+    if (existingNoindex) existingNoindex.remove();
   }, [view, activeCategory]);
 
   const scrollToSection = (sectionId: Section) => {
@@ -499,7 +526,6 @@ function App() {
 
   const handleExplainData = (data: ExplanationData) => {
     // Explicitly update the CURRENT history entry to be a valid Dashboard checkpoint
-    // This ensures that when the user clicks "Back", they return to this exact state
     if (view === 'dashboard') {
       window.history.replaceState({ view: 'dashboard' }, '', '/dashboard');
     }
@@ -513,8 +539,13 @@ function App() {
     setExplanationData(data);
     setView('explanation');
     window.scrollTo(0, 0);
-    // Use hash for navigation - explicit pushstate with hash
-    window.location.hash = 'explain';
+
+    // Step 7: Push a clean, indexable URL for the metric explanation
+    const metricSlug = (data.title || 'metric')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    window.history.pushState({ view: 'explanation', explanationData: data }, '', `/dashboard/${metricSlug}`);
   };
 
   const handleCloseExplanation = () => {

@@ -407,7 +407,7 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
                 </div>
 
                 {/* Climate System indicator cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
                     {climateIndicators.map(renderIndicatorCard)}
                 </div>
 
@@ -454,7 +454,7 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
                     <span className="text-[10px] text-gray-600 uppercase tracking-widest">4 Indicators</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-16 md:mb-20">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-16 md:mb-20">
                     {biosphereIndicators.map(renderIndicatorCard)}
                 </div>
 
@@ -469,7 +469,7 @@ const EarthDashboard: React.FC<EarthDashboardProps> = ({ onBack, onExplain, onSe
                     <span className="text-[10px] text-gray-600 uppercase tracking-widest">3 Indicators</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-16 md:mb-20">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-16 md:mb-20">
                     {governanceIndicators.map(renderIndicatorCard)}
                 </div>
 
