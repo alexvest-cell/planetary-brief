@@ -1,6 +1,7 @@
 import React from 'react';
 import { Article } from '../types';
 import { ArrowRight, BookOpen, Clock } from 'lucide-react';
+import ArticleTypeBadge from './ArticleTypeBadge';
 
 interface InDepthAnalysisSectionProps {
     title: string;
@@ -52,10 +53,7 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
                                 {/* Badge - Simplified for smaller cards */}
-                                <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-purple-900/80 backdrop-blur px-1.5 md:px-2 py-0.5 rounded-full text-[7px] md:text-[9px] font-bold uppercase tracking-wide text-white flex items-center gap-1 md:gap-1.5 border border-white/10 shadow-lg">
-                                    <BookOpen size={8} className="md:w-[10px] md:h-[10px]" />
-                                    <span>Analysis</span>
-                                </div>
+                                <ArticleTypeBadge type={article.articleType} className="top-2 left-2 md:top-3 md:left-3" />
                             </div>
 
                             {/* Content */}

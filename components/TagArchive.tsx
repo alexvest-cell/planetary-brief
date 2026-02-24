@@ -174,14 +174,6 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
                                             >
                                                 {categoryLabel}
                                             </span>
-                                            {article.articleType && (
-                                                <>
-                                                    <span className="w-1 h-1 rounded-full bg-gray-600 flex-shrink-0"></span>
-                                                    <span className="text-[8px] md:text-[9px] uppercase tracking-widest font-bold text-emerald-400">
-                                                        {article.articleType}
-                                                    </span>
-                                                </>
-                                            )}
                                         </div>
 
                                         {/* Title */}
@@ -211,7 +203,7 @@ const TagArchive: React.FC<TagArchiveProps> = ({ tagSlug, articles, onArticleCli
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 

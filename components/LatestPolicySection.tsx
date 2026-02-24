@@ -1,6 +1,7 @@
 import React from 'react';
 import { Article } from '../types';
 import { ArrowRight, FileText } from 'lucide-react';
+import ArticleTypeBadge from './ArticleTypeBadge';
 
 interface LatestPolicySectionProps {
     title: string;
@@ -45,10 +46,7 @@ const LatestPolicySection: React.FC<LatestPolicySectionProps> = ({ title, articl
                                     alt={article.title}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                                 />
-                                <div className="absolute top-3 left-3 bg-blue-600/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide text-white flex items-center gap-1">
-                                    <FileText size={10} />
-                                    <span>Policy</span>
-                                </div>
+                                <ArticleTypeBadge type={article.articleType} />
                             </div>
 
                             <div className="p-5 flex flex-col flex-grow">

@@ -4,6 +4,7 @@ import { newsArticles } from '../data/content';
 import { CATEGORIES, mapTopicToCategory } from '../data/categories';
 import { homepageConfig } from '../data/homepageConfig'; // Import config for signals
 import { Filter, ArrowRight, Headphones, Activity } from 'lucide-react';
+import ArticleTypeBadge from './ArticleTypeBadge';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 import { useAudio } from '../contexts/AudioContext';
@@ -183,10 +184,8 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                     )}
                                 </button>
 
+                                <ArticleTypeBadge type={heroArticle.articleType} className="top-3 left-3 md:top-4 md:left-4" />
                                 <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-10">
-                                    <span className="text-news-accent text-[8px] font-bold uppercase tracking-widest mb-1 md:mb-2 block bg-black/50 backdrop-blur w-fit px-1.5 py-0.5 rounded">
-                                        Featured
-                                    </span>
                                     <h2 className="text-[17px] md:text-2xl font-serif font-bold text-white leading-tight mb-1.5 md:mb-2 group-hover:underline decoration-2 decoration-news-accent underline-offset-4 shadow-black drop-shadow-lg pr-8 md:pr-0">
                                         {heroArticle.title}
                                     </h2>
@@ -390,11 +389,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                             )}
 
                                             {/* Article Type Badge - Top Left */}
-                                            {article.articleType && (
-                                                <span className="absolute top-2 left-2 px-2 py-0.5 bg-emerald-500/90 backdrop-blur border border-emerald-500 rounded text-[9px] font-bold uppercase tracking-widest text-white shadow-lg z-10">
-                                                    {article.articleType}
-                                                </span>
-                                            )}
+                                            <ArticleTypeBadge type={article.articleType} />
 
                                             {/* Listen Button - Top Right */}
                                             <button

@@ -6,6 +6,7 @@ import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 import { generateArticleSchema, generateBreadcrumbSchema, updateMetaTags, injectMultipleSchemas } from '../utils/seoUtils';
 import { tagLabelToSlug } from '../data/tagDictionary';
+import ArticleTypeBadge from './ArticleTypeBadge';
 
 interface ArticleViewProps {
   article: Article;
@@ -556,12 +557,13 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                   onClick={() => onArticleSelect(related)}
                   className="group cursor-pointer flex flex-col h-full bg-white/5 border border-white/5 rounded-lg overflow-hidden hover:border-white/20 hover:bg-white/10 transition-all duration-300"
                 >
-                  <div className="aspect-video w-full overflow-hidden">
+                  <div className="aspect-video w-full overflow-hidden relative">
                     <img
                       src={related.originalImageUrl || related.imageUrl}
                       alt={related.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
                     />
+                    <ArticleTypeBadge type={related.articleType} className="top-2 left-2" />
                   </div>
                   <div className="p-4 md:p-5 flex flex-col flex-grow">
                     <span className="text-[9px] md:text-[10px] text-news-accent font-bold uppercase tracking-widest mb-2 truncate">
