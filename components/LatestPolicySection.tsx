@@ -24,20 +24,24 @@ const LatestPolicySection: React.FC<LatestPolicySectionProps> = ({ title, articl
                         <span className="text-blue-400 font-bold tracking-widest uppercase text-[10px] md:text-xs truncate block">Global Frameworks</span>
                         <h2 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white mt-1 leading-tight">{title}</h2>
                     </div>
-                    <button
-                        onClick={() => window.location.href = '/category/policy-governance-and-finance'}
+                    <a
+                        href="/category/policy-governance-and-finance"
                         className="group flex flex-row items-center justify-end gap-1 md:gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors shrink-0 whitespace-nowrap"
                     >
                         <span className="text-right">View All Policy</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    </a>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {displayArticles.map((article) => (
-                        <div
+                        <a
                             key={article.id}
-                            onClick={() => onArticleClick(article)}
+                            href={`/article/${article.slug || article.id}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onArticleClick(article);
+                            }}
                             className="group cursor-pointer flex flex-col h-full bg-black/20 border border-white/5 hover:border-blue-500/30 hover:bg-black/40 transition-all duration-300 rounded-lg overflow-hidden"
                         >
                             <div className="h-40 overflow-hidden relative">
@@ -73,7 +77,7 @@ const LatestPolicySection: React.FC<LatestPolicySectionProps> = ({ title, articl
                                     <ArrowRight size={12} className="ml-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     ))}
                 </div>
             </div>

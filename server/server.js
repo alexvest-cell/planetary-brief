@@ -82,7 +82,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from public directory (for robots.txt, etc.)
+// Serve robots.txt explicitly
+app.get('/robots.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'robots.txt'));
+});
+
+// Serve static files from public directory (favicon, etc.)
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Database Connection
@@ -1253,16 +1258,6 @@ app.post('/api/newsletter/generate-digest', async (req, res) => {
 });
 
 // --- NEWSLETTER ROUTES END ---
-// --- SERVE FRONTEND (Production) ---
-// This allows the Node server to serve the React app after it's built
-const distPath = path.join(__dirname, '../dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
-}
-
 // --- AI Endpoints ---
 
 app.post('/api/analyze', async (req, res) => {
@@ -1510,12 +1505,20 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 
 
 // Serve static files from the React app (build directory)
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, '..', 'dist')));
 
 // SPA fallback: serve index.html for any request that doesn't match API routes or static files
-// Express 5 doesn't support wildcard routes, so we use middleware instead
+// We only serve index.html for paths that don't look like files (no extension)
+// to prevent "Soft 404" issues where missing images/scripts return the HTML shell with a 200 OK
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+  // If the request has an extension (e.g. .png, .js, .css, .txt), it's a missing asset, so return 404
+  if (path.extname(req.path)) {
+    console.log(`[404] Missing asset: ${req.path}`);
+    return res.status(404).send('Not Found');
+  }
+
+  // Otherwise, it's likely a frontend route, so serve index.html
+  res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
 });
 
 // Start Server

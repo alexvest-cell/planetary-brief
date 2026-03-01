@@ -26,21 +26,25 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                             {title}
                         </h2>
                     </div>
-                    <button
+                    <a
                         className="hidden md:flex group items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
-                        onClick={() => window.location.href = '/category/guides'} // Fallback link
+                        href="/category/guides"
                     >
                         <span>Browse All Reports</span>
                         <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    </a>
                 </div>
 
                 {/* Grid: 2 columns on mobile and desktop per user request (2x2 grid) */}
                 <div className="grid grid-cols-2 gap-4 md:gap-6">
                     {depthArticles.map((article, index) => (
-                        <div
+                        <a
                             key={article.id}
-                            onClick={() => onArticleClick(article)}
+                            href={`/article/${article.slug || article.id}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onArticleClick(article);
+                            }}
                             className="group cursor-pointer flex flex-col bg-zinc-900/20 border border-white/5 hover:border-purple-500/30 transition-all duration-300 rounded-xl overflow-hidden h-full"
                         >
                             {/* Image - Stacked on top */}
@@ -88,7 +92,7 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                                     <ArrowRight size={14} className="text-zinc-600 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     ))}
                 </div>
             </div>

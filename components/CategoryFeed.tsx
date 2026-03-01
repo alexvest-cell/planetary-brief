@@ -156,9 +156,13 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
 
                         {/* Right: Hero Article Card */}
                         {heroArticle ? (
-                            <div
-                                onClick={() => onArticleClick(heroArticle)}
-                                className="group relative aspect-[4/3] sm:aspect-video lg:aspect-[2/1] w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
+                            <a
+                                href={`/article/${heroArticle.slug || heroArticle.id}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onArticleClick(heroArticle);
+                                }}
+                                className="group relative aspect-[4/3] sm:aspect-video lg:aspect-[2/1] w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 block"
                             >
                                 <img
                                     src={heroArticle.imageUrl}
@@ -198,7 +202,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         ) : (
                             // Fallback placeholder
                             <div className="flex flex-col items-center justify-center rounded-xl bg-white/5 p-8 text-center aspect-[4/3] backdrop-blur-sm">
@@ -290,10 +294,14 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {highlights.map((h, i) => (
-                                        <div
+                                        <a
                                             key={h.id}
-                                            onClick={() => onArticleClick(h)}
-                                            className="group relative pl-4 border-l-2 border-white/10 hover:border-news-accent transition-colors cursor-pointer"
+                                            href={`/article/${h.slug || h.id}`}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                onArticleClick(h);
+                                            }}
+                                            className="group relative pl-4 border-l-2 border-white/10 hover:border-news-accent transition-colors cursor-pointer block"
                                         >
                                             <span className="text-[9px] text-news-accent font-bold uppercase tracking-widest mb-1 block bg-news-accent/10 w-fit px-1.5 py-0.5 rounded">
                                                 {h.highlightQuarter ? h.highlightQuarter.replace('-', ' ') : currentQuarter.replace('-', ' ')}
@@ -304,7 +312,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                             <p className="text-xs text-gray-400 leading-relaxed text-justify line-clamp-3">
                                                 {h.quarterlySummaryOverride || h.excerpt}
                                             </p>
-                                        </div>
+                                        </a>
                                     ))}
                                 </div>
                             </div>
@@ -372,9 +380,13 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                         </div>
                                     )}
 
-                                    <div
+                                    <a
+                                        href={`/article/${article.slug || article.id}`}
                                         className={`group relative bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col ${gridClass}`}
-                                        onClick={() => onArticleClick(article)}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onArticleClick(article);
+                                        }}
                                     >
                                         <div className={`w-full overflow-hidden bg-zinc-900 ${imageHeight} ${index === 0 ? 'md:h-full' : ''} relative`}>
                                             <img
@@ -441,7 +453,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                                 </div>
                                             )}
                                         </div>
-                                    </div>
+                                    </a>
                                 </React.Fragment>
                             );
                         })}
@@ -468,9 +480,11 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                             {HUB_RELATED[category].map((rel, i) => {
                                 const Icon = rel.icon;
                                 return (
-                                    <div
+                                    <a
                                         key={i}
-                                        onClick={() => {
+                                        href={`/category/${rel.label}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
                                             if (onCategorySelect) {
                                                 onCategorySelect(rel.label);
                                             }
@@ -485,7 +499,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                             <h4 className="text-sm font-bold text-gray-200 group-hover:text-white">{rel.label}</h4>
                                         </div>
                                         <ArrowRight size={14} className="ml-auto text-gray-600 group-hover:text-emerald-500 -translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                                    </div>
+                                    </a>
                                 );
                             })}
                         </div>

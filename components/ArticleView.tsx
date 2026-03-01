@@ -519,13 +519,17 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {topicsArray.map((topic, index) => (
-                    <button
+                    <a
                       key={index}
-                      onClick={() => onTagClick?.(tagLabelToSlug(topic))}
+                      href={`/tag/${tagLabelToSlug(topic)}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onTagClick?.(tagLabelToSlug(topic));
+                      }}
                       className="px-3 py-1.5 bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 rounded-full text-xs text-gray-300 hover:text-emerald-400 transition-all duration-200 cursor-pointer"
                     >
                       {topic}
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -552,9 +556,13 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
             {/* Responsive Grid: 2 Cols on Mobile, 4 Cols on Desktop */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {relatedArticles.map((related) => (
-                <div
+                <a
                   key={related.id}
-                  onClick={() => onArticleSelect(related)}
+                  href={`/article/${related.slug || related.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onArticleSelect(related);
+                  }}
                   className="group cursor-pointer flex flex-col h-full bg-white/5 border border-white/5 rounded-lg overflow-hidden hover:border-white/20 hover:bg-white/10 transition-all duration-300"
                 >
                   <div className="aspect-video w-full overflow-hidden relative">
@@ -579,7 +587,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                       </span>
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>

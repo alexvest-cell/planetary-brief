@@ -49,12 +49,16 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                         </div>
 
                         {/* Headline */}
-                        <h1
-                            className="text-[28px] sm:text-4xl md:text-5xl xl:text-6xl font-serif font-bold leading-[1.1] mb-4 md:mb-6 text-white hover:text-gray-200 cursor-pointer transition-colors tracking-tight"
-                            onClick={onReadFeatured}
+                        <a
+                            href={`/article/${featuredArticleOverride?.slug || featuredArticleOverride?.id}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onReadFeatured();
+                            }}
+                            className="text-[28px] sm:text-4xl md:text-5xl xl:text-6xl font-serif font-bold leading-[1.1] mb-4 md:mb-6 text-white hover:text-gray-200 cursor-pointer transition-colors tracking-tight block"
                         >
                             {displayHeadline}
-                        </h1>
+                        </a>
 
                         {/* Analytical Subheading */}
                         <p className="text-[15px] sm:text-lg md:text-xl text-gray-400 font-light leading-relaxed mb-6 md:mb-8 border-l-2 border-news-accent/30 pl-4 md:pl-6">
@@ -63,12 +67,16 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
 
                         {/* Metadata & Actions */}
                         <div className="flex items-center gap-4 md:gap-6 mt-auto">
-                            <button
-                                onClick={onReadFeatured}
+                            <a
+                                href={`/article/${featuredArticleOverride?.slug || featuredArticleOverride?.id}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onReadFeatured();
+                                }}
                                 className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest bg-white text-black px-4 py-2.5 md:px-6 md:py-3 rounded-sm hover:bg-gray-200 transition-colors"
                             >
                                 Read Briefing <ArrowUpRight className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                            </button>
+                            </a>
 
                             <div className="text-[9px] md:text-xs font-bold uppercase tracking-widest text-gray-500">
                                 {featuredArticleOverride?.originalReadTime || "10 min read"}
@@ -78,9 +86,13 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
 
                     {/* Right Column: Visual Anchor (7 cols) */}
                     <div className="lg:col-span-7 order-1 lg:order-2 h-full py-0 md:py-4">
-                        <div
-                            className="relative w-full aspect-[4/3] md:aspect-video lg:aspect-auto lg:h-full bg-zinc-900 rounded-sm overflow-hidden cursor-pointer group shadow-2xl shadow-black/50"
-                            onClick={onReadFeatured}
+                        <a
+                            href={`/article/${featuredArticleOverride?.slug || featuredArticleOverride?.id}`}
+                            className="relative w-full aspect-[4/3] md:aspect-video lg:aspect-auto lg:h-full bg-zinc-900 rounded-sm overflow-hidden cursor-pointer group shadow-2xl shadow-black/50 block"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onReadFeatured();
+                            }}
                         >
                             <img
                                 src={displayImageUrl}
@@ -109,7 +121,7 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                                     )}
                                 </button>
                             )}
-                        </div>
+                        </a>
                     </div>
 
                 </div>
