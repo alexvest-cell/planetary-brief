@@ -139,6 +139,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 {/* Listen Button - Top Right */}
                                                 <button
                                                     onClick={(e) => {
+                                                        e.preventDefault();
                                                         e.stopPropagation();
                                                         playArticle(article);
                                                     }}
@@ -246,6 +247,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                 />
                                                 <button
                                                     onClick={(e) => {
+                                                        e.preventDefault();
                                                         e.stopPropagation();
                                                         playArticle(article);
                                                     }}
@@ -331,6 +333,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             />
                                             <button
                                                 onClick={(e) => {
+                                                    e.preventDefault();
                                                     e.stopPropagation();
                                                     playArticle(article);
                                                 }}

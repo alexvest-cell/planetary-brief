@@ -56,7 +56,7 @@ const AdUnit: React.FC<AdUnitProps> = ({ className = '', format = 'auto', slotId
 
       <div className="absolute z-0 flex flex-col items-center justify-center opacity-30 pointer-events-none">
         <span className="text-gray-500 font-serif italic text-sm">Advertisement</span>
-        {ADS_CONFIG.IS_TEST_MODE && <span className="text-xs text-news-accent mt-1">(Test Mode)</span>}
+
       </div>
 
       {/* 

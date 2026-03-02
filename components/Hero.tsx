@@ -73,9 +73,9 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                                     e.preventDefault();
                                     onReadFeatured();
                                 }}
-                                className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest bg-white text-black px-4 py-2.5 md:px-6 md:py-3 rounded-sm hover:bg-gray-200 transition-colors"
+                                className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold uppercase tracking-widest text-white hover:text-news-accent transition-colors group"
                             >
-                                Read Briefing <ArrowUpRight className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                Read Briefing <ArrowUpRight className="w-3 h-3 md:w-3.5 md:h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                             </a>
 
                             <div className="text-[9px] md:text-xs font-bold uppercase tracking-widest text-gray-500">
@@ -107,6 +107,7 @@ const Hero: React.FC<HeroProps> = ({ onReadFeatured, onArticleClick, featuredArt
                             {featuredArticleOverride && (
                                 <button
                                     onClick={(e) => {
+                                        e.preventDefault();
                                         e.stopPropagation();
                                         playArticle(featuredArticleOverride);
                                     }}

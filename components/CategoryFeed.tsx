@@ -154,7 +154,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                             </p>
                         </div>
 
-                        {/* Right: Hero Article Card */}
+                        {/* Right: Hero Article Card — desktop only (overlaid on banner) */}
                         {heroArticle ? (
                             <a
                                 href={`/article/${heroArticle.slug || heroArticle.id}`}
@@ -174,6 +174,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                 {/* Listen Button - Top Right Overlay */}
                                 <button
                                     onClick={(e) => {
+                                        e.preventDefault();
                                         e.stopPropagation();
                                         playArticle(heroArticle);
                                     }}
@@ -292,7 +293,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                         Key Developments This Quarter
                                     </h3>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                                     {highlights.map((h, i) => (
                                         <a
                                             key={h.id}
@@ -301,15 +302,15 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                                 e.preventDefault();
                                                 onArticleClick(h);
                                             }}
-                                            className="group relative pl-4 border-l-2 border-white/10 hover:border-news-accent transition-colors cursor-pointer block"
+                                            className="group relative pl-3 md:pl-4 border-l-2 border-white/10 hover:border-news-accent transition-colors cursor-pointer block"
                                         >
-                                            <span className="text-[9px] text-news-accent font-bold uppercase tracking-widest mb-1 block bg-news-accent/10 w-fit px-1.5 py-0.5 rounded">
+                                            <span className="hidden md:block text-[9px] text-news-accent font-bold uppercase tracking-widest mb-1 bg-news-accent/10 w-fit px-1.5 py-0.5 rounded">
                                                 {h.highlightQuarter ? h.highlightQuarter.replace('-', ' ') : currentQuarter.replace('-', ' ')}
                                             </span>
-                                            <h4 className="text-sm font-bold text-white mb-2 group-hover:text-news-accent transition-colors leading-tight">
+                                            <h4 className="text-xs md:text-sm font-bold text-white mb-0 md:mb-2 group-hover:text-news-accent transition-colors leading-tight">
                                                 {h.title}
                                             </h4>
-                                            <p className="text-xs text-gray-400 leading-relaxed text-justify line-clamp-3">
+                                            <p className="hidden md:block text-xs text-gray-400 leading-relaxed text-justify line-clamp-3">
                                                 {h.quarterlySummaryOverride || h.excerpt}
                                             </p>
                                         </a>
@@ -350,10 +351,10 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                             let excerptClass = "line-clamp-2";
 
                             if (index === 0) {
-                                // The first article of the remaining grid gets the "Featured" Bento treatment
+                                // The first article of the remaining grid gets the "Featured" Bento treatment on md+
                                 gridClass = "col-span-2 md:col-span-2";
-                                titleSize = "text-xl md:text-2xl";
-                                imageHeight = "aspect-[4/3] sm:aspect-video md:aspect-[2/1]";
+                                titleSize = "text-sm md:text-xl md:text-2xl";
+                                imageHeight = "aspect-[3/2] md:aspect-[4/3] sm:aspect-video md:aspect-[2/1]";
                                 excerptClass = "line-clamp-3";
                             } else if (index === 1 || index === 2) {
                                 // Medium cards
@@ -397,7 +398,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                                 decoding="async"
                                             />
                                             {index === 0 && (
-                                                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
+                                                <div className="hidden md:block absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-black/50 to-transparent opacity-80"></div>
                                             )}
 
                                             {/* Article Type Badge - Top Left */}
@@ -406,6 +407,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                             {/* Listen Button - Top Right */}
                                             <button
                                                 onClick={(e) => {
+                                                    e.preventDefault();
                                                     e.stopPropagation();
                                                     playArticle(article);
                                                 }}
@@ -421,9 +423,9 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                             </button>
                                         </div>
 
-                                        <div className={`p-4 flex flex-col flex-grow ${index === 0 ? 'absolute bottom-0 left-0 w-full z-10' : ''}`}>
+                                        <div className={`p-4 flex flex-col flex-grow ${index === 0 ? 'md:absolute md:bottom-0 md:left-0 md:w-full md:z-10' : ''}`}>
                                             <div className="flex items-center gap-2 mb-2">
-                                                <span className={`font-bold uppercase tracking-widest text-news-accent ${index === 0 ? 'text-xs' : 'text-[9px]'}`}>
+                                                <span className={`font-bold uppercase tracking-widest text-news-accent text-[9px] ${index === 0 ? 'md:text-xs' : ''}`}>
                                                     {(() => {
                                                         const displayCategory = (cat: string) => cat === 'Action' || cat === 'Act' ? 'Guides' : cat;
                                                         const categories = Array.isArray(article.category) ? article.category : [article.category];
@@ -436,7 +438,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                                 {article.title}
                                             </h3>
 
-                                            <p className={`text-sm text-gray-300 font-light mb-3 ${excerptClass}`}>
+                                            <p className={`text-sm text-gray-300 font-light mb-3 ${excerptClass} ${index === 0 ? 'hidden md:block' : ''}`}>
                                                 {article.excerpt || (Array.isArray(article.content) ? article.content[0] : '') || ''}
                                             </p>
 

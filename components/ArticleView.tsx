@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Article } from '../types';
 import { useAudio } from '../contexts/AudioContext';
-import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck, Headphones, Pause, Play, Share2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, FileText, Volume2, StopCircle, Loader2, BookOpen, Globe, BarChart3, Database, ArrowRight, Info, ZoomIn, ShieldCheck, Headphones, Pause, Play, Share2, ChevronDown, ChevronUp } from 'lucide-react';
 import AdUnit from './AdUnit';
 import { ADS_CONFIG } from '../data/adsConfig';
 import { generateArticleSchema, generateBreadcrumbSchema, updateMetaTags, injectMultipleSchemas } from '../utils/seoUtils';
@@ -98,95 +98,118 @@ const ReferencedInstitutions = ({ article }: { article: Article }) => {
 
 
 // Combined Footer Component
-const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout: () => void }) => (
-  <div className="my-6 md:my-10">
+const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout: () => void }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
 
-    {/* Editorial Integrity Box */}
-    <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8">
-      {/* Top Row: Brand + Methodology */}
-      <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
-        {/* Brand Block */}
-        <div className="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-500/10 flex items-center justify-center font-serif font-bold text-emerald-500 text-base md:text-lg ring-1 ring-emerald-500/20 flex-shrink-0">
-            PB
+  const hasSources = Array.isArray(article.sources) && article.sources.length > 0;
+  const hasEntities = Array.isArray(article.entities) && article.entities.length > 0;
+  const hasExpandableContent = hasSources || hasEntities;
+
+  return (
+    <div className="my-6 md:my-10">
+
+      {/* Editorial Integrity Box */}
+      <div className="bg-zinc-900/60 border border-white/10 rounded-lg p-5 md:p-8">
+        {/* Top Row: Brand + Methodology */}
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
+          {/* Brand Block */}
+          <div className="flex items-center gap-4 flex-shrink-0 w-full md:w-auto">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-emerald-500/10 flex items-center justify-center font-serif font-bold text-emerald-500 text-base md:text-lg ring-1 ring-emerald-500/20 flex-shrink-0">
+              PB
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
+              <button
+                onClick={onShowAbout}
+                className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
+              >
+                About Verification <Info size={12} className="group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-white text-xs md:text-sm uppercase tracking-wide">Planetary Brief</span>
-            <button
-              onClick={onShowAbout}
-              className="text-[10px] uppercase tracking-wider text-emerald-500 hover:text-white transition-colors flex items-center gap-1 mt-0.5 group"
-            >
-              About Verification <Info size={12} className="group-hover:scale-110 transition-transform" />
-            </button>
+
+          {/* Divider */}
+          <div className="hidden md:block w-px h-10 bg-white/10"></div>
+
+          {/* Methodology */}
+          <div className="flex flex-col gap-1.5 flex-grow">
+            <div className="flex items-center gap-2 text-gray-400 font-bold uppercase tracking-wider text-[9px] md:text-[10px]">
+              <ShieldCheck size={12} className="text-emerald-500" />
+              <span>Editorial Integrity</span>
+            </div>
+            <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
+              This article synthesizes publicly available datasets and institutional reports.
+              <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
+            </p>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="hidden md:block w-px h-10 bg-white/10"></div>
+        {/* Sources Section — hidden on mobile until expanded */}
+        <div className={`${isExpanded ? 'block' : 'hidden'} md:block`}>
+          {hasSources && (() => {
+            const splitSources = article.sources.flatMap(s =>
+              s.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
+            );
+            return (
+              <div className="mt-5 pt-5 border-t border-white/5">
+                <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
+                  <Database size={12} className="text-gray-500" />
+                  <span>Primary Data &amp; Reports</span>
+                </div>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+                  {splitSources.map((source, i) => (
+                    <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
+                      <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
+                      <span>{source}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()}
 
-        {/* Methodology */}
-        <div className="flex flex-col gap-1.5 flex-grow">
-          <div className="flex items-center gap-2 text-gray-400 font-bold uppercase tracking-wider text-[9px] md:text-[10px]">
-            <ShieldCheck size={12} className="text-emerald-500" />
-            <span>Editorial Integrity</span>
-          </div>
-          <p className="text-[11px] md:text-xs text-gray-400 leading-relaxed max-w-2xl">
-            This article synthesizes publicly available datasets and institutional reports.
-            <span className="hidden sm:inline"> Our mission is to translate complex scientific data into actionable intelligence.</span>
-          </p>
+          {/* Referenced Institutions & Programs */}
+          {hasEntities && (() => {
+            const entities = article.entities.flatMap(e =>
+              e.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
+            );
+            if (entities.length === 0) return null;
+            return (
+              <div className="mt-5 pt-5 border-t border-white/5">
+                <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
+                  <Globe size={12} className="text-gray-500" />
+                  <span>Referenced Institutions &amp; Programs</span>
+                </div>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
+                  {entities.map((entity, i) => (
+                    <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
+                      <span className="text-gray-600 mt-0.5 flex-shrink-0">•</span>
+                      <span>{entity}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()}
         </div>
+
+        {/* Mobile expand/collapse toggle — hidden on desktop */}
+        {hasExpandableContent && (
+          <button
+            onClick={() => setIsExpanded(prev => !prev)}
+            className="md:hidden mt-4 pt-4 border-t border-white/5 w-full flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-emerald-400 transition-colors"
+          >
+            {isExpanded ? (
+              <>Show Less <ChevronUp size={14} /></>
+            ) : (
+              <>Show Sources &amp; Institutions <ChevronDown size={14} /></>
+            )}
+          </button>
+        )}
       </div>
-
-      {/* Sources Section */}
-      {Array.isArray(article.sources) && article.sources.length > 0 && (() => {
-        // Split sources that may be semicolon-separated strings into individual items
-        const splitSources = article.sources.flatMap(s =>
-          s.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
-        );
-        return (
-          <div className="mt-5 pt-5 border-t border-white/5">
-            <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
-              <Database size={12} className="text-gray-500" />
-              <span>Primary Data & Reports</span>
-            </div>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-              {splitSources.map((source, i) => (
-                <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
-                  <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
-                  <span>{source}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      })()}
-
-      {/* Referenced Institutions & Programs */}
-      {Array.isArray(article.entities) && article.entities.length > 0 && (() => {
-        const entities = article.entities.flatMap(e =>
-          e.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
-        );
-        if (entities.length === 0) return null;
-        return (
-          <div className="mt-5 pt-5 border-t border-white/5">
-            <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
-              <Globe size={12} className="text-gray-500" />
-              <span>Referenced Institutions & Programs</span>
-            </div>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-              {entities.map((entity, i) => (
-                <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
-                  <span className="text-gray-600 mt-0.5 flex-shrink-0">•</span>
-                  <span>{entity}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      })()}
     </div>
-  </div>
-);
+  );
+};
 
 const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSelect, allArticles, onShowAbout, onCategoryClick, onTagClick }) => {
   const { playArticle, pauseAudio, resumeAudio, isPlaying, isLoading, currentArticle } = useAudio();
@@ -421,8 +444,20 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
               ? article.content
               : (typeof article.content === 'string' ? [article.content] : []);
 
+            // Find the last subheader index (for placing the footer ad before the last h2)
+            const isSubheaderFn = (p: string) => p.length < 80 && !p.endsWith('.') && !p.endsWith('"') && !p.startsWith('//');
+            let lastSubheaderIndex = -1;
+            for (let i = contentArray.length - 1; i >= 5; i--) {
+              if (isSubheaderFn(contentArray[i])) {
+                lastSubheaderIndex = i;
+                break;
+              }
+            }
+            // Fallback: if no late subheader found, place ad before third-to-last paragraph
+            const footerAdIndex = lastSubheaderIndex !== -1 ? lastSubheaderIndex : Math.max(5, contentArray.length - 3);
+
             return contentArray.map((paragraph, index) => {
-              const isSubheader = paragraph.length < 80 && !paragraph.endsWith('.') && !paragraph.endsWith('"') && !paragraph.startsWith('//');
+              const isSubheader = isSubheaderFn(paragraph);
 
               // Parse for // highlight // pattern
               const parseContent = (text: string) => {
@@ -470,15 +505,19 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
               return (
                 <React.Fragment key={index}>
-                  {emittedElement}
-
-                  {index === 1 && (
+                  {index === 2 && (
                     <ArticleDataVisual article={article} />
                   )}
 
                   {index === 4 && (
                     <AdUnit className="w-full h-64 my-12" format="rectangle" slotId={ADS_CONFIG.SLOTS.ARTICLE_IN_CONTENT} />
                   )}
+
+                  {index === footerAdIndex && contentArray.length > 4 && (
+                    <AdUnit className="w-full h-64 my-12" format="rectangle" slotId={ADS_CONFIG.SLOTS.ARTICLE_FOOTER} />
+                  )}
+
+                  {emittedElement}
                 </React.Fragment>
               );
             });
@@ -537,9 +576,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
           })()
         )}
 
-        <div className="mt-16 mb-8">
-          <AdUnit className="w-full h-32 md:h-48" format="horizontal" slotId={ADS_CONFIG.SLOTS.ARTICLE_FOOTER} />
-        </div>
+        <div className="mt-8 mb-8"></div>
 
 
 
@@ -547,7 +584,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         <ArticleFooter article={article} onShowAbout={onShowAbout} />
 
         {relatedArticles.length > 0 && (
-          <div className="mt-12 mb-12 pt-8">
+          <div className="mt-4 md:mt-12 mb-4 md:mb-12 pt-4 md:pt-8">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl md:text-2xl font-serif font-bold text-white">Related Intelligence</h3>
               <div className="h-px flex-grow bg-white/10 ml-8 hidden md:block"></div>
