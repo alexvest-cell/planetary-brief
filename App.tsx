@@ -868,7 +868,6 @@ function App() {
               <Archives
                 articles={articles}
                 onArticleClick={handleArticleClick}
-                onBack={() => handleCategorySelect('All')}
               />
             </Suspense>
           )}
