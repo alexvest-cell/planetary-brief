@@ -436,7 +436,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                     const cleanText = part.slice(2, -2).trim();
                     if (cleanText) {
                       return (
-                        <span key={i} className="block my-8 pl-4 md:pl-8 border-l-2 border-news-accent text-2xl md:text-3xl font-serif font-bold text-white italic leading-tight">
+                        <span key={i} className="block my-8 pl-4 md:pl-8 border-l-2 border-news-accent text-xl md:text-2xl font-serif font-bold text-white italic leading-tight">
                           {cleanText}
                         </span>
                       );
