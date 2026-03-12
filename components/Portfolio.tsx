@@ -89,7 +89,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                 let excerptClass = "line-clamp-2";
 
                                 if (index === 0) {
-                                    gridClass = "col-span-2 md:col-span-2 row-span-2";
+                                    gridClass = "col-span-2 md:col-span-2";
                                     titleSize = "text-xl md:text-3xl";
                                     imageHeight = "aspect-video md:aspect-[16/9]";
                                     excerptClass = "line-clamp-3 md:line-clamp-4";
@@ -124,7 +124,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                             className={`group relative bg-white/5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col ${gridClass}`}
                                             onClick={() => onArticleClick(article)}
                                         >
-                                            <div className={`w-full overflow-hidden bg-zinc-900 ${imageHeight} ${index === 0 ? 'md:h-full' : ''} relative`}>
+                                            <div className={`w-full overflow-hidden bg-zinc-900 ${imageHeight} relative`}>
                                                 <img
                                                     src={article.imageUrl}
                                                     alt={article.title}
