@@ -83,7 +83,13 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                                         {article.date && (
                                             <>
                                                 <span className="w-0.5 h-0.5 rounded-full bg-gray-600"></span>
-                                                <span>{article.date}</span>
+                                                <span>{article.date.split(',')[0]}</span>
+                                            </>
+                                        )}
+                                        {article.updatedAt && (
+                                            <>
+                                                <span className="w-0.5 h-0.5 rounded-full bg-gray-600"></span>
+                                                <span className="text-news-accent">UPDATED {new Date(article.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
                                             </>
                                         )}
                                     </div>

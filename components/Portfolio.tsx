@@ -174,11 +174,16 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                                     {article.excerpt || (Array.isArray(article.content) ? article.content[0] : '') || ''}
                                                 </p>
 
-                                                {index !== 0 && (
-                                                    <div className="mt-auto pt-2 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                                                <div className="mt-auto pt-2 flex flex-col gap-1 text-[9px] font-bold uppercase tracking-widest text-gray-500">
+                                                    <div className="flex flex-wrap items-center gap-2">
                                                         <span>{article.date.split(',')[0]}</span>
+                                                        {article.updatedAt && (
+                                                            <span className="text-news-accent">
+                                                                • UPDATED {new Date(article.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                )}
+                                                </div>
                                             </div>
                                         </div>
                                     </React.Fragment>

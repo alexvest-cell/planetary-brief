@@ -54,8 +54,13 @@ const LatestPolicySection: React.FC<LatestPolicySectionProps> = ({ title, articl
                             </div>
 
                             <div className="p-5 flex flex-col flex-grow">
-                                <div className="flex items-center gap-2 text-[10px] text-blue-400 mb-2 font-mono">
+                                <div className="flex flex-wrap items-center gap-2 text-[10px] text-blue-400 mb-2 font-mono">
                                     <span>{article.date.split(',')[0]}</span>
+                                    {article.updatedAt && (
+                                        <span className="text-news-accent">
+                                            • UPDATED {new Date(article.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                        </span>
+                                    )}
                                     {article.originalReadTime && (
                                         <>
                                             <span className="text-zinc-600">•</span>
