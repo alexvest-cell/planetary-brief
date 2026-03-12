@@ -131,7 +131,7 @@ const Navigation: React.FC<NavigationProps> = ({
     <div className="fixed top-0 left-0 w-full z-50 flex flex-col font-sans overflow-visible">
 
       {/* Top Bar (Primary Nav) */}
-      <div className={`w-full transition-all duration-300 overflow-visible ${isScrolled ? 'bg-black/90' : 'bg-black/40'} backdrop-blur-xl`}>
+      <div className={`w-full transition-all duration-300 overflow-visible ${isScrolled ? 'bg-black/95' : 'bg-black/60'}`}>
         <div className="container mx-auto px-4 md:px-8 py-3 md:py-0 md:h-16 flex flex-col md:flex-row gap-3 md:gap-0 overflow-visible">
 
           {/* Top Row on Mobile: Logo + Right Actions */}
@@ -233,7 +233,7 @@ const Navigation: React.FC<NavigationProps> = ({
       </div>
 
       {/* Secondary Bar (Categories or Action Menu) */}
-      <div className={`relative w-full transition-all duration-300 hidden md:flex ${isScrolled ? 'h-10 bg-black/90' : 'h-12 bg-black/40'} backdrop-blur-xl`}>
+      <div className={`relative w-full transition-all duration-300 hidden md:flex ${isScrolled ? 'h-10 bg-black/95' : 'h-12 bg-black/60'}`}>
 
         <div className="container mx-auto px-4 md:px-8 h-full flex items-center overflow-x-auto hide-scrollbar">
           <div className="flex items-center gap-6 md:gap-8 min-w-max">
