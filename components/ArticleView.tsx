@@ -99,11 +99,11 @@ const ReferencedInstitutions = ({ article }: { article: Article }) => {
 
 // Combined Footer Component
 const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout: () => void }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isSourcesExpanded, setIsSourcesExpanded] = React.useState(false);
+  const [isEntitiesExpanded, setIsEntitiesExpanded] = React.useState(false);
 
   const hasSources = Array.isArray(article.sources) && article.sources.length > 0;
   const hasEntities = Array.isArray(article.entities) && article.entities.length > 0;
-  const hasExpandableContent = hasSources || hasEntities;
 
   return (
     <div className="my-6 md:my-10">
@@ -144,26 +144,38 @@ const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout
           </div>
         </div>
 
-        {/* Sources Section — hidden on mobile until expanded */}
-        <div className={`${isExpanded ? 'block' : 'hidden'} md:block`}>
+        {/* Collapsible Sections */}
+        <div className="block">
           {hasSources && (() => {
             const splitSources = article.sources.flatMap(s =>
               s.split(/;/).map(item => item.trim()).filter(item => item.length > 0)
             );
+            if (splitSources.length === 0) return null;
             return (
               <div className="mt-5 pt-5 border-t border-white/5">
-                <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
-                  <Database size={12} className="text-gray-500" />
-                  <span>Primary Data &amp; Reports</span>
-                </div>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-                  {splitSources.map((source, i) => (
-                    <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
-                      <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
-                      <span>{source}</span>
-                    </li>
-                  ))}
-                </ul>
+                <button 
+                  onClick={() => setIsSourcesExpanded(prev => !prev)}
+                  className="w-full flex items-center justify-between text-gray-500 hover:text-emerald-400 transition-colors group"
+                >
+                  <div className="flex items-center gap-2 font-bold uppercase tracking-widest text-[9px] md:text-[10px]">
+                    <Database size={12} className="text-gray-500 group-hover:text-emerald-400 transition-colors" />
+                    <span>Primary Data &amp; Reports</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-500/80 group-hover:text-emerald-400">
+                    <span>{isSourcesExpanded ? 'Hide' : 'Show'}</span>
+                    {isSourcesExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </div>
+                </button>
+                {isSourcesExpanded && (
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 animate-fade-in mt-4">
+                    {splitSources.map((source, i) => (
+                      <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
+                        <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
+                        <span>{source}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             );
           })()}
@@ -176,36 +188,33 @@ const ArticleFooter = ({ article, onShowAbout }: { article: Article; onShowAbout
             if (entities.length === 0) return null;
             return (
               <div className="mt-5 pt-5 border-t border-white/5">
-                <div className="flex items-center gap-2 text-gray-500 font-bold uppercase tracking-widest text-[9px] md:text-[10px] mb-3">
-                  <Globe size={12} className="text-gray-500" />
-                  <span>Referenced Institutions &amp; Programs</span>
-                </div>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-                  {entities.map((entity, i) => (
-                    <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
-                      <span className="text-gray-600 mt-0.5 flex-shrink-0">•</span>
-                      <span>{entity}</span>
-                    </li>
-                  ))}
-                </ul>
+                <button 
+                  onClick={() => setIsEntitiesExpanded(prev => !prev)}
+                  className="w-full flex items-center justify-between text-gray-500 hover:text-emerald-400 transition-colors group"
+                >
+                  <div className="flex items-center gap-2 font-bold uppercase tracking-widest text-[9px] md:text-[10px]">
+                    <Globe size={12} className="text-gray-500 group-hover:text-emerald-400 transition-colors" />
+                    <span>Referenced Institutions &amp; Programs</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-500/80 group-hover:text-emerald-400">
+                    <span>{isEntitiesExpanded ? 'Hide' : 'Show'}</span>
+                    {isEntitiesExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </div>
+                </button>
+                {isEntitiesExpanded && (
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 animate-fade-in mt-4">
+                    {entities.map((entity, i) => (
+                      <li key={i} className="text-[11px] md:text-xs text-gray-400 leading-relaxed flex items-start gap-2">
+                        <span className="text-gray-600 mt-0.5 flex-shrink-0">•</span>
+                        <span>{entity}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             );
           })()}
         </div>
-
-        {/* Mobile expand/collapse toggle — hidden on desktop */}
-        {hasExpandableContent && (
-          <button
-            onClick={() => setIsExpanded(prev => !prev)}
-            className="md:hidden mt-4 pt-4 border-t border-white/5 w-full flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-emerald-400 transition-colors"
-          >
-            {isExpanded ? (
-              <>Show Less <ChevronUp size={14} /></>
-            ) : (
-              <>Show Sources &amp; Institutions <ChevronDown size={14} /></>
-            )}
-          </button>
-        )}
       </div>
     </div>
   );
@@ -232,7 +241,9 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         ogTitle: article.title,
         ogDescription: description,
         ogImage: article.imageUrl,
-        twitterCard: 'summary_large_image'
+        twitterCard: 'summary_large_image',
+        publishedTime: article.createdAt || article.date,
+        modifiedTime: article.updatedAt || article.createdAt || article.date
       });
 
       // Update keywords meta tag
@@ -356,15 +367,22 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
           {/* Compact Header Metadata */}
           <div className="flex items-center justify-between border-y border-white/10 py-3 md:py-4 mt-6 md:my-6 mb-8 md:mb-10 w-full overflow-hidden flex-nowrap gap-2">
-            <div className="flex items-center gap-1.5 md:gap-4 text-[8.5px] sm:text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest font-bold text-gray-400 shrink truncate whitespace-nowrap">
-              <span className="text-white shrink-0">{article.date}</span>
-              <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
-              <span className="flex items-center gap-1 text-gray-400 shrink-0"><FileText size={10} className="md:w-3 md:h-3" /> <span className="hidden sm:inline"> {readTime}</span><span className="sm:hidden">{readTime.replace(' min read', ' MIN').replace(' minutes', ' MIN').replace(' min', ' MIN')}</span></span>
-              {article.articleType && (
-                <>
-                  <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
-                  <span className="text-emerald-400 shrink truncate max-w-[120px] md:max-w-none">{article.articleType}</span>
-                </>
+            <div className="flex flex-col gap-1 justify-center">
+              <div className="flex items-center gap-1.5 md:gap-4 text-[8.5px] sm:text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest font-bold text-gray-400 shrink truncate whitespace-nowrap">
+                <span className="text-white shrink-0">{article.date}</span>
+                <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
+                <span className="flex items-center gap-1 text-gray-400 shrink-0"><FileText size={10} className="md:w-3 md:h-3" /> <span className="hidden sm:inline"> {readTime}</span><span className="sm:hidden">{readTime.replace(' min read', ' MIN').replace(' minutes', ' MIN').replace(' min', ' MIN')}</span></span>
+                {article.articleType && (
+                  <>
+                    <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
+                    <span className="text-emerald-400 shrink truncate max-w-[120px] md:max-w-none">{article.articleType}</span>
+                  </>
+                )}
+              </div>
+              {article.updatedAt && (
+                <div className="flex items-center gap-2 text-[7.5px] sm:text-[8px] md:text-[9.5px] uppercase tracking-wider font-bold text-gray-500 shrink truncate whitespace-nowrap mt-0.5">
+                  <span>Updated: {new Date(article.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at {new Date(article.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+                </div>
               )}
             </div>
 

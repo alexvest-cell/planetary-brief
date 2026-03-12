@@ -307,6 +307,9 @@ const Navigation: React.FC<NavigationProps> = ({
         </div>
       </div>
 
+      {/* Fade effect at the bottom of the navigation bar */}
+      <div className={`absolute left-0 w-full h-16 md:h-24 bg-gradient-to-b from-black/70 via-black/20 to-transparent pointer-events-none transition-[opacity,top] duration-500 ease-out z-0 ${isSearchOpen && !isScrolled ? 'top-[calc(100%-4rem)] md:top-full' : 'top-full'} ${isScrolled ? 'opacity-100' : 'opacity-0'}`}></div>
+
       {/* Mobile Menu Overlay */}
       {
         isMobileMenuOpen && (

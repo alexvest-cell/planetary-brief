@@ -702,8 +702,11 @@ function App() {
                 {/* Vertical Line */}
                 <div className="w-px h-8 md:h-20 bg-gradient-to-b from-transparent via-white/30 to-transparent mb-5 md:mb-6 mt-8 md:mt-16"></div>
 
-                <div className="text-center max-w-4xl pb-4 md:pb-8">
-                  <p className="text-lg md:text-xl lg:text-2xl font-serif leading-relaxed text-zinc-300">
+                <div className="relative text-center max-w-4xl pb-4 md:pb-8 mx-auto w-full flex justify-center">
+                  {/* Subtle Planetary Brief Green Glow */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 max-w-3xl h-24 md:h-32 bg-news-accent/25 blur-[60px] md:blur-[100px] pointer-events-none rounded-[100%] z-0"></div>
+                  
+                  <p className="relative text-lg md:text-xl lg:text-2xl font-serif leading-relaxed text-zinc-300 z-10">
                     <span className="text-news-accent font-semibold">Planetary Brief</span> delivers data-driven environmental intelligence across climate systems, biodiversity, governance, and innovation. We translate institutional research into structured analysis.
                   </p>
                 </div>

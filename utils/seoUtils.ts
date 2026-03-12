@@ -91,6 +91,8 @@ export function updateMetaTags(config: {
     ogDescription?: string;
     ogImage?: string;
     twitterCard?: 'summary' | 'summary_large_image';
+    publishedTime?: string;
+    modifiedTime?: string;
 }) {
     // Update title
     if (config.title) {
@@ -119,6 +121,12 @@ export function updateMetaTags(config: {
     }
     if (config.canonicalUrl) {
         updateMetaTag('property', 'og:url', config.canonicalUrl);
+    }
+    if (config.publishedTime) {
+        updateMetaTag('property', 'article:published_time', config.publishedTime);
+    }
+    if (config.modifiedTime) {
+        updateMetaTag('property', 'article:modified_time', config.modifiedTime);
     }
 
     // Twitter Card tags
