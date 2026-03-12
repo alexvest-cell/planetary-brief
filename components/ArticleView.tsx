@@ -335,7 +335,7 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
     .slice(0, 4);
 
   return (
-    <div className="bg-zinc-950 min-h-screen animate-fade-in text-white">
+    <div className="bg-[#0d0d0d] min-h-screen animate-fade-in text-white">
       <div className="fixed top-0 left-0 w-full h-1 bg-white/10 z-50">
         <div className="h-full bg-news-accent w-full animate-[width_1s_ease-out]"></div>
       </div>
