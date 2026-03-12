@@ -70,7 +70,7 @@ const InDepthAnalysisSection: React.FC<InDepthAnalysisSectionProps> = ({ title, 
                                     {article.title}
                                 </h3>
 
-                                <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-4 line-clamp-3 hidden md:block">
+                                <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-4 line-clamp-3">
                                     {article.excerpt}
                                 </p>
 

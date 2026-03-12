@@ -91,7 +91,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
                                 if (index === 0) {
                                     gridClass = "col-span-2 md:col-span-2";
                                     titleSize = "text-xl md:text-3xl";
-                                    imageHeight = "aspect-video md:aspect-[16/9]";
+                                    imageHeight = "aspect-video md:aspect-[2.4/1]";
                                     excerptClass = "line-clamp-3 md:line-clamp-4";
                                 } else if (index === 1 || index === 2) {
                                     gridClass = "col-span-2 md:col-span-1"; // Full width mobile, 1 col desktop

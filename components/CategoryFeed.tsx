@@ -354,7 +354,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                 // The first article of the remaining grid gets the "Featured" Bento treatment on md+
                                 gridClass = "col-span-2 md:col-span-2";
                                 titleSize = "text-sm md:text-xl md:text-2xl";
-                                imageHeight = "aspect-[3/2] md:aspect-[4/3] sm:aspect-video md:aspect-[2/1]";
+                                imageHeight = "aspect-[3/2] md:aspect-[4/3] sm:aspect-video md:aspect-[2.4/1]";
                                 excerptClass = "line-clamp-3";
                             } else if (index === 1 || index === 2) {
                                 // Medium cards
@@ -438,7 +438,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                                                 {article.title}
                                             </h3>
 
-                                            <p className={`text-sm text-gray-300 font-light mb-3 ${excerptClass} ${index === 0 ? 'hidden md:block' : ''}`}>
+                                            <p className={`text-sm text-gray-300 font-light mb-3 ${excerptClass}`}>
                                                 {article.excerpt || (Array.isArray(article.content) ? article.content[0] : '') || ''}
                                             </p>
 
