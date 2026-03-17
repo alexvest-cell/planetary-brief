@@ -12,12 +12,13 @@ export function generateArticleSchema(article: Article): object {
     const articleSection = article.primaryTopic ||
         (Array.isArray(article.category) ? article.category[0] : article.category);
 
-    // Combine keywords with entities and secondaryTopics for richer semantic tags
+    // Combine entities and secondaryTopic tags for richer semantic keywords
+    // We ignore article.keywords which is the legacy manual field
     const allKeywords = [
-        ...(article.keywords || []),
+        ...(Array.isArray(article.category) ? article.category : [article.category]),
         ...(article.entities || []),
         ...(article.secondaryTopics || [])
-    ].filter((v, i, a) => a.indexOf(v) === i); // Remove duplicates
+    ].filter((v, i, a) => v && a.indexOf(v) === i); // Remove empty and duplicates
 
     return {
         '@context': 'https://schema.org',

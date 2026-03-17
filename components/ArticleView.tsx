@@ -246,19 +246,25 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
         modifiedTime: article.updatedAt || article.createdAt || article.date
       });
 
-      // Update keywords meta tag
+      // Update keywords meta tag based on semantic signals
       let metaKeywords = document.querySelector('meta[name="keywords"]');
       if (!metaKeywords) {
         metaKeywords = document.createElement('meta');
         metaKeywords.setAttribute('name', 'keywords');
         document.head.appendChild(metaKeywords);
       }
-      if (article.keywords && article.keywords.length > 0) {
-        metaKeywords.setAttribute('content', article.keywords.join(', '));
-      } else {
-        const cats = Array.isArray(article.category) ? article.category.join(', ') : article.category;
-        metaKeywords.setAttribute('content', `${cats}, ${article.topic}, environment, sustainability`);
-      }
+      
+      const cats = Array.isArray(article.category) ? article.category : [article.category];
+      const items = [
+        ...cats,
+        ...(article.topic ? [article.topic] : []),
+        ...(article.entities || []),
+        ...(article.secondaryTopics || []),
+        'environment',
+        'sustainability'
+      ].filter((v, i, a) => v && a.indexOf(v) === i);
+      
+      metaKeywords.setAttribute('content', items.join(', '));
 
       // Build BreadcrumbList schema
       const primaryCategory = Array.isArray(article.category) ? article.category[0] : article.category;
