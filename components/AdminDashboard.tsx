@@ -156,6 +156,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         imageOffsetY: 0
     });
 
+    // SEO State
+    const [seoKeywords, setSeoKeywords] = useState('');
+
     // Load articles only after authentication is verified
     useEffect(() => {
         if (isAuthenticated && !checkingAuth) {
@@ -428,8 +431,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         }));
 
         if (keywordsRaw) {
-            // Legacy keywords from import can still be mapped if needed, 
-            // but we are removing the dedicated field. We'll ignore it to declutter.
+            setSeoKeywords(keywordsRaw);
         }
 
         alert('Content imported successfully!');
@@ -482,7 +484,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                         contextBox: data.contextBox || prev.contextBox
                     }));
 
-                    // Keywords are now handled by categories, entities, and secondaryTopics automatically
+                    // Set keywords if provided
+                    if (data.keywords && Array.isArray(data.keywords)) {
+                        setSeoKeywords(data.keywords.join(', '));
+                    }
                 }
             } else if (data.text) {
                 if (type === 'title') {
@@ -899,6 +904,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 ...formData,
                 slug, // Add slug to article data
                 content: contentArray,
+                // Parse CSV string to array for backend
+                keywords: seoKeywords.split(',').map(s => s.trim()).filter(Boolean),
                 seoDescription: formData.seoDescription,
                 // Ensure dates are set if missing
                 createdAt: formData.createdAt || new Date().toISOString(),
@@ -1132,6 +1139,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             setEditingId(article.id);
             setFormData(article);
         }
+        setSeoKeywords(article.keywords ? article.keywords.join(', ') : '');
         window.scrollTo(0, 0);
     };
 
@@ -1674,6 +1682,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                         {/* SEO META */}
                                         <div className="space-y-4">
                                             <h3 className="text-xs font-bold text-white uppercase tracking-wider">Search Engine Optimization</h3>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Focus Keywords (Comma Separated)</label>
+                                                <input
+                                                    className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-white"
+                                                    placeholder="e.g. climate change, emissions, carbon tax"
+                                                    value={seoKeywords}
+                                                    onChange={e => setSeoKeywords(e.target.value)}
+                                                />
+                                            </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                                                     Article Type
