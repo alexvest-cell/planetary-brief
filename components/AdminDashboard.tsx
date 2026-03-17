@@ -572,11 +572,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
         setKeywordsLoading(true);
         try {
+            // Use a combined context for the main prompt to ensure AI has enough signal
+            const promptContext = [
+                formData.seoDescription,
+                formData.excerpt,
+                Array.isArray(formData.content) ? formData.content[0] : ''
+            ].filter(Boolean).join('\n\n') || formData.title;
+
             const res = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    prompt: formData.seoDescription || formData.excerpt || '',
+                    prompt: promptContext,
                     type: 'keywords',
                     model: aiModel,
                     category: formData.title, // HEADLINE mapping
@@ -587,14 +594,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 })
             });
 
-            if (!res.ok) throw new Error('Generation failed');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || `Server Error: ${res.status}`);
+            }
             const data = await res.json();
             
-            // Expected string response from Gemini handler
-            const result = typeof data === 'string' ? data : (data.text || JSON.stringify(data));
+            // Handle { text: "..." } response from server
+            const result = typeof data === 'string' ? data : (data.text || data.response || JSON.stringify(data));
             setSeoKeywords(result.replace(/\n/g, ' ').trim());
             
         } catch (err: any) {
+            console.error('Keyword generation error:', err);
             alert(`Failed to generate keywords: ${err.message}`);
         } finally {
             setKeywordsLoading(false);
