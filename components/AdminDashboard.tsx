@@ -23,6 +23,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     const [checkingAuth, setCheckingAuth] = useState(true);
 
     const [articles, setArticles] = useState<Article[]>([]);
+    const [librarySearch, setLibrarySearch] = useState('');
+    const [libraryCategory, setLibraryCategory] = useState('all');
+    const [libraryArticleType, setLibraryArticleType] = useState('all');
     const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [aiLoading, setAiLoading] = useState(false);
@@ -1683,7 +1686,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                         <div className="p-4 flex-1 flex flex-col h-full">
                             <div className="flex justify-between items-center mb-4 pb-4 border-b border-white/5">
                                 <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Library</h3>
-                                <div className="text-[10px] text-zinc-600 font-mono">{articles.length} ITEMS</div>
+                                <div className="text-[10px] text-zinc-600 font-mono">
+                                    {(() => {
+                                        const filtered = articles.filter((a: any) => {
+                                            if (librarySearch && !a.title.toLowerCase().includes(librarySearch.toLowerCase())) return false;
+                                            if (libraryCategory !== 'all' && !(Array.isArray(a.category) ? a.category.includes(libraryCategory) : a.category === libraryCategory)) return false;
+                                            if (libraryArticleType !== 'all' && a.articleType !== libraryArticleType) return false;
+                                            return true;
+                                        });
+                                        return filtered.length < articles.length
+                                            ? `${filtered.length} / ${articles.length}`
+                                            : `${articles.length} ITEMS`;
+                                    })()}
+                                </div>
                             </div>
 
                             {/* Controls */}
@@ -1692,9 +1707,33 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" />
                                     <input
                                         className="w-full bg-black/20 border border-white/5 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder-zinc-700 focus:border-news-accent outline-none"
-                                        placeholder="Filter..."
+                                        placeholder="Filter by title..."
+                                        value={librarySearch}
+                                        onChange={e => setLibrarySearch(e.target.value)}
                                     />
                                 </div>
+                                <select
+                                    value={libraryCategory}
+                                    onChange={e => setLibraryCategory(e.target.value)}
+                                    className="w-full bg-black/20 border border-white/5 rounded-lg py-2 px-3 text-xs text-zinc-400 outline-none cursor-pointer"
+                                >
+                                    <option value="all">Category: All</option>
+                                    {CATEGORIES.map(c => (
+                                        <option key={c.id} value={c.label}>{c.label}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={libraryArticleType}
+                                    onChange={e => setLibraryArticleType(e.target.value)}
+                                    className="w-full bg-black/20 border border-white/5 rounded-lg py-2 px-3 text-xs text-zinc-400 outline-none cursor-pointer"
+                                >
+                                    <option value="all">Type: All</option>
+                                    <option value="Policy Brief">Policy Brief</option>
+                                    <option value="Data Signal">Data Signal</option>
+                                    <option value="In-Depth Analysis">In-Depth Analysis</option>
+                                    <option value="Technology Assessment">Technology Assessment</option>
+                                    <option value="Treaty Explainer">Treaty Explainer</option>
+                                </select>
                                 <select
                                     className="w-full bg-black/20 border border-white/5 rounded-lg py-2 px-3 text-xs text-zinc-400 outline-none cursor-pointer"
                                     onChange={(e) => {
@@ -1711,10 +1750,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                             }
                                             return new Date(item.createdAt || 0).getTime();
                                         };
-
                                         const sorted = [...articles].sort((a, b) => {
                                             if (type === 'date') return getSortableDate(b) - getSortableDate(a);
-                                            if (type === 'edited') return new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime();
+                                            if (type === 'edited') return new Date((b as any).updatedAt || (b as any).createdAt || 0).getTime() - new Date((a as any).updatedAt || (a as any).createdAt || 0).getTime();
                                             if (type === 'name') return a.title.localeCompare(b.title);
                                             return 0;
                                         });
@@ -1743,10 +1781,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                     <Upload size={14} /> Create New
                                 </button>
 
-                                {articles.map(article => {
-                                    // Debug: log all article statuses
-                                    console.log(`Article: "${article.title.substring(0, 30)}..." - Status: ${article.status || 'undefined'}`);
-
+                                {articles.filter((a: any) => {
+                                    if (librarySearch && !a.title.toLowerCase().includes(librarySearch.toLowerCase())) return false;
+                                    if (libraryCategory !== 'all' && !(Array.isArray(a.category) ? a.category.includes(libraryCategory) : a.category === libraryCategory)) return false;
+                                    if (libraryArticleType !== 'all' && a.articleType !== libraryArticleType) return false;
+                                    return true;
+                                }).map(article => {
                                     const statusColors = {
                                         draft: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
                                         published: 'bg-green-500/20 text-green-400 border-green-500/30',
@@ -1804,24 +1844,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                                         {article.updatedAt ? new Date(article.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-1">
-                                                    {Array.isArray(article.category) ? (
-                                                        article.category.map(c => (
-                                                            <span
-                                                                key={c}
-                                                                className="w-1.5 h-1.5 rounded-full"
-                                                                style={{ backgroundColor: CATEGORY_COLORS[c] || '#6b7280' }}
-                                                                title={c}
-                                                            ></span>
-                                                        ))
-                                                    ) : (
-                                                        <span
-                                                            className="w-1.5 h-1.5 rounded-full"
-                                                            style={{ backgroundColor: CATEGORY_COLORS[article.category as string] || '#6b7280' }}
-                                                            title={article.category as string}
-                                                        ></span>
-                                                    )}
-                                                </div>
+                                            </div>
+                                            <div className="flex flex-wrap gap-1 mt-1.5">
+                                                {(article as any).articleType && (
+                                                    <span className="text-[8px] px-1.5 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 font-bold uppercase">
+                                                        {(article as any).articleType}
+                                                    </span>
+                                                )}
+                                                {(Array.isArray(article.category) ? article.category : [article.category as string]).filter(Boolean).map((c: string) => (
+                                                    <span
+                                                        key={c}
+                                                        className="text-[8px] px-1.5 py-0.5 rounded border font-bold uppercase"
+                                                        style={{
+                                                            borderColor: (CATEGORY_COLORS[c] || '#6b7280') + '55',
+                                                            backgroundColor: (CATEGORY_COLORS[c] || '#6b7280') + '22',
+                                                            color: CATEGORY_COLORS[c] || '#9ca3af'
+                                                        }}
+                                                    >
+                                                        {c}
+                                                    </span>
+                                                ))}
                                             </div>
                                             {/* Hover Delete */}
                                             <button
