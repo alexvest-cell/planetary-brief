@@ -158,6 +158,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
     // SEO State
     const [seoKeywords, setSeoKeywords] = useState('');
+    const [keywordsLoading, setKeywordsLoading] = useState(false);
 
     // Load articles only after authentication is verified
     useEffect(() => {
@@ -560,6 +561,43 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             alert(`Failed to generate image prompt: ${err.message}`);
         } finally {
             setImagePromptLoading(false);
+        }
+    };
+
+    const handleKeywordsGenerate = async () => {
+        if (!formData.title) {
+            alert('Please add a Title first.');
+            return;
+        }
+
+        setKeywordsLoading(true);
+        try {
+            const res = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prompt: formData.seoDescription || formData.excerpt || '',
+                    type: 'keywords',
+                    model: aiModel,
+                    category: formData.title, // HEADLINE mapping
+                    topic: formData.subheadline, // SUBHEADLINE mapping
+                    articleType: formData.articleType,
+                    primaryTopic: formData.primaryTopic,
+                    secondaryTopics: Array.isArray(formData.secondaryTopics) ? formData.secondaryTopics.join(', ') : ''
+                })
+            });
+
+            if (!res.ok) throw new Error('Generation failed');
+            const data = await res.json();
+            
+            // Expected string response from Gemini handler
+            const result = typeof data === 'string' ? data : (data.text || JSON.stringify(data));
+            setSeoKeywords(result.replace(/\n/g, ' ').trim());
+            
+        } catch (err: any) {
+            alert(`Failed to generate keywords: ${err.message}`);
+        } finally {
+            setKeywordsLoading(false);
         }
     };
 
@@ -1683,10 +1721,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                         <div className="space-y-4">
                                             <h3 className="text-xs font-bold text-white uppercase tracking-wider">Search Engine Optimization</h3>
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Focus Keywords (Comma Separated)</label>
+                                                <div className="flex justify-between items-center">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Focus Keywords (Search Queries)</label>
+                                                    <button
+                                                        onClick={handleKeywordsGenerate}
+                                                        disabled={keywordsLoading || !formData.title}
+                                                        className="text-[10px] bg-white/5 hover:bg-white/10 text-white px-2 py-0.5 rounded border border-white/10 transition-colors disabled:opacity-50"
+                                                    >
+                                                        {keywordsLoading ? 'Generating...' : 'Generate'}
+                                                    </button>
+                                                </div>
                                                 <input
                                                     className="w-full bg-zinc-950/30 border border-white/10 rounded-lg p-3 text-xs text-white"
-                                                    placeholder="e.g. climate change, emissions, carbon tax"
+                                                    placeholder="e.g. global methane emissions 2025, iea tracker report..."
                                                     value={seoKeywords}
                                                     onChange={e => setSeoKeywords(e.target.value)}
                                                 />

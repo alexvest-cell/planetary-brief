@@ -976,6 +976,37 @@ app.post('/api/generate', async (req, res) => {
       5. CTA: "Full briefing: [link placeholder]"
       Optional: 3–5 relevant professional hashtags.
       AVOID: Casual tone, emojis, activist framing.`;
+    } else if (type === 'keywords') {
+      systemPrompt = `You are updating a CMS field called: Focus Keywords (Search Queries)
+      Your task is to generate 3–6 high-quality search queries per article based on the article’s existing content.
+      
+      Input Per Article:
+      HEADLINE: ${category || 'N/A'}
+      SUBHEADLINE: ${topic || 'N/A'}
+      ARTICLE_TYPE: ${req.body.articleType || 'N/A'}
+      PRIMARY_TOPIC: ${req.body.primaryTopic || 'N/A'}
+      SECONDARY_TOPICS: ${req.body.secondaryTopics || 'N/A'}
+      META_DESCRIPTION: ${prompt || 'N/A'}
+      
+      Output Requirement:
+      Return: A single comma-separated list of 3 to 6 search queries.
+      No line breaks. No explanations. No repetition.
+      
+      Core Rules:
+      Queries must reflect realistic human search behavior, not internal tags.
+      Each query should be: 3 to 6 words long, natural language, lowercase, no punctuation except numbers and years.
+      At least:
+      - one query must include the year (e.g. 2025, 2026, latest)
+      - one query must include a named institution or dataset if available (e.g. iea, noaa, copernicus, world bank)
+      - one query must closely match the headline topic
+      
+      Construction Logic:
+      Generate queries using combinations of: core topic, year/time marker, institution/dataset, and intent words (data, report, statistics, update, trends).
+      
+      Strict Constraints:
+      Do NOT output single-word keywords, reuse secondary topic tags directly, include commas inside queries, or generate vague queries (like climate change).
+      
+      Quality Check: Verify queries are distinct, reflect actual content, align with headline, and don't look like tags.`;
     } else if (type === 'full') {
       const targetLength = minMinutes && maxMinutes ? `${minMinutes}-${maxMinutes}` : '5-7';
       const wordCount = Math.floor(((parseInt(minMinutes) || 5) + (parseInt(maxMinutes) || 7)) / 2 * 200);
