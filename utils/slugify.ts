@@ -1,10 +1,10 @@
 /**
  * Generate a URL-friendly slug from a string (typically article title)
  * @param text - The text to convert to a slug
- * @param maxLength - Maximum length of the slug (default 60)
+ * @param maxLength - Maximum length of the slug (default 200)
  * @returns A URL-safe slug
  */
-export function generateSlug(text: string, maxLength: number = 60): string {
+export function generateSlug(text: string, maxLength: number = 200): string {
     return text
         .toLowerCase()
         .trim()

@@ -373,7 +373,7 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                             return (
                                 <React.Fragment key={article.id}>
                                     {/* Insert Ad after the 4th item (index 4) as a Grid Card */}
-                                    {index === 4 && (
+                                    {index === 4 && ADS_CONFIG.SHOW_ADS && (
                                         <div className="col-span-1 bg-zinc-900/50 border border-white/5 rounded-sm overflow-hidden flex flex-col h-full min-h-[250px]">
                                             <div className="flex-grow">
                                                 <AdUnit format="rectangle" className="w-full h-full" slotId={ADS_CONFIG.SLOTS.CATEGORY_FEED_1} />
@@ -473,13 +473,15 @@ const CategoryFeed: React.FC<CategoryFeedProps> = ({ category, articles, onArtic
                 )}
 
                 {/* Ad Unit at bottom */}
-                <div className="mt-16">
-                    <div className="flex items-center gap-2 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-600">
-                        <span>Sponsored</span>
-                        <div className="h-px bg-gray-800 flex-grow"></div>
+                {ADS_CONFIG.SHOW_ADS && (
+                    <div className="mt-16">
+                        <div className="flex items-center gap-2 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-600">
+                            <span>Sponsored</span>
+                            <div className="h-px bg-gray-800 flex-grow"></div>
+                        </div>
+                        <AdUnit format="horizontal" className="h-32" slotId={ADS_CONFIG.SLOTS.CATEGORY_FOOTER} />
                     </div>
-                    <AdUnit format="horizontal" className="h-32" slotId={ADS_CONFIG.SLOTS.CATEGORY_FOOTER} />
-                </div>
+                )}
 
                 {/* Related Systems Cross-Links (Blueprint Layer 5) */}
                 {HUB_RELATED[category] && (

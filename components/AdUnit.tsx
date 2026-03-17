@@ -16,6 +16,9 @@ declare global {
 }
 
 const AdUnit: React.FC<AdUnitProps> = ({ className = '', format = 'auto', slotId = '1234567890', layoutKey, variant = 'card' }) => {
+  // Global visibility guard
+  if (!ADS_CONFIG.SHOW_ADS) return null;
+
   const adRef = useRef<HTMLModElement>(null);
   const isPushed = useRef(false);
 

@@ -367,11 +367,43 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
 
           {/* Compact Header Metadata */}
           <div className="flex items-center justify-between border-y border-white/10 py-3 md:py-4 mt-6 md:my-6 mb-8 md:mb-10 w-full overflow-hidden flex-nowrap gap-2">
-            <div className="flex flex-col gap-1 justify-center">
-              <div className="flex items-center gap-1.5 md:gap-4 text-[8.5px] sm:text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest font-bold text-gray-400 shrink truncate whitespace-nowrap">
+            <div className="flex flex-col gap-1.5 justify-center">
+              <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[7.5px] sm:text-[8px] md:text-[9.5px] uppercase tracking-wider font-bold text-gray-500 shrink-0 whitespace-nowrap">
+                <div className="flex items-center gap-1">
+                  <span>By</span>
+                  <a 
+                    href="/author/alexander-westergardh"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.dispatchEvent(new CustomEvent('nav-author', { detail: 'alexander-westergardh' }));
+                    }}
+                    className="text-news-accent hover:text-white transition-colors"
+                  >
+                    Alexander Westergårdh
+                  </a>
+                </div>
+                {article.updatedAt && (
+                  <>
+                    <span className="w-0.5 h-0.5 rounded-full bg-gray-600"></span>
+                    <span>Updated: {new Date(article.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} {new Date(article.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 md:gap-4 text-[8.5px] sm:text-[9px] md:text-xs uppercase tracking-wider md:tracking-widest font-bold text-gray-400 shrink truncate whitespace-nowrap mt-0.5">
                 <span className="text-white shrink-0">{article.date}</span>
                 <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
-                <span className="flex items-center gap-1 text-gray-400 shrink-0"><FileText size={10} className="md:w-3 md:h-3" /> <span className="hidden sm:inline"> {readTime}</span><span className="sm:hidden">{readTime.replace(' min read', ' MIN').replace(' minutes', ' MIN').replace(' min', ' MIN')}</span></span>
+                <span className="flex items-center gap-1 text-gray-400 shrink-0">
+                  <span className="hidden sm:inline">
+                    {readTime.toLowerCase().includes('read') ? 
+                      readTime.toLowerCase().replace('min', 'minute') : 
+                      `${readTime.toLowerCase().replace('minutes', 'minute')} read`}
+                  </span>
+                  <span className="sm:hidden">
+                    {readTime.toLowerCase().includes('read') ? 
+                      readTime.toLowerCase().replace('minute', 'min') : 
+                      `${readTime.toLowerCase().replace('minutes', 'min').replace('min', 'min')} read`}
+                  </span>
+                </span>
                 {article.articleType && (
                   <>
                     <span className="w-0.5 h-0.5 md:w-1 md:h-1 rounded-full bg-gray-600 shrink-0"></span>
@@ -379,11 +411,6 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                   </>
                 )}
               </div>
-              {article.updatedAt && (
-                <div className="flex items-center gap-2 text-[7.5px] sm:text-[8px] md:text-[9.5px] uppercase tracking-wider font-bold text-gray-500 shrink truncate whitespace-nowrap mt-0.5">
-                  <span>Updated: {new Date(article.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at {new Date(article.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
-                </div>
-              )}
             </div>
 
             <div className="flex items-center gap-1.5 md:gap-2 shrink-0">

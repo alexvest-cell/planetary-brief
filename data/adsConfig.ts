@@ -1,4 +1,6 @@
 export const ADS_CONFIG = {
+    // Set to false to hide all ad placeholders site-wide
+    SHOW_ADS: false,
     // Replace this with your actual Google AdSense Publisher ID (e.g., ca-pub-1234567890123456)
     PUBLISHER_ID: "ca-pub-YOUR_PUBLISHER_ID",
 

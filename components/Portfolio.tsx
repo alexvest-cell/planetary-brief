@@ -64,12 +64,12 @@ const Portfolio: React.FC<PortfolioProps> = ({
                             const gridItems = [...displayedArticles];
 
                             // Insert ad placeholder at index 2
-                            if (gridItems.length >= 2) {
+                            if (ADS_CONFIG.SHOW_ADS && gridItems.length >= 2) {
                                 gridItems.splice(2, 0, { id: 'ad-top-right', type: 'ad_placeholder' } as any);
                             }
 
                             // Insert second ad placeholder at index 7 (adjusted for previous shift)
-                            if (gridItems.length >= 8) {
+                            if (ADS_CONFIG.SHOW_ADS && gridItems.length >= 8) {
                                 gridItems.splice(8, 0, { id: 'ad-mid-feed', type: 'ad_placeholder' } as any);
                             }
 
@@ -201,7 +201,7 @@ const Portfolio: React.FC<PortfolioProps> = ({
 
                 {/* Ad Placement 2: Divider between Grid and Upcoming Events */}
                 {/* Ad Placement 2: Divider between Grid and Upcoming Events */}
-                {!searchQuery && (
+                {!searchQuery && ADS_CONFIG.SHOW_ADS && (
                     <div className="w-full my-12 py-8">
                         <div className="container mx-auto px-4 md:px-0">
                             <div className="flex flex-col items-center">

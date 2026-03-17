@@ -32,6 +32,7 @@ const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
 const TermsOfUse = lazy(() => import('./components/TermsOfUse'));
 const Archives = lazy(() => import('./components/Archives'));
 const TagArchive = lazy(() => import('./components/TagArchive'));
+const AuthorPage = lazy(() => import('./components/AuthorPage'));
 
 
 // Helper to restore icon component lost in JSON serialization
@@ -93,7 +94,7 @@ function App() {
   // Browser History Management: All view changes push state to history API,
   // allowing the browser back/forward buttons to work correctly across the entire site
   const [activeSection, setActiveSection] = useState<Section>(Section.HERO);
-  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'about' | 'subscribe' | 'admin' | 'privacy' | 'terms' | 'archives' | 'tag-archive'>(() => {
+  const [view, setView] = useState<'home' | 'category' | 'article' | 'sources' | 'dashboard' | 'explanation' | 'about' | 'subscribe' | 'admin' | 'privacy' | 'terms' | 'archives' | 'tag-archive' | 'author'>(() => {
     // Initialize view from URL
     const path = window.location.pathname;
     const hash = window.location.hash;
@@ -101,6 +102,7 @@ function App() {
     if (hash === '#explain') return 'explanation';
     if (path === '/dashboard') return 'dashboard';
     if (path === '/about') return 'about';
+    if (path === '/author/alexander-westergardh') return 'author';
 
     if (path === '/privacy') return 'privacy';
     if (path === '/terms') return 'terms';
@@ -275,6 +277,9 @@ function App() {
           window.history.replaceState({ view: 'article', articleId: foundArticle.id }, '', preferredPath);
         }
       }
+    } else if (pathname === '/author/alexander-westergardh') {
+      setView('author');
+      window.history.replaceState({ view: 'author' }, '', pathname);
     }
   }, [articles]);
 
@@ -338,6 +343,9 @@ function App() {
             break;
           case 'subscribe':
             setView('subscribe');
+            break;
+          case 'author':
+            setView('author');
             break;
           case 'home':
           default:
@@ -617,6 +625,18 @@ function App() {
     window.history.pushState({ view: 'tag-archive', tagSlug }, '', `/tag/${tagSlug}`);
   };
 
+  const handleAuthorNav = () => {
+    setView('author');
+    window.scrollTo(0, 0);
+    window.history.pushState({ view: 'author' }, '', '/author/alexander-westergardh');
+  };
+
+  useEffect(() => {
+    const handleNavAuthor = () => handleAuthorNav();
+    window.addEventListener('nav-author', handleNavAuthor);
+    return () => window.removeEventListener('nav-author', handleNavAuthor);
+  }, []);
+
   if (view === 'admin') {
     return (
       <Suspense fallback={
@@ -751,18 +771,20 @@ function App() {
               {/* Portfolio removed per strategic redesign */}
               {/* <Portfolio ... /> */}
 
-              <div className="w-full bg-black py-12 border-t border-white/5">
-                <div className="container mx-auto px-4">
-                  <div className="flex justify-center">
-                    <AdUnit
-                      format="horizontal"
-                      variant="transparent"
-                      className="w-full h-32 md:h-48 bg-transparent"
-                      slotId={ADS_CONFIG.SLOTS.HOME_FOOTER}
-                    />
+              {ADS_CONFIG.SHOW_ADS && (
+                <div className="w-full bg-black py-12 border-t border-white/5">
+                  <div className="container mx-auto px-4">
+                    <div className="flex justify-center">
+                      <AdUnit
+                        format="horizontal"
+                        variant="transparent"
+                        className="w-full h-32 md:h-48 bg-transparent"
+                        slotId={ADS_CONFIG.SLOTS.HOME_FOOTER}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
             </>
           )}
@@ -792,6 +814,20 @@ function App() {
                 onShowAbout={handleShowAbout}
                 onCategoryClick={handleCategorySelect}
                 onTagClick={handleTagClick}
+              />
+            </Suspense>
+          )}
+
+          {view === 'author' && (
+            <Suspense fallback={
+              <div className="min-h-screen bg-black pt-36 flex items-center justify-center">
+                <Loader2 size={48} className="animate-spin text-emerald-500" />
+              </div>
+            }>
+              <AuthorPage
+                articles={articles}
+                onBack={handleBackToFeed}
+                onArticleClick={handleArticleClick}
               />
             </Suspense>
           )}

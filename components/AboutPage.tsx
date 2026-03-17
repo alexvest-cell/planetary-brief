@@ -10,7 +10,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     }, []);
 
     return (
-        <div className="bg-zinc-950 min-h-screen text-white pt-20 md:pt-40 pb-24 relative overflow-hidden font-sans">
+        <div className="bg-zinc-950 min-h-screen text-white pt-20 md:pt-40 pb-12 relative overflow-hidden font-sans">
             <div className="container mx-auto px-4 md:px-8 relative z-10 max-w-4xl">
 
                 {/* SECTION 1 — HERO */}
@@ -25,6 +25,9 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                     </p>
 
                     <div className="prose prose-invert max-w-none text-zinc-300 leading-relaxed text-sm md:text-base">
+                        <p className="text-lg text-white font-medium mb-6">
+                            Planetary Brief provides clear, data-driven reports on environmental change. We translate complex datasets from international organizations and research institutions into structured analysis of climate, energy, and planetary systems.
+                        </p>
                         <p>
                             Planetary Brief is a structured environmental intelligence platform. We monitor institutional datasets, scientific literature, and policy developments to provide clear, categorized analysis. Our methodology ensures that complex planetary data is synthesized into standardized formats, allowing for comparability, clarity, and uncompromising accuracy.
                         </p>
@@ -32,6 +35,25 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                 </header>
 
                 <div className="w-full h-px bg-white/10 my-16"></div>
+
+                {/* SECTION 1.5 — Ownership & Accountability */}
+                <section className="mb-20 grid md:grid-cols-12 gap-8 items-start">
+                    <div className="md:col-span-4">
+                        <div className="sticky top-24">
+                            <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-widest">Who Is Behind Planetary Brief</h2>
+                        </div>
+                    </div>
+                    <div className="md:col-span-8">
+                        <div className="prose prose-invert max-w-none text-zinc-300 leading-relaxed text-sm md:text-base">
+                            <p>
+                                Planetary Brief is an independent publication founded and operated by **Alexander Westergårdh**. 
+                            </p>
+                            <p className="mt-4">
+                                The project was established to provide an accountable, evidence-based alternative to fragmented environmental reporting. As an independent platform, Planetary Brief is not affiliated with any political advocacy groups or commercial interests, ensuring that all analysis remains strictly tied to institutional data and scientific baselines. 
+                            </p>
+                        </div>
+                    </div>
+                </section>
 
                 {/* SECTION 2 — Editorial Mandate */}
                 <section className="mb-20 grid md:grid-cols-12 gap-8 items-start">
@@ -218,25 +240,40 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                 <div className="w-full h-px bg-white/10 my-16"></div>
 
                 {/* SECTION 7 — Contact & Transparency */}
-                <section className="mb-24 grid md:grid-cols-12 gap-8 items-start">
+                <section className="mb-12 grid md:grid-cols-12 gap-8 items-start">
                     <div className="md:col-span-4">
                         <div className="sticky top-24">
                             <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-widest">Transparency & Contact</h2>
                         </div>
                     </div>
-                    <div className="md:col-span-8 space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="md:col-span-8 space-y-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <div>
-                                <h3 className="text-white font-bold text-xs uppercase tracking-widest mb-2 text-zinc-500">Contact</h3>
-                                <p className="text-sm text-zinc-300 mb-2">Editorial Inquiries & Institutional Collaboration:</p>
-                                <a href="mailto:intelligence@planetarybrief.com" className="text-news-accent hover:underline text-sm font-mono">intelligence@planetarybrief.com</a>
+                                <h3 className="text-white font-bold text-xs uppercase tracking-widest mb-3 text-zinc-500">Contact Channels</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1">Editorial & Corrections</p>
+                                        <a href="mailto:alexander@planetarybrief.com" className="text-news-accent hover:underline text-sm font-mono">alexander@planetarybrief.com</a>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1">General Inquiries</p>
+                                        <a href="mailto:intelligence@planetarybrief.com" className="text-news-accent hover:underline text-sm font-mono">intelligence@planetarybrief.com</a>
+                                    </div>
+                                </div>
                             </div>
                             <div>
-                                <h3 className="text-white font-bold text-xs uppercase tracking-widest mb-2 text-zinc-500">Corrections Policy</h3>
+                                <h3 className="text-white font-bold text-xs uppercase tracking-widest mb-3 text-zinc-500">Location</h3>
                                 <p className="text-sm text-zinc-300 leading-relaxed">
-                                    Planetary Brief is committed to factual precision. Material errors in data or interpretation are corrected transparently, with appendums noting the date and nature of the revision on the respective brief.
+                                    Planetary Brief is based in Stockholm, Sweden. 
                                 </p>
                             </div>
+                        </div>
+                        
+                        <div className="pt-8 border-t border-white/5">
+                            <h3 className="text-white font-bold text-xs uppercase tracking-widest mb-3 text-zinc-500">Corrections Policy</h3>
+                            <p className="text-sm text-zinc-300 leading-relaxed italic">
+                                Factual precision is central to the publication's mandate. Any material errors in data, synthesis, or interpretation are corrected transparently, with appendums noting the date and nature of the revision on the respective brief.
+                            </p>
                         </div>
                     </div>
                 </section>

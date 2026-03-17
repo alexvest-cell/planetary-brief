@@ -353,7 +353,7 @@ const Navigation: React.FC<NavigationProps> = ({
                   <div className="flex flex-col gap-4 text-[10px] font-sans font-normal uppercase tracking-widest text-gray-400">
                     <button onClick={() => { onShowAbout(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">About Planetary Brief</button>
                     <button onClick={() => { onSubscribeClick(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">Newsletter</button>
-                    <button onClick={() => { onSupportClick(); setIsMobileMenuOpen(false); }} className="text-left hover:text-white transition-colors leading-snug">Contact</button>
+                    <a href="mailto:contact@planetarybrief.com" className="text-left hover:text-white transition-colors leading-snug">Contact</a>
                   </div>
                 </div>
 
