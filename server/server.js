@@ -975,11 +975,14 @@ app.post('/api/generate', async (req, res) => {
       4. "Why this matters for decision-makers:" section (1–2 lines).
       5. CTA: "Full briefing: [link placeholder]"
       Optional: 3–5 relevant professional hashtags.
-      AVOID: Casual tone, emojis, activist framing.`;
+      AVOID: casual tone, emojis, activist framing.`;
     } else if (type === 'keywords') {
       systemPrompt = `You are generating a comma-separated list of search queries.
+
 This is NOT a summary task.
+
 This is NOT a writing task.
+
 This is a strict formatting task.
 
 INPUT:
@@ -989,38 +992,56 @@ META_DESCRIPTION: ${prompt || 'N/A'}
 SECONDARY_TOPICS: ${req.body.secondaryTopics || 'N/A'}
 
 TASK:
+
 Return 3 to 6 search queries.
 
 OUTPUT FORMAT (MANDATORY):
+
 Output ONLY a comma-separated list
+
 Output MUST be a single line
+
 Output MUST NOT contain sentences
+
 Output MUST NOT contain explanations
+
 Output MUST NOT contain punctuation except commas and numbers
 
 QUERY RULES:
+
 Each query must be 3 to 6 words
+
 All lowercase
+
 Must sound like a real Google search
+
 Must reflect the article topic
 
 Include:
+
 one query with a year (2025, 2026, latest)
+
 one query with an institution or dataset if present (iea, noaa, copernicus, world bank)
+
 one query similar to the headline
 
 INVALID OUTPUT EXAMPLES (DO NOT DO THIS):
+
 The International Energy Agency reported that methane emissions...
+
 Methane emissions remain high despite reductions...
 
 VALID OUTPUT EXAMPLE:
+
 global methane emissions 2025, iea methane tracker 2025, methane emissions data global, methane emissions trends 2025
 
 FINAL RULE:
+
 If the output reads like a sentence, it is WRONG.
+
 Now generate the output.`;
     } else if (type === 'full') {
-      const targetLength = minMinutes && maxMinutes ? `${minMinutes}-${maxMinutes}` : '5-7';
+      const targetLength = minMinutes && maxMinutes ? `${ minMinutes } -${ maxMinutes } ` : '5-7';
       const wordCount = Math.floor(((parseInt(minMinutes) || 5) + (parseInt(maxMinutes) || 7)) / 2 * 200);
 
       systemPrompt = `You are an expert environmental journalist writing for Planetary Brief, a premium environmental intelligence platform.
@@ -1028,28 +1049,28 @@ Now generate the output.`;
       Based on the user's prompt, generate a comprehensive, factual environmental news article.
 
       REQUIREMENTS:
-      - Target Length: ${targetLength} minutes (approximately ${wordCount} words)
-      - ${context}
+      - Target Length: ${ targetLength } minutes(approximately ${ wordCount } words)
+        - ${ context }
 
-      Generate a JSON object with the following structure (DO NOT include markdown code blocks, just raw JSON):
+      Generate a JSON object with the following structure(DO NOT include markdown code blocks, just raw JSON):
 
       {
         "title": "Serious 8-10 word investigative finding. FORBIDDEN: Short tags like 'Reefs in Peril'. NO '!', NO CTA.",
-        "excerpt": "Sophisticated 1-sentence teaser summarizing the investigative core.",
-        "content": ["Array of 6-10 substantial paragraphs, each 3-5 sentences. Focus on facts, data, and impact. Include specific numbers and sources where relevant."],
-        "contextBox": {
+          "excerpt": "Sophisticated 1-sentence teaser summarizing the investigative core.",
+            "content": ["Array of 6-10 substantial paragraphs, each 3-5 sentences. Focus on facts, data, and impact. Include specific numbers and sources where relevant."],
+              "contextBox": {
           "title": "A short title for additional context (e.g., 'The Science Behind It', 'Key Policy Details')",
-          "content": "2-3 sentences providing crucial background information or data that enhances understanding",
-          "source": "Credible source for this context (e.g., 'IPCC 2023 Report', 'Nature Climate Change')"
+            "content": "2-3 sentences providing crucial background information or data that enhances understanding",
+              "source": "Credible source for this context (e.g., 'IPCC 2023 Report', 'Nature Climate Change')"
         },
         "publicationDate": "The date of the most recent data or event mentioned (format: 'Mon YYYY', e.g., 'Jan 2026')",
-        "keywords": ["Array of exactly 20 trending, relevant keywords related to the article content, focusing on environmental topics, policies, locations, and key concepts"]
+          "keywords": ["Array of exactly 20 trending, relevant keywords related to the article content, focusing on environmental topics, policies, locations, and key concepts"]
       }
 
-      IMPORTANT: 
+      IMPORTANT:
       - Be factual and cite realistic sources.
       - ABSOLUTELY NO CALLS TO ACTION OR EXCLAMATIONS.
-      - NO COMMUNITY APPEALS (e.g., "Let's protect this").
+      - NO COMMUNITY APPEALS(e.g., "Let's protect this").
       - The article must end with a cold, factual finding about future systemic risk or scientific progress.
       - Ensure keywords are diverse and relevant.`;
     }
@@ -1058,11 +1079,11 @@ Now generate the output.`;
     const modelLower = (selectedModel || "").toLowerCase().trim();
 
     if (modelLower.startsWith('gpt-') || modelLower.includes('openai')) {
-      console.log(`[AI Route] Routing to OpenAI handler for model: ${selectedModel}`);
+      console.log(`[AI Route] Routing to OpenAI handler for model: ${ selectedModel } `);
       return handleOpenAI(req, res, systemPrompt, prompt, selectedModel || "gpt-4o");
     } else {
       const geminiModel = selectedModel || "gemini-1.5-flash-latest";
-      console.log(`[AI Route] Routing to Gemini handler for model: ${geminiModel}`);
+      console.log(`[AI Route] Routing to Gemini handler for model: ${ geminiModel } `);
       return handleGemini(req, res, systemPrompt, prompt, geminiModel, apiKey, context, type);
     }
 
@@ -1095,11 +1116,11 @@ cron.schedule('0 * * * *', async () => {
         const hour = parts.find(p => p.type === 'hour')?.value;
 
         if (weekday === 'Friday' && hour === '12') {
-          console.log(`Sending digest to ${sub.email}`);
+          console.log(`Sending digest to ${ sub.email } `);
           sendDigestEmail(sub.email, sub.topics, false);
         }
       } catch (e) {
-        console.error(`Error processing schedule for ${sub.email}:`, e);
+        console.error(`Error processing schedule for ${ sub.email }: `, e);
       }
     });
   } catch (err) {
@@ -1119,13 +1140,13 @@ cron.schedule('* * * * *', async () => {
     });
 
     if (articlesToPublish.length > 0) {
-      console.log(`Auto-publishing ${articlesToPublish.length} scheduled article(s)...`);
+      console.log(`Auto - publishing ${ articlesToPublish.length } scheduled article(s)...`);
 
       for (const article of articlesToPublish) {
         article.status = 'published';
         article.publishedAt = now;
         await article.save();
-        console.log(`✓ Published: ${article.title}`);
+        console.log(`✓ Published: ${ article.title }`);
       }
     }
   } catch (err) {
@@ -1154,27 +1175,27 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
   const articleRows = chunk(relevantArticles, 2);
 
   const emailHtml = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
+< !DOCTYPE html >
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
       <style>
-        body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #18181b; color: #ffffff; }
-        .container { max-width: 640px; margin: 0 auto; background-color: #18181b; }
-        .header { padding: 40px 20px; border-bottom: 1px solid #27272a; text-align: center; }
-        .header h1 { margin: 0; font-family: Georgia, serif; font-size: 28px; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; }
-        .accent { color: #10b981; }
-        .content { padding: 40px 20px; }
-        .article-img { width: 100%; aspect-ratio: 3/2; border-radius: 8px; margin-bottom: 16px; display: block; object-fit: cover; background-color: #27272a; }
-        .btn { display: inline-block; padding: 8px 16px; background-color: #ffffff; color: #000000; text-decoraion: none; font-weight: bold; font-size: 10px; border-radius: 4px; text-transform: uppercase; }
+        body {margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #18181b; color: #ffffff; }
+        .container {max - width: 640px; margin: 0 auto; background-color: #18181b; }
+        .header {padding: 40px 20px; border-bottom: 1px solid #27272a; text-align: center; }
+        .header h1 {margin: 0; font-family: Georgia, serif; font-size: 28px; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; }
+        .accent {color: #10b981; }
+        .content {padding: 40px 20px; }
+        .article-img {width: 100%; aspect-ratio: 3/2; border-radius: 8px; margin-bottom: 16px; display: block; object-fit: cover; background-color: #27272a; }
+        .btn {display: inline-block; padding: 8px 16px; background-color: #ffffff; color: #000000; text-decoraion: none; font-weight: bold; font-size: 10px; border-radius: 4px; text-transform: uppercase; }
       </style>
-    </head>
-    <body style="background-color: #18181b; margin: 0; padding: 0;">
-      <div class="container">
-        <div class="header"><h1><span class="accent">Planetary</span>Brief</h1></div>
-        <div class="content">
-          ${isWelcome ? '<p style="text-align:center">Welcome to the inner circle.</p>' : '<p style="text-align:center">Your weekly articles.</p>'}
-          ${articleRows.map(row => `
+  </head>
+  <body style="background-color: #18181b; margin: 0; padding: 0;">
+    <div class="container">
+      <div class="header"><h1><span class="accent">Planetary</span>Brief</h1></div>
+      <div class="content">
+        ${isWelcome ? '<p style="text-align:center">Welcome to the inner circle.</p>' : '<p style="text-align:center">Your weekly articles.</p>'}
+        ${articleRows.map(row => `
             <div style="display: flex; gap: 20px; margin-bottom: 30px;">
               ${row.map(a => `
                   <div style="flex: 1;">
@@ -1186,10 +1207,10 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
               `).join('')}
             </div>
           `).join('')}
-        </div>
       </div>
-    </body>
-    </html>
+    </div>
+  </body>
+</html>
   `;
 
   let transporter;
@@ -1203,7 +1224,7 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
         pass: process.env.SMTP_PASS,
       },
     });
-    console.log(`Using Real SMTP (${process.env.SMTP_USER})`);
+    console.log(`Using Real SMTP(${ process.env.SMTP_USER })`);
   }
   // 2. Fallback to Ethereal (Test Mode)
   else {
@@ -1224,7 +1245,7 @@ const sendDigestEmail = async (email, topics, isWelcome = false) => {
     html: emailHtml,
   });
 
-  console.log(`Email sent to ${email} (Topics: ${topics}). Preview: ${nodemailer.getTestMessageUrl(info)}`);
+  console.log(`Email sent to ${ email }(Topics: ${ topics }).Preview: ${ nodemailer.getTestMessageUrl(info) }`);
 };
 
 import { generateWeeklyDigest } from './templates/newsletterDigest.js';
@@ -1248,7 +1269,7 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
     // Assuming frontend sends the tag IDs from the config mapping.
     const response = await subscribeToKit(email, topics);
 
-    console.log(`[Newsletter] Subscribed ${email} to topics:`, topics);
+    console.log(`[Newsletter] Subscribed ${ email } to topics: `, topics);
     res.json({ success: true, data: response });
   } catch (error) {
     console.error('[Newsletter] Subscribe Error:', error.message);
@@ -1314,10 +1335,10 @@ app.post('/api/analyze', async (req, res) => {
       contents: prompt,
       config: {
         systemInstruction: `You are the Planetary Brief AI, an intelligent environmental assistant.
-        Goal: Answer user questions on environment, climate, sustainability with high accuracy.
-        Tone: Helpful, authoritative, scientific, yet accessible. Avoid alarmism.
-        Format: Keep responses concise (under 200 words) unless asked for deep dive. Use markdown.
-        Verification: Rely on consensus science (IPCC, NOAA, etc.).`,
+  Goal: Answer user questions on environment, climate, sustainability with high accuracy.
+    Tone: Helpful, authoritative, scientific, yet accessible.Avoid alarmism.
+      Format: Keep responses concise(under 200 words) unless asked for deep dive.Use markdown.
+        Verification: Rely on consensus science(IPCC, NOAA, etc.).`,
       }
     });
 
@@ -1398,24 +1419,24 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     // Priority 1: Use voiceover text provided in request (real-time preview from CMS)
     if (req.body.voiceoverText && req.body.voiceoverText.trim().length > 0) {
       textToRead = req.body.voiceoverText;
-      console.log(`Using provided voiceover text from request (${textToRead.length} chars)`);
+      console.log(`Using provided voiceover text from request(${ textToRead.length } chars)`);
     }
     // Priority 2: Use saved voiceover text from database
     else if (article.voiceoverText && article.voiceoverText.trim().length > 0) {
       textToRead = article.voiceoverText;
-      console.log(`Using saved voiceover text from DB (${textToRead.length} chars)`);
+      console.log(`Using saved voiceover text from DB(${ textToRead.length } chars)`);
     }
     // Priority 3: Fallback to full article content
     else {
       const contentArray = Array.isArray(article.content) ? article.content : [article.content];
-      textToRead = `${article.title}. ${article.excerpt}. ${contentArray.join(' ')}`;
-      console.log(`Using full article content for audio (${textToRead.length} chars)`);
+      textToRead = `${ article.title }. ${ article.excerpt }. ${ contentArray.join(' ') } `;
+      console.log(`Using full article content for audio(${ textToRead.length } chars)`);
     }
 
 
-    console.log(`Generating audio for article: ${articleId}`);
-    console.log(`Text source: ${textToRead ? 'voiceoverText' : 'full article'}`);
-    console.log(`Text length: ${textToRead.length} characters`);
+    console.log(`Generating audio for article: ${ articleId } `);
+    console.log(`Text source: ${ textToRead ? 'voiceoverText' : 'full article' } `);
+    console.log(`Text length: ${ textToRead.length } characters`);
 
 
     // Preprocess text to reduce glitches
@@ -1449,7 +1470,7 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
     // Triple ellipses create ~600-800ms pauses vs single ellipsis ~200ms
     const textWithPauses = sentences.join('... ... ... ');
 
-    console.log(`Processed ${sentences.length} sentences with extended pause markers`);
+    console.log(`Processed ${ sentences.length } sentences with extended pause markers`);
 
     // Use Google Cloud Text-to-Speech API
     const textToSpeechUrl = 'https://texttospeech.googleapis.com/v1/text:synthesize';
@@ -1488,7 +1509,7 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 
       // Include full error details for debugging
       const errorMessage = errorData.error?.message || errorData.error?.details?.[0]?.message || ttsResponse.statusText;
-      throw new Error(`Text-to-Speech API failed: ${errorMessage}`);
+      throw new Error(`Text - to - Speech API failed: ${ errorMessage } `);
     }
 
     const ttsData = await ttsResponse.json();
@@ -1530,7 +1551,7 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
       { audioUrl: uploadResult.secure_url }
     );
 
-    console.log(`Audio generated and cached for ${articleId}: ${uploadResult.secure_url}`);
+    console.log(`Audio generated and cached for ${ articleId }: ${ uploadResult.secure_url } `);
 
     res.json({
       success: true,
@@ -1556,7 +1577,7 @@ app.use(express.static(path.join(__dirname, '..', 'dist')));
 app.use((req, res) => {
   // If the request has an extension (e.g. .png, .js, .css, .txt), it's a missing asset, so return 404
   if (path.extname(req.path)) {
-    console.log(`[404] Missing asset: ${req.path}`);
+    console.log(`[404] Missing asset: ${ req.path } `);
     return res.status(404).send('Not Found');
   }
 
@@ -1585,7 +1606,7 @@ async function handleGemini(req, res, systemPrompt, prompt, model, apiKey, conte
         parts: [{ text: systemPrompt }]
       },
       contents: [{
-        parts: [{ text: `Generate ${type} content based on: ${prompt}` }]
+        parts: [{ text: type === 'keywords' ? "Now generate the comma-separated search queries." : `Generate ${type} content based on: ${prompt}` }]
       }]
     };
 
@@ -1644,9 +1665,9 @@ async function handleOpenAI(req, res, systemPrompt, prompt, model) {
         model: model,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: prompt }
+          { role: 'user', content: type === 'keywords' ? "Now generate the comma-separated search queries." : prompt }
         ],
-        temperature: 0.7
+        temperature: type === 'keywords' ? 0.3 : 0.7
       })
     });
 
@@ -1713,6 +1734,10 @@ function processAIResponse(res, text, type) {
       console.error("JSON Parse Error on text:", text);
       return res.status(500).json({ error: 'AI output was not valid JSON', raw: text });
     }
+  }
+
+  if (type === 'keywords') {
+    return res.json({ keywords: text.trim() });
   }
 
   return res.json({ text });
