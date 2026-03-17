@@ -28,7 +28,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
     // AI Orchestrator State
     const [aiPrompt, setAiPrompt] = useState('');
-    const [aiModel, setAiModel] = useState('gemini-1.5-flash-latest');
+    const [aiModel, setAiModel] = useState('gpt-4o');
     const [minMinutes, setMinMinutes] = useState(5);
     const [maxMinutes, setMaxMinutes] = useState(10);
 
