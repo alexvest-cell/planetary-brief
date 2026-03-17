@@ -1211,7 +1211,6 @@ import { subscribeToKit, getSubscribers, getTags, getBroadcasts, getKitStats } f
 
 // 1. Public Subscribe Endpoint
 app.post('/api/newsletter/subscribe', async (req, res) => {
-  console.log('[DEBUG] Hit /api/newsletter/subscribe with body:', req.body);
   try {
     const { email, topics } = req.body;
 
