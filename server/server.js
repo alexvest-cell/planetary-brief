@@ -977,38 +977,48 @@ app.post('/api/generate', async (req, res) => {
       Optional: 3–5 relevant professional hashtags.
       AVOID: Casual tone, emojis, activist framing.`;
     } else if (type === 'keywords') {
-      systemPrompt = `You are generating SEO search queries for a single article.
+      systemPrompt = `You are generating a comma-separated list of search queries.
+This is NOT a summary task.
+This is NOT a writing task.
+This is a strict formatting task.
 
-Use the following inputs:
+INPUT:
 HEADLINE: ${category || 'N/A'}
 SUBHEADLINE: ${topic || 'N/A'}
 META_DESCRIPTION: ${prompt || 'N/A'}
 SECONDARY_TOPICS: ${req.body.secondaryTopics || 'N/A'}
 
-Your task is to return 3 to 6 search queries.
+TASK:
+Return 3 to 6 search queries.
 
-OUTPUT RULES (STRICT)
-Return ONLY a comma-separated list.
-Do NOT output: sentences, explanations, paragraphs, labels, bullet points.
-The output must: be a single line, contain only queries separated by commas, contain no text before or after.
+OUTPUT FORMAT (MANDATORY):
+Output ONLY a comma-separated list
+Output MUST be a single line
+Output MUST NOT contain sentences
+Output MUST NOT contain explanations
+Output MUST NOT contain punctuation except commas and numbers
 
-QUERY REQUIREMENTS
-Each query must:
-be 3 to 6 words, be written in lowercase, sound like a real Google search, reflect the article topic.
+QUERY RULES:
+Each query must be 3 to 6 words
+All lowercase
+Must sound like a real Google search
+Must reflect the article topic
 
 Include:
-at least one query with a year (e.g. 2025, 2026, latest)
-at least one query with a dataset or institution if available (e.g. iea, noaa, copernicus, world bank)
-at least one query closely matching the headline topic
+one query with a year (2025, 2026, latest)
+one query with an institution or dataset if present (iea, noaa, copernicus, world bank)
+one query similar to the headline
 
-Use intent words where relevant:
-data, report, statistics, update, trends
+INVALID OUTPUT EXAMPLES (DO NOT DO THIS):
+The International Energy Agency reported that methane emissions...
+Methane emissions remain high despite reductions...
 
-HARD CONSTRAINTS
-If the output: contains a period, exceeds 25 total words, reads like a sentence, Then it is invalid.
+VALID OUTPUT EXAMPLE:
+global methane emissions 2025, iea methane tracker 2025, methane emissions data global, methane emissions trends 2025
 
-EXAMPLE (FORMAT ONLY)
-global methane emissions 2025, iea methane tracker 2025, methane emissions data global, methane emissions trends 2025`;
+FINAL RULE:
+If the output reads like a sentence, it is WRONG.
+Now generate the output.`;
     } else if (type === 'full') {
       const targetLength = minMinutes && maxMinutes ? `${minMinutes}-${maxMinutes}` : '5-7';
       const wordCount = Math.floor(((parseInt(minMinutes) || 5) + (parseInt(maxMinutes) || 7)) / 2 * 200);
