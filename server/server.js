@@ -977,69 +977,23 @@ app.post('/api/generate', async (req, res) => {
       Optional: 3–5 relevant professional hashtags.
       AVOID: casual tone, emojis, activist framing.`;
     } else if (type === 'keywords') {
-      systemPrompt = `You are generating a comma-separated list of search queries.
+      systemPrompt = `You are a strict SEO keyword generator.
+Your ONLY task is to return a comma-separated list of 3-6 search queries.
 
-This is NOT a summary task.
+STRICT RULES:
+1. Output ONLY the queries separated by commas.
+2. NO JSON. NO sentences. NO explanations. NO headers. NO bullet points.
+3. Each query must be 3-6 words long.
+4. All lowercase. No punctuation except commas and numbers.
+5. Sound like a real Google search.
 
-This is NOT a writing task.
+REQUIRED ELEMENTS:
+- Include the year (2025, 2026, or latest).
+- Include an institution if present (iea, noaa, etc).
+- Include a query similar to the headline.
 
-This is a strict formatting task.
+DANGER: If you write a summary or explanation, you have FAILED.`;
 
-INPUT:
-HEADLINE: ${category || 'N/A'}
-SUBHEADLINE: ${topic || 'N/A'}
-META_DESCRIPTION: ${prompt || 'N/A'}
-SECONDARY_TOPICS: ${req.body.secondaryTopics || 'N/A'}
-
-TASK:
-
-Return 3 to 6 search queries.
-
-OUTPUT FORMAT (MANDATORY):
-
-Output ONLY a comma-separated list
-
-Output MUST be a single line
-
-Output MUST NOT contain sentences
-
-Output MUST NOT contain explanations
-
-Output MUST NOT contain punctuation except commas and numbers
-
-QUERY RULES:
-
-Each query must be 3 to 6 words
-
-All lowercase
-
-Must sound like a real Google search
-
-Must reflect the article topic
-
-Include:
-
-one query with a year (2025, 2026, latest)
-
-one query with an institution or dataset if present (iea, noaa, copernicus, world bank)
-
-one query similar to the headline
-
-INVALID OUTPUT EXAMPLES (DO NOT DO THIS):
-
-The International Energy Agency reported that methane emissions...
-
-Methane emissions remain high despite reductions...
-
-VALID OUTPUT EXAMPLE:
-
-global methane emissions 2025, iea methane tracker 2025, methane emissions data global, methane emissions trends 2025
-
-FINAL RULE:
-
-If the output reads like a sentence, it is WRONG.
-
-Now generate the output.`;
     } else if (type === 'full') {
       const targetLength = minMinutes && maxMinutes ? `${ minMinutes } -${ maxMinutes } ` : '5-7';
       const wordCount = Math.floor(((parseInt(minMinutes) || 5) + (parseInt(maxMinutes) || 7)) / 2 * 200);
@@ -1078,9 +1032,11 @@ Now generate the output.`;
     // --- ROUTE TO PROVIDER ---
     const modelLower = (selectedModel || "").toLowerCase().trim();
 
-    if (modelLower.startsWith('gpt-') || modelLower.includes('openai')) {
-      console.log(`[AI Route] Routing to OpenAI handler for model: ${ selectedModel } `);
-      return handleOpenAI(req, res, systemPrompt, prompt, selectedModel || "gpt-4o");
+    // Default to OpenAI/GPT-4o if no model is specified or if it's an OpenAI model
+    if (!selectedModel || modelLower.startsWith('gpt-') || modelLower.includes('openai')) {
+      const gptModel = selectedModel || "gpt-4o";
+      console.log(`[AI Route] Routing to OpenAI handler for model: ${gptModel}`);
+      return handleOpenAI(req, res, systemPrompt, prompt, gptModel, type);
     } else {
       const geminiModel = selectedModel || "gemini-1.5-flash-latest";
       console.log(`[AI Route] Routing to Gemini handler for model: ${ geminiModel } `);
@@ -1606,7 +1562,16 @@ async function handleGemini(req, res, systemPrompt, prompt, model, apiKey, conte
         parts: [{ text: systemPrompt }]
       },
       contents: [{
-        parts: [{ text: type === 'keywords' ? "Now generate the comma-separated search queries." : `Generate ${type} content based on: ${prompt}` }]
+        parts: [{ 
+          text: type === 'keywords' 
+            ? `INPUT DATA:
+HEADLINE: ${req.body.category || 'N/A'}
+SUBHEADLINE: ${req.body.topic || 'N/A'}
+META: ${prompt || 'N/A'}
+
+TASK: Strictly generate the 3-6 comma-separated search queries now. Do not write summary or explanation.` 
+            : `Generate ${type} content based on: ${prompt}` 
+        }]
       }]
     };
 
@@ -1643,7 +1608,7 @@ async function handleGemini(req, res, systemPrompt, prompt, model, apiKey, conte
 }
 
 // --- OPENAI HANDLER ---
-async function handleOpenAI(req, res, systemPrompt, prompt, model) {
+async function handleOpenAI(req, res, systemPrompt, prompt, model, type) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'Missing OPENAI_API_KEY. Please ensure it is set in your environment variables or .env.local file.' });
@@ -1665,9 +1630,19 @@ async function handleOpenAI(req, res, systemPrompt, prompt, model) {
         model: model,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: type === 'keywords' ? "Now generate the comma-separated search queries." : prompt }
+          { 
+            role: 'user', 
+            content: type === 'keywords' 
+              ? `INPUT DATA:
+HEADLINE: ${req.body.category || 'N/A'}
+SUBHEADLINE: ${req.body.topic || 'N/A'}
+META: ${prompt || 'N/A'}
+
+TASK: Strictly generate the 3-6 comma-separated search queries now. Do not write anything else.` 
+              : prompt 
+          }
         ],
-        temperature: type === 'keywords' ? 0.3 : 0.7
+        temperature: type === 'keywords' ? 0.2 : 0.7
       })
     });
 
@@ -1737,7 +1712,17 @@ function processAIResponse(res, text, type) {
   }
 
   if (type === 'keywords') {
-    return res.json({ keywords: text.trim() });
+    let cleanText = text.trim();
+    // If AI accidentally returns JSON, try to extract the keywords field
+    if (cleanText.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(cleanText);
+        cleanText = parsed.keywords || parsed.text || parsed.queries || cleanText;
+      } catch (e) {
+        // Not valid JSON, just use as is
+      }
+    }
+    return res.json({ keywords: cleanText });
   }
 
   return res.json({ text });
