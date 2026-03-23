@@ -399,8 +399,8 @@ const ArticleView: React.FC<ArticleViewProps> = ({ article, onBack, onArticleSel
                     Alexander Westergårdh
                   </a>
                 </div>
-                {article.updatedAt && article.createdAt &&
-                  new Date(article.updatedAt).getTime() - new Date(article.createdAt).getTime() > 5 * 60 * 1000 && (
+                {article.updatedAt && (article.publishedAt || article.createdAt) &&
+                  new Date(article.updatedAt).getTime() - new Date((article as any).publishedAt || article.createdAt).getTime() > 5 * 60 * 1000 && (
                   <>
                     <span className="w-0.5 h-0.5 rounded-full bg-gray-600"></span>
                     <span>Updated: {new Date(article.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} {new Date(article.updatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>

@@ -648,6 +648,9 @@ app.post('/api/articles', requireAuth, async (req, res) => {
       newArticle.createdAt = new Date().toISOString();
     }
     newArticle.updatedAt = new Date().toISOString();
+    if (newArticle.status === 'published' && !newArticle.publishedAt) {
+      newArticle.publishedAt = new Date().toISOString();
+    }
 
     // Ensure Slug
     if (!newArticle.slug && newArticle.title) {
@@ -689,6 +692,12 @@ app.put('/api/articles/:id', requireAuth, async (req, res) => {
     const articleId = req.params.id;
     const updates = req.body;
     updates.updatedAt = new Date().toISOString();
+    if (updates.status === 'published' && !updates.publishedAt) {
+      const existing = await Article.findOne({ id: articleId });
+      if (existing && existing.status !== 'published') {
+        updates.publishedAt = new Date().toISOString();
+      }
+    }
 
     // Enforce Single Global Hero
     if (updates.isFeaturedDiscover) {
