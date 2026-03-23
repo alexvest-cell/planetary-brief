@@ -16,6 +16,11 @@ interface AdminDashboardProps {
     onBack: () => void;
 }
 
+const toLocalDatetimeInput = (d: Date) => {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     // Authentication State
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -1667,14 +1672,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                                             <input
                                                 type="datetime-local"
                                                 value={formData.scheduledPublishDate
-                                                    ? new Date(formData.scheduledPublishDate).toISOString().slice(0, 16)
+                                                    ? toLocalDatetimeInput(new Date(formData.scheduledPublishDate))
                                                     : ''
                                                 }
                                                 onChange={e => setFormData({
                                                     ...formData,
                                                     scheduledPublishDate: e.target.value ? new Date(e.target.value).toISOString() : undefined
                                                 })}
-                                                min={new Date().toISOString().slice(0, 16)}
+                                                min={toLocalDatetimeInput(new Date())}
                                                 className="bg-black/40 border border-white/10 rounded-lg py-1.5 px-2 text-xs text-white outline-none focus:border-news-accent"
                                             />
                                         </div>
