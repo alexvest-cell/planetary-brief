@@ -19,10 +19,15 @@ interface ArticleViewProps {
 }
 
 const ArticleDataVisual = ({ article }: { article: Article }) => {
+  const [isVerifiedExpanded, setIsVerifiedExpanded] = React.useState(false);
   if (!article.contextBox) return null;
 
+  const sources = article.contextBox.source
+    ? article.contextBox.source.split(';').map(s => s.trim()).filter(s => s)
+    : [];
+
   return (
-    <div className="my-12 -mx-4 md:mx-0 bg-zinc-900/40 border-y md:border border-white/10 md:rounded-xl overflow-hidden relative p-6 md:p-10">
+    <div className="my-8 -mx-4 md:mx-0 bg-zinc-900/40 border-y md:border border-white/10 md:rounded-xl overflow-hidden relative p-4 md:p-6">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
         backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
@@ -31,31 +36,43 @@ const ArticleDataVisual = ({ article }: { article: Article }) => {
       </div>
 
       <div className="relative z-10">
-        <div className="flex items-center gap-2 text-news-accent font-bold uppercase tracking-widest text-[10px] mb-4">
+        <div className="flex items-center gap-2 text-news-accent font-bold uppercase tracking-widest text-[10px] mb-3">
           <BookOpen size={14} className="animate-pulse" />
           <span>Deep Dive Context</span>
         </div>
 
-        <h3 className="text-xl md:text-2xl font-serif font-bold text-white leading-tight mb-4">
+        <h3 className="text-lg md:text-xl font-serif font-bold text-white leading-tight mb-3">
           {article.contextBox.title}
         </h3>
-        <p className="text-gray-300 text-base leading-relaxed border-l-2 border-white/10 pl-4 md:pl-6">
+        <p className="text-gray-300 text-sm leading-relaxed border-l-2 border-white/10 pl-3 md:pl-4">
           {article.contextBox.content}
         </p>
 
-        {article.contextBox.source && (
-          <div className="pt-4 border-t border-white/5 mt-6">
-            <div className="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-3">
-              Verified Data
-            </div>
-            <ul className="grid grid-cols-1 gap-y-1">
-              {article.contextBox.source.split(';').map(s => s.trim()).filter(s => s).map((source, i) => (
-                <li key={i} className="text-[10px] text-gray-400 leading-relaxed flex items-start gap-2">
-                  <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
-                  <span>{source}</span>
-                </li>
-              ))}
-            </ul>
+        {sources.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-white/5">
+            <button
+              onClick={() => setIsVerifiedExpanded(prev => !prev)}
+              className="w-full flex items-center justify-between text-gray-500 hover:text-emerald-400 transition-colors group"
+            >
+              <div className="flex items-center gap-2 font-bold uppercase tracking-widest text-[9px] md:text-[10px]">
+                <Database size={12} className="text-gray-500 group-hover:text-emerald-400 transition-colors" />
+                <span>Verified Data</span>
+              </div>
+              <div className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-500/80 group-hover:text-emerald-400">
+                <span>{isVerifiedExpanded ? 'Hide' : 'Show'}</span>
+                {isVerifiedExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </div>
+            </button>
+            {isVerifiedExpanded && (
+              <ul className="grid grid-cols-1 gap-y-1 mt-3">
+                {sources.map((source, i) => (
+                  <li key={i} className="text-[10px] text-gray-400 leading-relaxed flex items-start gap-2">
+                    <span className="text-emerald-500/60 mt-0.5 flex-shrink-0">•</span>
+                    <span>{source}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </div>
