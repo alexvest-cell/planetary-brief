@@ -655,10 +655,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             // Generate slug from title if not already set
             const slug = formData.slug || generateSlug(formData.title);
 
+            // Auto-set display date on first publish (not when editing)
+            let displayDate = formData.date;
+            if (!editingId) {
+                if (formData.status === 'scheduled' && formData.scheduledPublishDate) {
+                    displayDate = new Date(formData.scheduledPublishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                } else if (formData.status === 'published' || !formData.status) {
+                    displayDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+            }
+
             const payload = {
                 ...formData,
                 slug, // Add slug to article data
                 content: contentArray,
+                date: displayDate,
                 // Parse CSV string to array for backend
                 keywords: seoKeywords.split(',').map(s => s.trim()).filter(Boolean),
                 seoDescription: formData.seoDescription,
