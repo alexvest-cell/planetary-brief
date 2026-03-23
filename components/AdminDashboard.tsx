@@ -661,9 +661,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             // Generate slug from title if not already set
             const slug = formData.slug || generateSlug(formData.title);
 
-            // Auto-set display date on first publish (not when editing)
+            // Auto-set display date on first publish
+            // Fires when: brand new article, OR existing draft/scheduled being published for the first time
+            const existingStatus = editingId ? (articles.find((a: any) => a.id === editingId) as any)?.status : null;
+            const isFirstPublish = !editingId || (existingStatus !== 'published');
             let displayDate = formData.date;
-            if (!editingId) {
+            if (isFirstPublish) {
                 if (formData.status === 'scheduled' && formData.scheduledPublishDate) {
                     displayDate = new Date(formData.scheduledPublishDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 } else if (formData.status === 'published' || !formData.status) {
