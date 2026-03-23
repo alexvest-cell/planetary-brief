@@ -4,7 +4,7 @@ import { Trash2, Edit, Save, Plus, Download, Upload, Calendar, Eye, EyeOff, Spar
 import { generateSlug } from '../utils/slugify';
 import { Article } from '../types';
 import { newsArticles as staticArticles } from '../data/content';
-import { CATEGORIES, CATEGORY_COLORS } from '../data/categories';
+import { CATEGORIES, CATEGORY_COLORS, mapTopicToCategory } from '../data/categories';
 import AdminLogin from './AdminLogin';
 import RedirectManager from './RedirectManager';
 import NewsletterManager from './NewsletterManager';
@@ -407,6 +407,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             // NEW FIELDS (Feb 2026 - Enhanced SEO)
             articleType: (articleType as any) || prev.articleType,
             primaryTopic: primaryTopic || prev.primaryTopic,
+            category: primaryTopic ? [mapTopicToCategory(primaryTopic)] : prev.category,
             secondaryTopics: secondaryTopics.length > 0 ? secondaryTopics : prev.secondaryTopics,
             whyItMatters: whyItMatters || prev.whyItMatters,
             entities: entities.length > 0 ? entities : prev.entities,
