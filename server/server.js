@@ -291,6 +291,11 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ message: 'Logged out successfully' });
 });
 
+// Ping endpoint for keep-alive cron jobs
+app.get('/api/ping', (req, res) => {
+  res.json({ ok: true });
+});
+
 // Verify token endpoint (check if still logged in)
 app.get('/api/auth/verify', (req, res) => {
   const token = req.headers['authorization']?.replace('Bearer ', '');
