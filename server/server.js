@@ -91,8 +91,12 @@ app.get('/robots.txt', (req, res) => {
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Database Connection
+let dbConnectionPromise = null;
+const readLocalArticles = () => [];
+const writeLocalArticles = () => false;
+
 if (MONGODB_URI) {
-  mongoose.connect(MONGODB_URI, {
+  dbConnectionPromise = mongoose.connect(MONGODB_URI, {
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 30000,
     family: 4, // Force IPv4
@@ -103,10 +107,9 @@ if (MONGODB_URI) {
     })
     .catch(err => {
       console.error('MongoDB connection error:', err.message);
-      console.log('⚠️  Server will use local file storage as fallback');
     });
 } else {
-  console.warn('⚠️ MONGODB_URI is not set. Using local file storage.');
+  console.warn('⚠️ MONGODB_URI is not set.');
 }
 
 // Cloudinary Config
@@ -236,6 +239,18 @@ const validTokens = new Set();
 // Global request logger to debug routing issues
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
+// Ensure DB connection is ready before handling API requests (critical for Vercel cold starts)
+app.use('/api', async (req, res, next) => {
+  if (dbConnectionPromise && mongoose.connection.readyState !== 1) {
+    try {
+      await dbConnectionPromise;
+    } catch (err) {
+      return res.status(503).json({ error: 'Database unavailable' });
+    }
+  }
   next();
 });
 
