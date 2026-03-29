@@ -1532,27 +1532,26 @@ app.post('/api/generate-audio', requireAuth, async (req, res) => {
 });
 
 
-// Serve static files from the React app (build directory)
-app.use(express.static(path.join(__dirname, '..', 'dist')));
+if (!process.env.VERCEL) {
+  // Serve static files from the React app (build directory)
+  app.use(express.static(path.join(__dirname, '..', 'dist')));
 
-// SPA fallback: serve index.html for any request that doesn't match API routes or static files
-// We only serve index.html for paths that don't look like files (no extension)
-// to prevent "Soft 404" issues where missing images/scripts return the HTML shell with a 200 OK
-app.use((req, res) => {
-  // If the request has an extension (e.g. .png, .js, .css, .txt), it's a missing asset, so return 404
-  if (path.extname(req.path)) {
-    console.log(`[404] Missing asset: ${ req.path } `);
-    return res.status(404).send('Not Found');
-  }
+  // SPA fallback: serve index.html for any request that doesn't match API routes or static files
+  app.use((req, res) => {
+    if (path.extname(req.path)) {
+      console.log(`[404] Missing asset: ${ req.path } `);
+      return res.status(404).send('Not Found');
+    }
+    res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+  });
 
-  // Otherwise, it's likely a frontend route, so serve index.html
-  res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
-});
+  // Start Server
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+}
 
-// Start Server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+export default app;
 
 // --- AI PROVIDER ROUTING ---
 
